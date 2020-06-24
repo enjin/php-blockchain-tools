@@ -2,62 +2,71 @@
 
 namespace Enjin\BlockchainTools;
 
+use Brick\Math\BigInteger;
 use InvalidArgumentException;
 
 class BigHex
 {
     protected $value;
 
-    static public function create($value) : self
-    {
-        return new BigHex($value);
-    }
-
-    public static function isValid(string $str) : bool
-    {
-        $len = strlen($str);
-        for ($i = 0; $i < $len; $i++) {
-            $c = ord($str[$i]);
-            if (($i != 0 || $c != 45) && ($c < 48 || $c > 57) && ($c < 65 || $c > 70) && ($c < 97 || $c > 102)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Hexadecimal constructor.
-     * @param $value string|int|BigInt|static
+     *
+     * @param $value string|BigInteger|static
      */
     public function __construct($value)
     {
-        if ($value instanceof self) {
-            $value = $value->toStringUnPrefixed();
-        } else if ($value instanceof BigInt) {
-            $value = $value->toHexStr();
-        } else if (is_int($value)) {
-            $value = (new BigInt($value))->toHexStr();
-        } else if (is_string($value)) {
+        if (is_string($value)) {
             $value = HexConverter::unPrefix($value);
+            if (!self::isValidHex($value)) {
+                throw new InvalidArgumentException("BigHex constructor input is not a valid hexadecimal string: \"{$value}\"");
+            }
+        } elseif ($value instanceof self) {
+            $value = $value->toStringUnPrefixed();
+        } elseif ($value instanceof BigInteger) {
+            $value = $value->toBase(16);
         } else {
-            throw new InvalidArgumentException('value provided is not a valid hexadecimal: ' . $value);
-        }
+            $value = $this->valueToErrorString($value);
 
-        if (!is_string($value) || !self::isValid($value)) {
-            throw new InvalidArgumentException('value provided is not a valid hexadecimal string: ' . $value);
+            throw new InvalidArgumentException('BigHex constructor input is not valid: ' . $value);
         }
 
         $this->value = $value;
     }
 
-    public function toBigInt() : BigInt
+    public function __toString()
     {
-        return new BigInt($this->value, 16);
+        return $this->toStringPrefixed();
+    }
+
+    public static function createFromInt($integer) : self
+    {
+        $value = BigInteger::fromBase($integer, 10)->toBase(16);
+
+        return new self($value);
+    }
+
+    public static function create(string $value) : self
+    {
+        return new self($value);
+    }
+
+    public static function isValidHex(string $str) : bool
+    {
+        return ctype_xdigit($str);
+    }
+
+    public function toBigInt() : BigInteger
+    {
+        return BigInteger::fromBase($this->value, 16);
     }
 
     public function toBytes() : array
     {
-        return unpack('C*', hex2bin($this->value));
+        $bin = hex2bin($this->value);
+        $array = unpack('C*', $bin);
+
+        return array_values($array);
     }
 
     public function toStringUnPrefixed() : string
@@ -70,8 +79,28 @@ class BigHex
         return '0x' . $this->value;
     }
 
-    public function __toString()
+    private function valueToErrorString($value)
     {
-        return $this->toStringPrefixed();
+        $normalized = '';
+        if (is_object($value)) {
+            $normalized = get_class($value);
+        } elseif ($value === null) {
+            $normalized = 'null';
+        } elseif (is_bool($value)) {
+            $normalized = $value ? 'true' : 'false';
+        } elseif (is_array($value)) {
+            $normalized = 'Array';
+        } elseif (is_int($value)) {
+            $normalized = (string) $value;
+        } elseif (is_float($value)) {
+            $normalized = (string) $value;
+        }
+
+        $type = gettype($value);
+        if ($type === 'double') {
+            $type = 'float';
+        }
+
+        return $normalized . ' (type: ' . $type . ')';
     }
 }
