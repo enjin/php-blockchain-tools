@@ -49,7 +49,24 @@ class HexConverter
 
     public static function hexToString(string $hex): string
     {
-        return pack('H*', static::unPrefix($hex));
+        return (string) pack('H*', static::unPrefix($hex));
+    }
+
+    public static function intToHex(string $int): string
+    {
+        return BigHex::createFromInt($int)->toStringUnPrefixed();
+    }
+
+    public static function intToHexPrefixed(string $int): string
+    {
+        return '0x' . self::intToHex($int);
+    }
+
+    public static function hexToInt(string $hex): string
+    {
+        $hex = HexConverter::unPrefix($hex);
+
+        return (string) BigInteger::fromBase($hex, 16)->toBase(10);
     }
 
     public static function uint256To128AsHexTop(string $uInt256): string

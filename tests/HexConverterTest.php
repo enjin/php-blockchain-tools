@@ -58,6 +58,20 @@ class HexConverterTest extends TestCase
     }
 
     /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToString
+     */
+    public function testHexToString()
+    {
+        $hex = '746573745f737472696e67';
+        $expected = 'test_string';
+        $str = HexConverter::hexToString($hex);
+        $this->assertEquals($expected, $str);
+
+        $str = HexConverter::hexToString('0x' . $hex);
+        $this->assertEquals($expected, $str);
+    }
+
+    /**
      * @covers \Enjin\BlockchainTools\HexConverter::stringToHex
      * @covers \Enjin\BlockchainTools\HexConverter::hexToString
      */
@@ -66,6 +80,35 @@ class HexConverterTest extends TestCase
         $str = 'lt6X6Nf6sCYX9Aw6JZIl2p4LnrPnaLdu5SuCJ65ex9qqGCLHAoceGlEVF1kgHPi2pvcl32teI2DfNNwe6';
         $encoded = HexConverter::stringToHex($str);
         $this->assertEquals($str, HexConverter::hexToString($encoded));
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexPrefixed
+     */
+    public function testIntToHex()
+    {
+        $int = 882514;
+        $expected = 'd7752';
+
+        $encoded = HexConverter::intToHex($int);
+        $this->assertEquals($expected, $encoded);
+        $this->assertEquals('0x' . $expected, HexConverter::intToHexPrefixed($int));
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToInt
+     */
+    public function testHexToInt()
+    {
+        $hex = 'd7752';
+        $expected = 882514;
+
+        $encoded = HexConverter::hexToInt($hex);
+        $this->assertEquals($expected, $encoded);
+
+        $encoded = HexConverter::hexToInt('0x' . $hex);
+        $this->assertEquals($expected, $encoded);
     }
 
     /**
