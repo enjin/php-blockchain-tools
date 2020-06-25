@@ -52,14 +52,20 @@ class HexConverter
         return (string) pack('H*', static::unPrefix($hex));
     }
 
-    public static function intToHex(string $int): string
+    public static function intToHex(string $int, int $length = null): string
     {
-        return BigHex::createFromInt($int)->toStringUnPrefixed();
+        $hex = BigHex::createFromInt($int)->toStringUnPrefixed();
+
+        if ($length) {
+            $hex = str_pad($hex, $length, '0', STR_PAD_LEFT);
+        }
+
+        return $hex;
     }
 
-    public static function intToHexPrefixed(string $int): string
+    public static function intToHexPrefixed(string $int, int $length = null): string
     {
-        return '0x' . self::intToHex($int);
+        return '0x' . self::intToHex($int, $length);
     }
 
     public static function hexToInt(string $hex): string

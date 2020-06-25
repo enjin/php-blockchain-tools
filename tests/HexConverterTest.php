@@ -91,9 +91,16 @@ class HexConverterTest extends TestCase
         $int = 882514;
         $expected = 'd7752';
 
-        $encoded = HexConverter::intToHex($int);
-        $this->assertEquals($expected, $encoded);
+        $hex = HexConverter::intToHex($int);
+        $this->assertEquals($expected, $hex);
         $this->assertEquals('0x' . $expected, HexConverter::intToHexPrefixed($int));
+
+        $expected = '00000000000d7752';
+        $hex = HexConverter::intToHex($int, 16);
+        $this->assertEquals($expected, $hex);
+
+        $hex = HexConverter::intToHexPrefixed($int, 16);
+        $this->assertEquals('0x' . $expected, $hex);
     }
 
     /**
