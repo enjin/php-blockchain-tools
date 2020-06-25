@@ -51,7 +51,7 @@ class BigHexTest extends TestCase
         $this->assertBigHexValues($bigHex, $hex, $number);
     }
 
-    public function testBytesSymetry()
+    public function testBytesSymmetry()
     {
         $hex = '1a2b3c4d5e6f';
 
