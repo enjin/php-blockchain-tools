@@ -43,29 +43,29 @@ class HexConverterTest extends TestCase
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::encodeString
-     * @covers \Enjin\BlockchainTools\HexConverter::encodeStringPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::stringToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::stringToHexPrefixed
      */
-    public function testEncodeString()
+    public function testStringToHex()
     {
         $str = 'lt6X6Nf6sCYX9Aw6JZIl2p4LnrPnaLdu5SuCJ65ex9qqGCLHAoceGlEVF1kgHPi2pvcl32teI2DfNNwe6';
 
         $expected = '6c743658364e663673435958394177364a5a496c3270344c6e72506e614c6475355375434a3635657839717147434c48416f6365476c455646316b67485069327076636c33327465493244664e4e77653600000000000000000000000000000000';
 
-        $encoded = HexConverter::encodeString($str, 97);
+        $encoded = HexConverter::stringToHex($str, 97);
         $this->assertEquals($expected, $encoded);
-        $this->assertEquals('0x' . $expected, HexConverter::encodeStringPrefixed($str, 97));
+        $this->assertEquals('0x' . $expected, HexConverter::stringToHexPrefixed($str, 97));
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::encodeString
-     * @covers \Enjin\BlockchainTools\HexConverter::decodeString
+     * @covers \Enjin\BlockchainTools\HexConverter::stringToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToString
      */
-    public function testEncodeAndDecodeString()
+    public function testStringToHexAndHexToString()
     {
         $str = 'lt6X6Nf6sCYX9Aw6JZIl2p4LnrPnaLdu5SuCJ65ex9qqGCLHAoceGlEVF1kgHPi2pvcl32teI2DfNNwe6';
-        $encoded = HexConverter::encodeString($str);
-        $this->assertEquals($str, HexConverter::decodeString($encoded));
+        $encoded = HexConverter::stringToHex($str);
+        $this->assertEquals($str, HexConverter::hexToString($encoded));
     }
 
     /**

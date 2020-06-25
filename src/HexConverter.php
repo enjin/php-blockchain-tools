@@ -29,7 +29,7 @@ class HexConverter
         return substr($value, 0, 2) == '0x';
     }
 
-    public static function encodeString(string $string, int $length = null): string
+    public static function stringToHex(string $string, int $length = null): string
     {
         $hex = implode('', unpack('H*', $string));
 
@@ -42,12 +42,12 @@ class HexConverter
         return str_pad($hex, $padLength, '0');
     }
 
-    public static function encodeStringPrefixed(string $string, int $length = null): string
+    public static function stringToHexPrefixed(string $string, int $length = null): string
     {
-        return '0x' . static::encodeString($string, $length);
+        return '0x' . static::stringToHex($string, $length);
     }
 
-    public static function decodeString(string $hex): string
+    public static function hexToString(string $hex): string
     {
         return pack('H*', static::unPrefix($hex));
     }
