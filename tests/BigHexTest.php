@@ -118,10 +118,10 @@ class BigHexTest extends TestCase
         }
     }
 
-    private function assertBigHexValues(BigHex $bigHex, string $hex, string $number) : void
+    private function assertBigHexValues(BigHex $bigHex, string $hex, string $number): void
     {
         $this->assertEquals('0x' . $hex, $bigHex->toStringPrefixed());
-        $this->assertEquals('0x' . $hex, (string) $bigHex);
+        $this->assertEquals($hex, (string) $bigHex);
         $this->assertEquals($hex, $bigHex->toStringUnPrefixed());
 
         $bigInt = $bigHex->toBigInt();

@@ -14,8 +14,8 @@ class HexConverterTest extends TestCase
     {
         $str = $this->faker()->regexify('[A-Za-z0-9]{20}');
 
-        $this->assertEquals(true, HexConverter::hasPrefix('0x' . $str));
-        $this->assertEquals(false, HexConverter::hasPrefix($str));
+        $this->assertTrue(HexConverter::hasPrefix('0x' . $str));
+        $this->assertFalse(HexConverter::hasPrefix($str));
     }
 
     /**
@@ -68,7 +68,6 @@ class HexConverterTest extends TestCase
         $this->assertEquals($str, HexConverter::decodeString($encoded));
     }
 
-
     /**
      * @covers \Enjin\BlockchainTools\HexConverter::uInt256ToHex
      * @covers \Enjin\BlockchainTools\HexConverter::uInt256ToHexPrefixed
@@ -79,7 +78,6 @@ class HexConverterTest extends TestCase
         $encoded = HexConverter::uInt256ToHex($uInt256);
         $expected = 'f02d2a04c330c8fb6de7ab9653b7b4b3fcd771cfddf6a67e3493a50c59ff80fb8';
         $this->assertEquals($expected, $encoded);
-
 
         $uInt256 = '0173815810847426045236197493370151523';
         $encoded = HexConverter::uInt256ToHex($uInt256);

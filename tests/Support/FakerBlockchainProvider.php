@@ -35,6 +35,7 @@ class FakerBlockchainProvider extends Base
             $number = str_pad($number, $chunkLength, 0, STR_PAD_LEFT);
             $output .= $number;
         }
+
         return $output;
     }
 }

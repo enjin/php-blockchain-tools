@@ -79,6 +79,7 @@ class HexConverter
     public static function uInt256ToHex(string $uInt256): string
     {
         $hex = BigInteger::fromBase($uInt256, 10)->toBase(16);
+
         return str_pad($hex, 64, '0', STR_PAD_LEFT);
     }
 

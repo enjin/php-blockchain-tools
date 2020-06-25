@@ -36,7 +36,7 @@ class BigHex
 
     public function __toString()
     {
-        return $this->toStringPrefixed();
+        return $this->toStringUnPrefixed();
     }
 
     public static function createFromInt($integer) : self
