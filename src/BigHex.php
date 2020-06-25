@@ -46,6 +46,15 @@ class BigHex
         return new self($value);
     }
 
+    public static function createFromBytes(array $bytes) : string
+    {
+        $bytes = array_pad($bytes, -64 / 2, 0);
+        $bytes = array_map('chr', $bytes);
+        $bytes = implode('', $bytes);
+
+        return new self(bin2hex($bytes));
+    }
+
     public static function create(string $value) : self
     {
         return new self($value);
