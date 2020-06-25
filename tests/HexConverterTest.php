@@ -8,14 +8,14 @@ use Tests\TestCase;
 class HexConverterTest extends TestCase
 {
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::strHasPrefix
+     * @covers \Enjin\BlockchainTools\HexConverter::hasPrefix
      */
     public function testStrHasPrefix()
     {
         $str = $this->faker()->regexify('[A-Za-z0-9]{20}');
 
-        $this->assertEquals(true, HexConverter::strHasPrefix('0x' . $str));
-        $this->assertEquals(false, HexConverter::strHasPrefix($str));
+        $this->assertEquals(true, HexConverter::hasPrefix('0x' . $str));
+        $this->assertEquals(false, HexConverter::hasPrefix($str));
     }
 
     /**

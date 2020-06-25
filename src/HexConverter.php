@@ -2,11 +2,13 @@
 
 namespace Enjin\BlockchainTools;
 
+use Brick\Math\BigInteger;
+
 class HexConverter
 {
     public static function prefix(string $value): string
     {
-        if (!self::strHasPrefix($value)) {
+        if (!self::hasPrefix($value)) {
             $value = '0x' . $value;
         }
 
@@ -15,14 +17,14 @@ class HexConverter
 
     public static function unPrefix(string $value): string
     {
-        if (self::strHasPrefix($value)) {
+        if (self::hasPrefix($value)) {
             $value = substr($value, 2);
         }
 
         return $value;
     }
 
-    public static function strHasPrefix(string $value): bool
+    public static function hasPrefix(string $value): bool
     {
         return substr($value, 0, 2) == '0x';
     }
@@ -48,5 +50,27 @@ class HexConverter
     public static function decodeString(string $hex): string
     {
         return pack('H*', static::unPrefix($hex));
+    }
+
+    public static function uint256To128AsHexTop(string $uInt256) : string
+    {
+        $hex = self::uInt256ToHex($uInt256);
+
+        return substr($hex, 0, 16);
+    }
+
+    public static function uint256To128AsHexBottom(string $uInt256) : string
+    {
+        $hex = self::uInt256ToHex($uInt256);
+
+        return substr($hex, 48);
+    }
+
+
+    public static function uInt256ToHex(string $uInt256) : string
+    {
+        $hex = BigInteger::fromBase($uInt256, 10)->toBase(16);
+        $hex = str_pad($hex, 64, '0', STR_PAD_LEFT);
+        return $hex;
     }
 }
