@@ -31,8 +31,8 @@ class FakerBlockchainProvider extends Base
         $output = '';
         foreach ($chunks as $chunk) {
             $number = $this->generator->numberBetween($min, $chunk);
-
-            $number = str_pad($number, $chunkSize, 0, STR_PAD_LEFT);
+            $chunkLength = strlen($chunk);
+            $number = str_pad($number, $chunkLength, 0, STR_PAD_LEFT);
             $output .= $number;
         }
         return $output;
