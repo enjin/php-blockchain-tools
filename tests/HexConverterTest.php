@@ -79,9 +79,9 @@ class HexConverterTest extends TestCase
         $expected = 'f02d2a04c330c8fb6de7ab9653b7b4b3fcd771cfddf6a67e3493a50c59ff80fb8';
         $this->assertEquals($expected, $encoded);
 
-        $uInt256 = '0173815810847426045236197493370151523';
+        $uInt256 = '038706080339854479600326417178207427887749730641288511036';
         $encoded = HexConverter::uInt256ToHex($uInt256);
-        $expected = '00000000000000000000000000000000002179c7f7582cd1493c26a8cafe6263';
+        $expected = '000000000000000001941c3edf88aca7587e41aa684965927079ec5bd6963e3c';
         $this->assertEquals($expected, $encoded);
 
         $encoded = HexConverter::uInt256ToHexPrefixed($uInt256);
@@ -94,8 +94,8 @@ class HexConverterTest extends TestCase
      */
     public function testUint256To128AsHexTop()
     {
-        $uInt256 = '01738158108474260452361974933701515230734836882550540189496323730524147000283064';
-        $expected = 'f02d2a04c330c8fb';
+        $uInt256 = '081927672940934803029854760644693165040200904336594723727925923706809402054567';
+        $expected = 'b5216b6bd7192d67';
 
         $encoded = HexConverter::uint256To128AsHexTop($uInt256);
         $this->assertEquals($expected, $encoded);
@@ -110,8 +110,8 @@ class HexConverterTest extends TestCase
      */
     public function testUint256To128AsHexBottom()
     {
-        $uInt256 = '01738158108474260452361974933701515230734836882550540189496323730524147000283064';
-        $expected = '3493a50c59ff80fb8';
+        $uInt256 = '054148363319296431240571427963542866010049542420325057378565843002662371236805';
+        $expected = '94721fe8044c9bc5';
 
         $encoded = HexConverter::uint256To128AsHexBottom($uInt256);
         $this->assertEquals($expected, $encoded);
