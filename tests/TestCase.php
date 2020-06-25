@@ -8,7 +8,7 @@ use Tests\Support\FakerBlockchainProvider;
 
 class TestCase extends BaseTestCase
 {
-    static private $faker;
+    private static $faker;
 
     protected function faker()
     {
