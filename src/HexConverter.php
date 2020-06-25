@@ -2,9 +2,11 @@
 
 namespace Enjin\BlockchainTools;
 
+use Brick\Math\BigInteger;
+
 class HexConverter
 {
-    static public function prefix(string $value)
+    public static function prefix(string $value)
     {
         if (!self::strHasPrefix($value)) {
             $value = '0x' . $value;
@@ -13,7 +15,7 @@ class HexConverter
         return $value;
     }
 
-    static public function unPrefix(string $value)
+    public static function unPrefix(string $value)
     {
         if (self::strHasPrefix($value)) {
             $value = substr($value, 2);
