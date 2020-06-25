@@ -8,6 +8,9 @@ use InvalidArgumentException;
 use stdClass;
 use Tests\TestCase;
 
+/**
+ * @covers \Enjin\BlockchainTools\BigHex
+ */
 class BigHexTest extends TestCase
 {
     public function testCreateFromString()
@@ -15,6 +18,26 @@ class BigHexTest extends TestCase
         $number = (string) random_int(0, 100000);
         $hex = dechex($number);
         $bigHex = new BigHex($hex);
+
+        $this->assertBigHexValues($bigHex, $hex, $number);
+    }
+
+    public function testCreateFromSelf()
+    {
+        $number = (string) random_int(0, 100000);
+        $hex = dechex($number);
+        $bigHex = new BigHex($hex);
+        $bigHex2 = new BigHex($bigHex);
+
+        $this->assertBigHexValues($bigHex2, $hex, $number);
+    }
+
+    public function testCreateFromBigInteger()
+    {
+        $number = (string) random_int(0, 100000);
+        $bigInt = BigInteger::fromBase($number, 10);
+        $hex = $bigInt->toBase(16);
+        $bigHex = new BigHex($bigInt);
 
         $this->assertBigHexValues($bigHex, $hex, $number);
     }
@@ -28,13 +51,13 @@ class BigHexTest extends TestCase
         $this->assertBigHexValues($bigHex, $hex, $number);
     }
 
-    public function testToBytes()
+    public function testBytesSymetry()
     {
         $hex = '1a2b3c4d5e6f';
 
         $bigHex = BigHex::create($hex);
 
-        $expected = [
+        $bytes = [
             26,
             43,
             60,
@@ -43,7 +66,11 @@ class BigHexTest extends TestCase
             111,
         ];
 
-        $this->assertEquals($expected, $bigHex->toBytes());
+        $this->assertEquals($bytes, $bigHex->toBytes());
+
+        $bigHex2 = BigHex::createFromBytes($bytes);
+
+        $this->assertEquals($hex, $bigHex2->toStringUnPrefixed());
     }
 
     public function testCreateFromInvalid()

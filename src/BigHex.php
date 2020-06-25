@@ -46,9 +46,8 @@ class BigHex
         return new self($value);
     }
 
-    public static function createFromBytes(array $bytes) : string
+    public static function createFromBytes(array $bytes) : self
     {
-        $bytes = array_pad($bytes, -64 / 2, 0);
         $bytes = array_map('chr', $bytes);
         $bytes = implode('', $bytes);
 
