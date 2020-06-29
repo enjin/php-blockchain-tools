@@ -2,9 +2,9 @@
 
 namespace Tests\Support;
 
-use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEventInput;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionInput;
 
 trait HasContractTestHelpers
@@ -35,15 +35,19 @@ trait HasContractTestHelpers
         $this->assertEquals($json['constant'], $function->constant(), $functionMessage . 'assert contract function constant');
 
         if (array_key_exists('inputs', $json)) {
-            $functionInputs = $function->inputs();
+            $jsonInputsByName = [];
 
             foreach ($json['inputs'] as $inputJson) {
                 $inputName = $inputJson['name'];
+                $jsonInputsByName[$inputName] = $inputJson;
                 $functionInput = $function->input($inputName);
                 $this->assertContractFunctionInput($functionInput, $inputJson, $message);
             }
 
-
+            foreach ($function->inputs() as $functionInput) {
+                $inputJson = $jsonInputsByName[$functionInput->name()];
+                $this->assertContractFunctionInput($functionInput, $inputJson, $message);
+            }
         }
     }
 
@@ -88,9 +92,18 @@ trait HasContractTestHelpers
         $this->assertEquals($json['anonymous'], $event->anonymous(), $eventMessage . 'assert contract event anonymous');
 
         if (array_key_exists('inputs', $json)) {
+
+            $jsonInputsByName = [];
+
             foreach ($json['inputs'] as $inputJson) {
                 $inputName = $inputJson['name'];
+                $jsonInputsByName[$inputName]= $inputJson;
                 $eventInput = $event->input($inputName);
+                $this->assertContractEventInput($eventInput, $inputJson, $message);
+            }
+
+            foreach ($event->inputs() as $eventInput) {
+                $inputJson = $jsonInputsByName[$eventInput->name()];
                 $this->assertContractEventInput($eventInput, $inputJson, $message);
             }
         }

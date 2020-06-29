@@ -50,7 +50,9 @@ class ContractEvent
 
     public function inputs(): array
     {
-        return $this->inputs;
+        return array_map(function (array $input) {
+            return new ContractEventInput($input);
+        }, $this->inputs);
     }
 
     public function anonymous(): bool

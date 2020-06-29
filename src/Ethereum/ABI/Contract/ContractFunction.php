@@ -89,7 +89,9 @@ class ContractFunction
 
     public function inputs(): array
     {
-        return $this->inputs;
+        return array_map(function (array $input) {
+            return new ContractFunctionInput($input);
+        }, $this->inputs);
     }
 
     public function outputs(): array
