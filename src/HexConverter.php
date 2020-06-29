@@ -70,7 +70,7 @@ class HexConverter
 
     public static function hexToInt(string $hex): string
     {
-        $hex = HexConverter::unPrefix($hex);
+        $hex = self::unPrefix($hex);
 
         return (string) BigInteger::fromBase($hex, 16)->toBase(10);
     }
@@ -109,5 +109,20 @@ class HexConverter
     public static function uInt256ToHexPrefixed(string $uInt256): string
     {
         return '0x' . self::uInt256ToHex($uInt256);
+    }
+
+    public static function hexToBytes(string $hex): array
+    {
+        return BigHex::create($hex)->toBytes();
+    }
+
+    public static function bytesToHex(array $bytes): string
+    {
+        return BigHex::createFromBytes($bytes)->toStringUnPrefixed();
+    }
+
+    public static function bytesToHexPrefixed(array $bytes): string
+    {
+        return '0x' . static::bytesToHexPrefixed($bytes);
     }
 }

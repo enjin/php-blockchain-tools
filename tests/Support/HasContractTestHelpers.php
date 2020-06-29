@@ -92,12 +92,11 @@ trait HasContractTestHelpers
         $this->assertEquals($json['anonymous'], $event->anonymous(), $eventMessage . 'assert contract event anonymous');
 
         if (array_key_exists('inputs', $json)) {
-
             $jsonInputsByName = [];
 
             foreach ($json['inputs'] as $inputJson) {
                 $inputName = $inputJson['name'];
-                $jsonInputsByName[$inputName]= $inputJson;
+                $jsonInputsByName[$inputName] = $inputJson;
                 $eventInput = $event->input($inputName);
                 $this->assertContractEventInput($eventInput, $inputJson, $message);
             }

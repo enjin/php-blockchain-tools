@@ -12,9 +12,9 @@ class EthUint256
     public const MIN_ENCODED_VALUE = '0x0';
     public const MAX_ENCODED_VALUE = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-    public static function encode(string $uInt32)
+    public static function encode(string $uInt256)
     {
-        return HexConverter::intToHexPrefixed($uInt32, 64);
+        return HexConverter::intToHexPrefixed($uInt256, 64);
     }
 
     public static function decode(string $hex)

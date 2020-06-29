@@ -44,7 +44,7 @@ class Contract
             $type = $item['type'];
             if ($type === 'function') {
                 $this->functions[$name] = $item;
-            } else if ($type === 'event') {
+            } elseif ($type === 'event') {
                 $this->events[$name] = $item;
             }
         }
@@ -71,7 +71,7 @@ class Contract
         return $functions;
     }
 
-    public function function (string $name): ContractFunction
+    public function function(string $name): ContractFunction
     {
         if (!array_key_exists($name, $this->functions)) {
             throw new InvalidArgumentException('invalid method name input: ' . $name . ' for Contract: ' . $this->name());
@@ -96,6 +96,7 @@ class Contract
         if (!array_key_exists($name, $this->events)) {
             throw new InvalidArgumentException('invalid event name input: ' . $name . ' for Contract: ' . $this->name());
         }
+
         return new ContractEvent($this->events[$name]);
     }
 }
