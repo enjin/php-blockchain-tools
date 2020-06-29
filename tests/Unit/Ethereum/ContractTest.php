@@ -15,24 +15,21 @@ class ContractTest extends TestCase
     {
         $name = $this->faker()->name;
         $address = $this->faker()->ethAddress;
-        $version = '1.1';
         $json = [];
 
-        $contract = new Contract($name, $address, $version, $json);
+        $contract = new Contract($name, $address, $json);
 
         $this->assertEquals($name, $contract->name());
         $this->assertEquals($address, $contract->address());
-        $this->assertEquals($version, $contract->version());
     }
 
     public function testInvalidFunction()
     {
         $name = $this->faker()->name;
         $address = $this->faker()->ethAddress;
-        $version = '1.1';
         $json = [];
 
-        $contract = new Contract($name, $address, $version, $json);
+        $contract = new Contract($name, $address, $json);
 
         $this->expectException(InvalidArgumentException::class);
         $contract->function('invalid_function');
@@ -42,10 +39,9 @@ class ContractTest extends TestCase
     {
         $name = $this->faker()->name;
         $address = $this->faker()->ethAddress;
-        $version = '1.1';
         $json = [];
 
-        $contract = new Contract($name, $address, $version, $json);
+        $contract = new Contract($name, $address, $json);
 
         $this->expectException(InvalidArgumentException::class);
         $contract->event('invalid_event');
@@ -55,7 +51,6 @@ class ContractTest extends TestCase
     {
         $name = $this->faker()->name;
         $address = $this->faker()->ethAddress;
-        $version = '1.1';
 
         $json = [
             $this->makeContractEventJson([
@@ -68,7 +63,7 @@ class ContractTest extends TestCase
             ]),
         ];
 
-        $contract = new Contract($name, $address, $version, $json);
+        $contract = new Contract($name, $address, $json);
 
         $this->assertCount(2, $contract->events());
 
@@ -83,7 +78,6 @@ class ContractTest extends TestCase
     {
         $name = $this->faker()->name;
         $address = $this->faker()->ethAddress;
-        $version = '1.1';
 
         $json = [
             $this->makeContractFunctionJson([
@@ -96,7 +90,7 @@ class ContractTest extends TestCase
             ]),
         ];
 
-        $contract = new Contract($name, $address, $version, $json);
+        $contract = new Contract($name, $address, $json);
 
         $this->assertCount(2, $contract->functions());
 

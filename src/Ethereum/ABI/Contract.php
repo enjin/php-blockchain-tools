@@ -19,11 +19,6 @@ class Contract
     protected $address;
 
     /**
-     * @var string
-     */
-    protected $version;
-
-    /**
      * @var array
      */
     protected $json;
@@ -38,11 +33,10 @@ class Contract
      */
     protected $events = [];
 
-    public function __construct(string $name, string $address, string $version, array $json)
+    public function __construct(string $name, string $address, array $json)
     {
         $this->name = $name;
         $this->address = $address;
-        $this->version = $version;
         $this->json = $json;
 
         foreach ($json as $item) {
@@ -64,11 +58,6 @@ class Contract
     public function address(): string
     {
         return $this->address;
-    }
-
-    public function version(): string
-    {
-        return $this->version;
     }
 
     public function functions(): array
