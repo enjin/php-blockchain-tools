@@ -2,6 +2,8 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use InvalidArgumentException;
 
 class Contract

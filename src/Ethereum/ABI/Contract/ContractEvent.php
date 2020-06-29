@@ -1,6 +1,6 @@
 <?php
 
-namespace Enjin\BlockchainTools\Ethereum\ABI;
+namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
 use InvalidArgumentException;
 

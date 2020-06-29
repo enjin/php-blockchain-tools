@@ -2,10 +2,10 @@
 
 namespace Tests\Support;
 
-use Enjin\BlockchainTools\Ethereum\ABI\ContractEvent;
-use Enjin\BlockchainTools\Ethereum\ABI\ContractEventInput;
-use Enjin\BlockchainTools\Ethereum\ABI\ContractFunction;
-use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionInput;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEventInput;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionInput;
 
 trait HasContractTestHelpers
 {
