@@ -276,10 +276,9 @@ class DataTypeParserTest extends TestCase
             'length' => 'dynamic',
             'isArray' => false,
         ];
-        dump('a');
+
         $this->assertDataTypeValues($type, $expected);
 
-        dump('b');
         $type = 'bytes[]';
         $expected = [
             'rawType' => 'bytes[]',
