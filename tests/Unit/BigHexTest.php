@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use Brick\Math\BigInteger;
 use Enjin\BlockchainTools\BigHex;
-use InvalidArgumentException;
 use stdClass;
 use Tests\TestCase;
 
@@ -75,47 +74,53 @@ class BigHexTest extends TestCase
 
     public function testCreateFromInvalid()
     {
-        $value = 'invalid_string';
         $message = 'BigHex constructor input is not a valid hexadecimal string: "invalid_string"';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = null;
-        $message = 'BigHex constructor input is not valid: null (type: NULL)';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = new stdClass();
-        $message = 'BigHex constructor input is not valid: stdClass (type: object)';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = true;
-        $message = 'BigHex constructor input is not valid: true (type: boolean)';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = false;
-        $message = 'BigHex constructor input is not valid: false (type: boolean)';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = [];
-        $message = 'BigHex constructor input is not valid: Array (type: array)';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = 999;
-        $message = 'BigHex constructor input is not valid: 999 (type: integer)';
-        $this->assertInvalidArgumentException($value, $message);
-
-        $value = 1.23;
-        $message = 'BigHex constructor input is not valid: 1.23 (type: float)';
-        $this->assertInvalidArgumentException($value, $message);
-    }
-
-    private function assertInvalidArgumentException($value, string $message)
-    {
-        try {
+        $this->assertInvalidArgumentException($message, function () {
+            $value = 'invalid_string';
             new BigHex($value);
-            $this->fail('failed to throw expected exception: InvalidArgumentException, with message' . $message);
-        } catch (InvalidArgumentException $e) {
-            $this->assertEquals($message, $e->getMessage());
-        }
+        });
+
+        $message = 'BigHex constructor input is not valid: null (type: NULL)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = null;
+            new BigHex($value);
+        });
+
+        $message = 'BigHex constructor input is not valid: stdClass (type: object)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = new stdClass();
+            new BigHex($value);
+        });
+
+        $message = 'BigHex constructor input is not valid: true (type: boolean)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = true;
+            new BigHex($value);
+        });
+
+        $message = 'BigHex constructor input is not valid: false (type: boolean)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = false;
+            new BigHex($value);
+        });
+
+        $message = 'BigHex constructor input is not valid: Array (type: array)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = [];
+            new BigHex($value);
+        });
+
+        $message = 'BigHex constructor input is not valid: 999 (type: integer)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = 999;
+            new BigHex($value);
+        });
+
+        $message = 'BigHex constructor input is not valid: 1.23 (type: float)';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = 1.23;
+            new BigHex($value);
+        });
     }
 
     private function assertBigHexValues(BigHex $bigHex, string $hex, string $number): void
