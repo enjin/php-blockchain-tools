@@ -75,42 +75,6 @@ class HexConverter
         return (string) BigInteger::fromBase($hex, 16)->toBase(10);
     }
 
-    public static function uint256To128AsHexTop(string $uInt256): string
-    {
-        $hex = self::uInt256ToHex($uInt256);
-
-        return substr($hex, 0, 16);
-    }
-
-    public static function uint256To128AsHexTopPrefixed(string $uInt256): string
-    {
-        return '0x' . self::uint256To128AsHexTop($uInt256);
-    }
-
-    public static function uint256To128AsHexBottom(string $uInt256): string
-    {
-        $hex = self::uInt256ToHex($uInt256);
-
-        return substr($hex, 48);
-    }
-
-    public static function uint256To128AsHexBottomPrefixed(string $uInt256): string
-    {
-        return '0x' . self::uint256To128AsHexBottom($uInt256);
-    }
-
-    public static function uInt256ToHex(string $uInt256): string
-    {
-        $hex = BigInteger::fromBase($uInt256, 10)->toBase(16);
-
-        return str_pad($hex, 64, '0', STR_PAD_LEFT);
-    }
-
-    public static function uInt256ToHexPrefixed(string $uInt256): string
-    {
-        return '0x' . self::uInt256ToHex($uInt256);
-    }
-
     public static function hexToBytes(string $hex): array
     {
         return BigHex::create($hex)->toBytes();

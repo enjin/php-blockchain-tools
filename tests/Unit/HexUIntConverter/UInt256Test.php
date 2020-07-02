@@ -128,4 +128,28 @@ class UInt256Test extends TestCase
         $actual = (new UInt256($value))->toUInt64Bottom();
         $this->assertEquals($expected, $actual);
     }
+
+    public function test256To128Top()
+    {
+        $value = str_pad('12345678123456781234567812345678', 64, '0', STR_PAD_RIGHT);
+        $expected = '0x12345678123456781234567812345678';
+
+        $actual = HexUIntConverter::fromUInt256($value)->toUInt128Top();
+        $this->assertEquals($expected, $actual);
+
+        $actual = (new UInt256($value))->toUInt128Top();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test256To128Bottom()
+    {
+        $value = str_pad('1234567890abcdef1234567890abcdef', 64, '0', STR_PAD_LEFT);
+        $expected = '0x1234567890abcdef1234567890abcdef';
+
+        $actual = HexUIntConverter::fromUInt256($value)->toUInt128Bottom();
+        $this->assertEquals($expected, $actual);
+
+        $actual = (new UInt256($value))->toUInt128Bottom();
+        $this->assertEquals($expected, $actual);
+    }
 }
