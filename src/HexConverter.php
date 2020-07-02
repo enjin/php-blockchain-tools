@@ -87,6 +87,6 @@ class HexConverter
 
     public static function bytesToHexPrefixed(array $bytes): string
     {
-        return '0x' . static::bytesToHexPrefixed($bytes);
+        return '0x' . static::bytesToHex($bytes);
     }
 }

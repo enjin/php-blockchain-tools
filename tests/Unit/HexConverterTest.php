@@ -111,10 +111,49 @@ class HexConverterTest extends TestCase
         $hex = 'd7752';
         $expected = 882514;
 
-        $encoded = HexConverter::hexToInt($hex);
-        $this->assertEquals($expected, $encoded);
+        $int = HexConverter::hexToInt($hex);
+        $this->assertEquals($expected, $int);
 
-        $encoded = HexConverter::hexToInt('0x' . $hex);
-        $this->assertEquals($expected, $encoded);
+        $int = HexConverter::hexToInt('0x' . $hex);
+        $this->assertEquals($expected, $int);
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToBytes
+     */
+    public function testHexToBytes()
+    {
+        $hex = 'd77522';
+        $expected = [
+            215,
+            117,
+            34,
+        ];
+
+        $bytes = HexConverter::hexToBytes($hex);
+        $this->assertEquals($expected, $bytes);
+
+        $bytes = HexConverter::hexToBytes('0x' . $hex);
+        $this->assertEquals($expected, $bytes);
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::bytesToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::bytesToHexPrefixed
+     */
+    public function testBytesToHex()
+    {
+        $expected = 'd77522';
+        $bytes = [
+            215,
+            117,
+            34,
+        ];
+
+        $hex = HexConverter::bytesToHex($bytes);
+        $this->assertEquals($expected, $hex);
+
+        $hex = HexConverter::bytesToHexPrefixed($bytes);
+        $this->assertEquals('0x'.$expected, $hex);
     }
 }
