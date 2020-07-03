@@ -29,10 +29,14 @@ trait HasContractTestHelpers
         if ($message) {
             $functionMessage = ', ' . $message;
         }
+        $stateMutability = $json['stateMutability'];
+        $payable = $stateMutability === 'payable';
+        $constant = in_array($stateMutability, ['pure', 'view']);
         $this->assertEquals($json['name'], $function->name(), $functionMessage . 'assert contract function name');
-        $this->assertEquals($json['stateMutability'], $function->stateMutability(), $functionMessage . 'assert contract function stateMutability');
-        $this->assertEquals($json['payable'], $function->payable(), $functionMessage . 'assert contract function payable');
-        $this->assertEquals($json['constant'], $function->constant(), $functionMessage . 'assert contract function constant');
+        $this->assertEquals($stateMutability, $function->stateMutability(), $functionMessage . 'assert contract function stateMutability');
+        $this->assertEquals($payable, $function->payable(), $functionMessage . 'assert contract function payable');
+
+        $this->assertEquals($constant, $function->constant(), $functionMessage . 'assert contract function constant');
 
         if (array_key_exists('inputs', $json)) {
             $jsonInputsByName = [];

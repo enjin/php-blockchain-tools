@@ -2,6 +2,8 @@
 
 namespace Tests\Support;
 
+use Enjin\BlockchainTools\HexIntConverter\UInt128;
+use Enjin\BlockchainTools\HexIntConverter\UInt256;
 use Faker\Provider\Base;
 
 class FakerBlockchainProvider extends Base
@@ -16,9 +18,16 @@ class FakerBlockchainProvider extends Base
         return $this->generator->regexify('0x[0-9A-Fa-f]{40}');
     }
 
+    public function uint128()
+    {
+        $max = UInt128::MAX_VALUE;
+
+        return $this->bigNumberBetween(0, $max);
+    }
+
     public function uint256()
     {
-        $max = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+        $max = UInt256::MAX_VALUE;
 
         return $this->bigNumberBetween(0, $max);
     }

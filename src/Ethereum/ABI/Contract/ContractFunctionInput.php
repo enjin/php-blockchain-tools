@@ -2,6 +2,9 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
+use Enjin\BlockchainTools\Ethereum\ABI\DataType;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypeParser;
+
 class ContractFunctionInput
 {
     /**
@@ -39,5 +42,10 @@ class ContractFunctionInput
     public function components(): array
     {
         return $this->components;
+    }
+
+    public function dataType(): DataType
+    {
+        return (new DataTypeParser())->parse($this->type());
     }
 }
