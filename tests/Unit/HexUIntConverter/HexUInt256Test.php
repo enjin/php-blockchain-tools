@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\HexUIntConverter;
 
-use Enjin\BlockchainTools\HexIntConverter\HexUInt128;
 use Enjin\BlockchainTools\HexIntConverter\HexUInt256;
 use Enjin\BlockchainTools\HexUIntConverter;
 use Tests\TestCase;

@@ -214,6 +214,7 @@ class HexConverterTest extends TestCase
         $hex = HexConverter::bytesToHexPrefixed($bytes);
         $this->assertEquals('0x' . $expected, $hex);
     }
+
     //
     // public function testBigIntegerToHex()
     // {
