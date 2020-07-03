@@ -2,32 +2,32 @@
 
 namespace Tests\Unit\HexUIntConverter;
 
-use Enjin\BlockchainTools\HexIntConverter\UInt8;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt8;
 use Enjin\BlockchainTools\HexUIntConverter;
 use Tests\TestCase;
 
-class UInt8Test extends TestCase
+class HexUInt8Test extends TestCase
 {
     public function testInvalidLength()
     {
         $value = '1';
-        $expectedMessage = 'UInt8 value provided is invalid. Expected 2 characters but has: 1 (input value: 1)';
+        $expectedMessage = 'HexUInt8 value provided is invalid. Expected 2 characters but has: 1 (input value: 1)';
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
             HexUIntConverter::fromUInt8($value);
         });
 
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
-            new UInt8($value);
+            new HexUInt8($value);
         });
 
         $value = '123';
-        $expectedMessage = 'UInt8 value provided is invalid. Expected 2 characters but has: 3 (input value: 123)';
+        $expectedMessage = 'HexUInt8 value provided is invalid. Expected 2 characters but has: 3 (input value: 123)';
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
             HexUIntConverter::fromUInt8($value);
         });
 
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
-            new UInt8($value);
+            new HexUInt8($value);
         });
     }
 
@@ -39,7 +39,7 @@ class UInt8Test extends TestCase
         $actual = HexUIntConverter::fromUInt8($value)->toUInt16();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt8($value))->toUInt16();
+        $actual = (new HexUInt8($value))->toUInt16();
         $this->assertEquals($expected, $actual);
     }
 
@@ -51,7 +51,7 @@ class UInt8Test extends TestCase
         $actual = HexUIntConverter::fromUInt8($value)->toUInt32();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt8($value))->toUInt32();
+        $actual = (new HexUInt8($value))->toUInt32();
         $this->assertEquals($expected, $actual);
     }
 
@@ -63,7 +63,7 @@ class UInt8Test extends TestCase
         $actual = HexUIntConverter::fromUInt8($value)->toUInt64();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt8($value))->toUInt64();
+        $actual = (new HexUInt8($value))->toUInt64();
         $this->assertEquals($expected, $actual);
     }
 
@@ -75,7 +75,7 @@ class UInt8Test extends TestCase
         $actual = HexUIntConverter::fromUInt8($value)->toUInt128();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt8($value))->toUInt128();
+        $actual = (new HexUInt8($value))->toUInt128();
         $this->assertEquals($expected, $actual);
     }
 
@@ -87,7 +87,7 @@ class UInt8Test extends TestCase
         $actual = HexUIntConverter::fromUInt8($value)->toUInt256();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt8($value))->toUInt256();
+        $actual = (new HexUInt8($value))->toUInt256();
         $this->assertEquals($expected, $actual);
     }
 }

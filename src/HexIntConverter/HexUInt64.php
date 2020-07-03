@@ -2,15 +2,15 @@
 
 namespace Enjin\BlockchainTools\HexIntConverter;
 
-class UInt256 extends UInt
+class HexUInt64 extends HexUInt
 {
     public const MIN_VALUE = '0';
-    public const MAX_VALUE = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+    public const MAX_VALUE = '18446744073709551615';
 
     public const MIN_ENCODED_VALUE = '0x0';
-    public const MAX_ENCODED_VALUE = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+    public const MAX_ENCODED_VALUE = '0xffffffffffffffff';
 
-    protected $stringLength = 64;
+    protected $stringLength = 16;
 
     public function toUInt8Top(): string
     {
@@ -42,23 +42,13 @@ class UInt256 extends UInt
         return $this->covertDownToUInt32Bottom($this->value);
     }
 
-    public function toUInt64Top(): string
+    public function toUInt128(): string
     {
-        return $this->covertDownToUInt64Top($this->value);
+        return $this->convertUpToUInt128($this->value);
     }
 
-    public function toUInt64Bottom(): string
+    public function toUInt256(): string
     {
-        return $this->covertDownToUInt64Bottom($this->value);
-    }
-
-    public function toUInt128Top(): string
-    {
-        return $this->covertDownToUInt128Top($this->value);
-    }
-
-    public function toUInt128Bottom(): string
-    {
-        return $this->covertDownToUInt128Bottom($this->value);
+        return $this->convertUpToUInt256($this->value);
     }
 }

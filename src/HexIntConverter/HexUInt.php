@@ -5,7 +5,7 @@ namespace Enjin\BlockchainTools\HexIntConverter;
 use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
 
-abstract class UInt
+abstract class HexUInt
 {
     /**
      * @var string
@@ -20,6 +20,16 @@ abstract class UInt
     public function __construct(string $value)
     {
         $this->value = $this->parseAndValidate($value);
+    }
+
+    public function toBase10(): string
+    {
+        return HexConverter::hexToInt($this->value);
+    }
+
+    public function toDecimal(): string
+    {
+        return $this->toBase10();
     }
 
     protected function parseAndValidate(string $hex)

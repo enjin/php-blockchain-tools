@@ -2,32 +2,32 @@
 
 namespace Tests\Unit\HexUIntConverter;
 
-use Enjin\BlockchainTools\HexIntConverter\UInt64;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt64;
 use Enjin\BlockchainTools\HexUIntConverter;
 use Tests\TestCase;
 
-class UInt64Test extends TestCase
+class HexUInt64Test extends TestCase
 {
     public function testInvalidLength()
     {
         $value = '1234567890abcde';
-        $expectedMessage = 'UInt64 value provided is invalid. Expected 16 characters but has: 15 (input value: 1234567890abcde)';
+        $expectedMessage = 'HexUInt64 value provided is invalid. Expected 16 characters but has: 15 (input value: 1234567890abcde)';
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
             HexUIntConverter::fromUInt64($value);
         });
 
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
-            new UInt64($value);
+            new HexUInt64($value);
         });
 
         $value = '1234567890abcdefa';
-        $expectedMessage = 'UInt64 value provided is invalid. Expected 16 characters but has: 17 (input value: 1234567890abcdefa)';
+        $expectedMessage = 'HexUInt64 value provided is invalid. Expected 16 characters but has: 17 (input value: 1234567890abcdefa)';
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
             HexUIntConverter::fromUInt64($value);
         });
 
         $this->assertInvalidArgumentException($expectedMessage, function () use ($value) {
-            new UInt64($value);
+            new HexUInt64($value);
         });
     }
 
@@ -39,7 +39,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt8Top();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt8Top();
+        $actual = (new HexUInt64($value))->toUInt8Top();
         $this->assertEquals($expected, $actual);
     }
 
@@ -51,7 +51,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt8Bottom();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt8Bottom();
+        $actual = (new HexUInt64($value))->toUInt8Bottom();
         $this->assertEquals($expected, $actual);
     }
 
@@ -63,7 +63,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt16Top();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt16Top();
+        $actual = (new HexUInt64($value))->toUInt16Top();
         $this->assertEquals($expected, $actual);
     }
 
@@ -75,7 +75,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt16Bottom();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt16Bottom();
+        $actual = (new HexUInt64($value))->toUInt16Bottom();
         $this->assertEquals($expected, $actual);
     }
 
@@ -87,7 +87,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt32Top();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt32Top();
+        $actual = (new HexUInt64($value))->toUInt32Top();
         $this->assertEquals($expected, $actual);
     }
 
@@ -99,7 +99,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt32Bottom();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt32Bottom();
+        $actual = (new HexUInt64($value))->toUInt32Bottom();
         $this->assertEquals($expected, $actual);
     }
 
@@ -111,7 +111,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt128();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt128();
+        $actual = (new HexUInt64($value))->toUInt128();
         $this->assertEquals($expected, $actual);
     }
 
@@ -123,7 +123,7 @@ class UInt64Test extends TestCase
         $actual = HexUIntConverter::fromUInt64($value)->toUInt256();
         $this->assertEquals($expected, $actual);
 
-        $actual = (new UInt64($value))->toUInt256();
+        $actual = (new HexUInt64($value))->toUInt256();
         $this->assertEquals($expected, $actual);
     }
 }

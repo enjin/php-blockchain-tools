@@ -2,7 +2,7 @@
 
 namespace Enjin\BlockchainTools\HexIntConverter;
 
-class UInt8 extends UInt
+class HexUInt8 extends HexUInt
 {
     public const MIN_VALUE = '0';
     public const MAX_VALUE = '255';

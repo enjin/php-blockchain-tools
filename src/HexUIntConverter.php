@@ -2,42 +2,42 @@
 
 namespace Enjin\BlockchainTools;
 
-use Enjin\BlockchainTools\HexIntConverter\UInt128;
-use Enjin\BlockchainTools\HexIntConverter\UInt16;
-use Enjin\BlockchainTools\HexIntConverter\UInt256;
-use Enjin\BlockchainTools\HexIntConverter\UInt32;
-use Enjin\BlockchainTools\HexIntConverter\UInt64;
-use Enjin\BlockchainTools\HexIntConverter\UInt8;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt128;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt16;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt256;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt32;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt64;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt8;
 
 class HexUIntConverter
 {
-    public static function fromUInt8(string $uInt8): UInt8
+    public static function fromUInt8(string $uInt8): HexUInt8
     {
-        return new UInt8($uInt8);
+        return new HexUInt8($uInt8);
     }
 
-    public static function fromUInt16(string $uInt16): UInt16
+    public static function fromUInt16(string $uInt16): HexUInt16
     {
-        return new UInt16($uInt16);
+        return new HexUInt16($uInt16);
     }
 
-    public static function fromUInt32(string $uInt32): UInt32
+    public static function fromUInt32(string $uInt32): HexUInt32
     {
-        return new UInt32($uInt32);
+        return new HexUInt32($uInt32);
     }
 
-    public static function fromUInt64(string $uInt64): UInt64
+    public static function fromUInt64(string $uInt64): HexUInt64
     {
-        return new UInt64($uInt64);
+        return new HexUInt64($uInt64);
     }
 
-    public static function fromUInt128(string $uInt128): UInt128
+    public static function fromUInt128(string $uInt128): HexUInt128
     {
-        return new UInt128($uInt128);
+        return new HexUInt128($uInt128);
     }
 
-    public static function fromUInt256(string $uInt256): UInt256
+    public static function fromUInt256(string $uInt256): HexUInt256
     {
-        return new UInt256($uInt256);
+        return new HexUInt256($uInt256);
     }
 }
