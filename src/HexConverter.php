@@ -52,7 +52,7 @@ class HexConverter
         return (string) pack('H*', static::unPrefix($hex));
     }
 
-    public static function intToHex(string $int, int $length = null): string
+    public static function intToHexInt(string $int, int $length = null): string
     {
         $isNegative = strpos($int, '-') === 0;
         $value = (new BigInteger($int, 10))->abs();
@@ -74,10 +74,10 @@ class HexConverter
 
     public static function intToHexPrefixed(string $int, int $length = null): string
     {
-        return '0x' . self::intToHex($int, $length);
+        return '0x' . self::intToHexInt($int, $length);
     }
 
-    public static function uIntToHex(string $int, int $length = null): string
+    public static function intToHexUInt(string $int, int $length = null): string
     {
         $hex = static::bigIntegerToHex(new BigInteger($int));
 
@@ -90,7 +90,7 @@ class HexConverter
 
     public static function uIntToHexPrefixed(string $int, int $length = null): string
     {
-        return '0x' . self::uIntToHex($int, $length);
+        return '0x' . self::intToHexUInt($int, $length);
     }
 
     public static function hexToUInt(string $hex): string

@@ -19,7 +19,7 @@ class EthString
         $value = HexConverter::prefix($hex);
 
         $stringLengthHex = substr($value, 0, 66);
-        $stringLength = HexConverter::intToHex($stringLengthHex);
+        $stringLength = HexConverter::intToHexInt($stringLengthHex);
 
         $value = substr($value, 66);
         $value = HexConverter::hexToString($value);

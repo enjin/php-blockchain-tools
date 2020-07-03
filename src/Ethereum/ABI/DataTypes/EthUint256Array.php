@@ -13,7 +13,7 @@ class EthUint256Array
 
         $encodedValue = $arrayLengthEncoded;
         foreach ($integers as $uInt256) {
-            $encodedValue .= HexConverter::intToHex($arrayLength, 64);
+            $encodedValue .= HexConverter::intToHexInt($arrayLength, 64);
         }
 
         return $encodedValue;
