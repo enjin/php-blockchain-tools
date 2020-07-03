@@ -3,6 +3,7 @@
 namespace Tests\Unit\HexUIntConverter;
 
 use Enjin\BlockchainTools\HexIntConverter\HexUInt128;
+use Enjin\BlockchainTools\HexIntConverter\HexUInt64;
 use Enjin\BlockchainTools\HexUIntConverter;
 use Tests\TestCase;
 
@@ -136,6 +137,18 @@ class HexUInt128Test extends TestCase
         $this->assertEquals($expected, $actual);
 
         $actual = (new HexUInt128($value))->toUInt256();
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testToDecimal()
+    {
+        $value = 'aaaaaaaabbbbbbbbaaaaaaaabbbbbbbb';
+        $expected = '226854911285907519808637577856120765371';
+
+        $actual = HexUIntConverter::fromUInt128($value)->toDecimal();
+        $this->assertEquals($expected, $actual);
+
+        $actual = (new HexUInt128($value))->toDecimal();
         $this->assertEquals($expected, $actual);
     }
 }

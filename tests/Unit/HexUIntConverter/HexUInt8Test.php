@@ -90,4 +90,16 @@ class HexUInt8Test extends TestCase
         $actual = (new HexUInt8($value))->toUInt256();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testToDecimal()
+    {
+        $value = 'ff';
+        $expected = '255';
+
+        $actual = HexUIntConverter::fromUInt8($value)->toDecimal();
+        $this->assertEquals($expected, $actual);
+
+        $actual = (new HexUInt8($value))->toDecimal();
+        $this->assertEquals($expected, $actual);
+    }
 }

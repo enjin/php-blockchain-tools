@@ -22,14 +22,12 @@ abstract class HexUInt
         $this->value = $this->parseAndValidate($value);
     }
 
-    public function toBase10(): string
-    {
-        return HexConverter::hexToUInt($this->value);
-    }
-
+    /**
+     * @return string number in base 10
+     */
     public function toDecimal(): string
     {
-        return $this->toBase10();
+        return HexConverter::hexToUInt($this->value);
     }
 
     protected function parseAndValidate(string $hex)
