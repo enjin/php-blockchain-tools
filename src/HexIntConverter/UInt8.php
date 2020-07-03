@@ -12,27 +12,27 @@ class UInt8 extends UInt
 
     protected $stringLength = 2;
 
-    public function toUInt16()
+    public function toUInt16(): string
     {
         return $this->convertUpToUInt16($this->value);
     }
 
-    public function toUInt32()
+    public function toUInt32(): string
     {
         return $this->convertUpToUInt32($this->value);
     }
 
-    public function toUInt64()
+    public function toUInt64(): string
     {
         return $this->convertUpToUInt64($this->value);
     }
 
-    public function toUInt128()
+    public function toUInt128(): string
     {
         return $this->convertUpToUInt128($this->value);
     }
 
-    public function toUInt256()
+    public function toUInt256(): string
     {
         return $this->convertUpToUInt256($this->value);
     }

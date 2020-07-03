@@ -12,52 +12,52 @@ class UInt256 extends UInt
 
     protected $stringLength = 64;
 
-    public function toUInt8Top()
+    public function toUInt8Top(): string
     {
         return $this->covertDownToUInt8Top($this->value);
     }
 
-    public function toUInt8Bottom()
+    public function toUInt8Bottom(): string
     {
         return $this->covertDownToUInt8Bottom($this->value);
     }
 
-    public function toUInt16Top()
+    public function toUInt16Top(): string
     {
         return $this->covertDownToUInt16Top($this->value);
     }
 
-    public function toUInt16Bottom()
+    public function toUInt16Bottom(): string
     {
         return $this->covertDownToUInt16Bottom($this->value);
     }
 
-    public function toUInt32Top()
+    public function toUInt32Top(): string
     {
         return $this->covertDownToUInt32Top($this->value);
     }
 
-    public function toUInt32Bottom()
+    public function toUInt32Bottom(): string
     {
         return $this->covertDownToUInt32Bottom($this->value);
     }
 
-    public function toUInt64Top()
+    public function toUInt64Top(): string
     {
         return $this->covertDownToUInt64Top($this->value);
     }
 
-    public function toUInt64Bottom()
+    public function toUInt64Bottom(): string
     {
         return $this->covertDownToUInt64Bottom($this->value);
     }
 
-    public function toUInt128Top()
+    public function toUInt128Top(): string
     {
         return $this->covertDownToUInt128Top($this->value);
     }
 
-    public function toUInt128Bottom()
+    public function toUInt128Bottom(): string
     {
         return $this->covertDownToUInt128Bottom($this->value);
     }
