@@ -13,6 +13,6 @@ class EthUint64
 
     public static function decode(string $hex)
     {
-        return HexConverter::hexToInt($hex);
+        return HexConverter::hexToUInt($hex);
     }
 }

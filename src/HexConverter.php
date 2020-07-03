@@ -2,7 +2,7 @@
 
 namespace Enjin\BlockchainTools;
 
-use Brick\Math\BigInteger;
+use phpseclib\Math\BigInteger;
 
 class HexConverter
 {
@@ -54,10 +54,19 @@ class HexConverter
 
     public static function intToHex(string $int, int $length = null): string
     {
-        $hex = BigHex::createFromInt($int)->toStringUnPrefixed();
+        $isNegative = strpos($int, '-') === 0;
+        $value = (new BigInteger($int, 10))->abs();
+
+        $hex = static::bigIntegerToHex($value);
 
         if ($length) {
-            $hex = str_pad($hex, $length, '0', STR_PAD_LEFT);
+            $hex = str_pad($hex, $length - 2, '0', STR_PAD_LEFT);
+        }
+
+        if ($isNegative) {
+            $hex = 'ff' . $hex;
+        } else {
+            $hex = '00' . $hex;
         }
 
         return $hex;
@@ -68,11 +77,27 @@ class HexConverter
         return '0x' . self::intToHex($int, $length);
     }
 
-    public static function hexToInt(string $hex): string
+    public static function uIntToHex(string $int, int $length = null): string
+    {
+        $hex = static::bigIntegerToHex(new BigInteger($int));
+
+        if ($length) {
+            $hex = str_pad($hex, $length, '0', STR_PAD_LEFT);
+        }
+
+        return $hex;
+    }
+
+    public static function uIntToHexPrefixed(string $int, int $length = null): string
+    {
+        return '0x' . self::uIntToHex($int, $length);
+    }
+
+    public static function hexToUInt(string $hex): string
     {
         $hex = self::unPrefix($hex);
 
-        return (string) BigInteger::fromBase($hex, 16)->toBase(10);
+        return (string) (new BigInteger($hex, 16))->toString();
     }
 
     public static function hexToBytes(string $hex): array
@@ -88,5 +113,17 @@ class HexConverter
     public static function bytesToHexPrefixed(array $bytes): string
     {
         return '0x' . static::bytesToHex($bytes);
+    }
+
+    public static function bigIntegerToHex(BigInteger $number): string
+    {
+        $value = $number->toHex(true);
+        $value = ltrim($value, '0');
+
+        if ($value === '') {
+            return '0';
+        }
+
+        return $value;
     }
 }

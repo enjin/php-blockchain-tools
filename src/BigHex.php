@@ -2,8 +2,8 @@
 
 namespace Enjin\BlockchainTools;
 
-use Brick\Math\BigInteger;
 use InvalidArgumentException;
+use phpseclib\Math\BigInteger;
 
 class BigHex
 {
@@ -24,7 +24,10 @@ class BigHex
         } elseif ($value instanceof self) {
             $value = $value->toStringUnPrefixed();
         } elseif ($value instanceof BigInteger) {
-            $value = $value->toBase(16);
+            if ($value->is_negative) {
+                throw new InvalidArgumentException('Negative BigIntegers are not supported.');
+            }
+            $value = HexConverter::bigIntegerToHex($value);
         } else {
             $value = $this->valueToErrorString($value);
 
@@ -39,14 +42,7 @@ class BigHex
         return $this->toStringUnPrefixed();
     }
 
-    public static function createFromInt($integer) : self
-    {
-        $value = BigInteger::fromBase($integer, 10)->toBase(16);
-
-        return new self($value);
-    }
-
-    public static function createFromBytes(array $bytes) : self
+    public static function createFromBytes(array $bytes): self
     {
         $bytes = array_map('chr', $bytes);
         $bytes = implode('', $bytes);
@@ -54,22 +50,22 @@ class BigHex
         return new self(bin2hex($bytes));
     }
 
-    public static function create(string $value) : self
+    public static function create(string $value): self
     {
         return new self($value);
     }
 
-    public static function isValidHex(string $str) : bool
+    public static function isValidHex(string $str): bool
     {
         return ctype_xdigit($str);
     }
 
-    public function toBigInt() : BigInteger
+    public function toBigInt(): BigInteger
     {
-        return BigInteger::fromBase($this->value, 16);
+        return new BigInteger($this->value, 16);
     }
 
-    public function toBytes() : array
+    public function toBytes(): array
     {
         $bin = hex2bin($this->value);
         $array = unpack('C*', $bin);
@@ -77,12 +73,12 @@ class BigHex
         return array_values($array);
     }
 
-    public function toStringUnPrefixed() : string
+    public function toStringUnPrefixed(): string
     {
         return $this->value;
     }
 
-    public function toStringPrefixed() : string
+    public function toStringPrefixed(): string
     {
         return '0x' . $this->value;
     }

@@ -15,6 +15,6 @@ class EthBoolean
 
     public static function decode(string $value)
     {
-        return (bool) HexConverter::hexToInt($value);
+        return (bool) HexConverter::hexToUInt($value);
     }
 }

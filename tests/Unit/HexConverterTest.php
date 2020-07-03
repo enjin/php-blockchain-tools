@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Enjin\BlockchainTools\HexConverter;
+use phpseclib\Math\BigInteger;
 use Tests\TestCase;
 
 class HexConverterTest extends TestCase
@@ -89,7 +90,7 @@ class HexConverterTest extends TestCase
     public function testIntToHex()
     {
         $int = 882514;
-        $expected = 'd7752';
+        $expected = '00d7752';
 
         $hex = HexConverter::intToHex($int);
         $this->assertEquals($expected, $hex);
@@ -104,17 +105,74 @@ class HexConverterTest extends TestCase
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::hexToInt
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexPrefixed
+     */
+    public function testNegativeIntToHex()
+    {
+        $int = -882514;
+        $expected = 'ffd7752';
+
+        $hex = HexConverter::intToHex($int);
+        $this->assertEquals($expected, $hex);
+        $this->assertEquals('0x' . $expected, HexConverter::intToHexPrefixed($int));
+
+        $expected = 'ff000000000d7752';
+        $hex = HexConverter::intToHex($int, 16);
+        $this->assertEquals($expected, $hex);
+
+        $hex = HexConverter::intToHexPrefixed($int, 16);
+        $this->assertEquals('0x' . $expected, $hex);
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::uIntToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::uIntToHexPrefixed
+     */
+    public function testUIntToHex()
+    {
+        $int = 882514;
+        $expected = 'd7752';
+
+        $hex = HexConverter::uIntToHex($int);
+        $this->assertEquals($expected, $hex);
+        $this->assertEquals('0x' . $expected, HexConverter::uIntToHexPrefixed($int));
+
+        $expected = '00000000000d7752';
+        $hex = HexConverter::uIntToHex($int, 16);
+        $this->assertEquals($expected, $hex);
+
+        $hex = HexConverter::uIntToHexPrefixed($int, 16);
+        $this->assertEquals('0x' . $expected, $hex);
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToUInt
+     */
+    public function testHexToIntZero()
+    {
+        $hex = '0';
+        $expected = 0;
+
+        $int = HexConverter::hexToUInt($hex);
+        $this->assertEquals($expected, $int);
+
+        $int = HexConverter::hexToUInt('0x' . $hex);
+        $this->assertEquals($expected, $int);
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToUInt
      */
     public function testHexToInt()
     {
         $hex = 'd7752';
         $expected = 882514;
 
-        $int = HexConverter::hexToInt($hex);
+        $int = HexConverter::hexToUInt($hex);
         $this->assertEquals($expected, $int);
 
-        $int = HexConverter::hexToInt('0x' . $hex);
+        $int = HexConverter::hexToUInt('0x' . $hex);
         $this->assertEquals($expected, $int);
     }
 
@@ -154,6 +212,33 @@ class HexConverterTest extends TestCase
         $this->assertEquals($expected, $hex);
 
         $hex = HexConverter::bytesToHexPrefixed($bytes);
-        $this->assertEquals('0x'.$expected, $hex);
+        $this->assertEquals('0x' . $expected, $hex);
     }
+    //
+    // public function testBigIntegerToHex()
+    // {
+    //     $number = 10;
+    //     $expected = 'a';
+    //
+    //     $int = new BigInteger($number);
+    //     $hex = HexConverter::bigIntegerToHex($int);
+    //
+    //     $this->assertEquals($expected, $hex);
+    //
+    //     $number = 0;
+    //     $expected = '0';
+    //
+    //     $int = new BigInteger($number);
+    //     $hex = HexConverter::bigIntegerToHex($int);
+    //
+    //     $this->assertEquals($expected, $hex);
+    //
+    //     $number = -10;
+    //     $expected = '0';
+    //
+    //     $int = new BigInteger($number);
+    //     $hex = HexConverter::bigIntegerToHex($int);
+    //
+    //     $this->assertEquals($expected, $hex);
+    // }
 }

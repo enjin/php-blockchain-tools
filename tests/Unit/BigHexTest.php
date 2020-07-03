@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use Brick\Math\BigInteger;
 use Enjin\BlockchainTools\BigHex;
+use phpseclib\Math\BigInteger;
 use stdClass;
 use Tests\TestCase;
 
@@ -12,6 +12,15 @@ use Tests\TestCase;
  */
 class BigHexTest extends TestCase
 {
+    public function testCreateFromStringZero()
+    {
+        $number = '0';
+        $hex = '0';
+        $bigHex = new BigHex($hex);
+
+        $this->assertBigHexValues($bigHex, $hex, $number);
+    }
+
     public function testCreateFromString()
     {
         $number = (string) random_int(0, 100000);
@@ -19,6 +28,16 @@ class BigHexTest extends TestCase
         $bigHex = new BigHex($hex);
 
         $this->assertBigHexValues($bigHex, $hex, $number);
+    }
+
+    public function testCreateFromSelfZero()
+    {
+        $number = '0';
+        $hex = '0';
+        $bigHex = new BigHex($hex);
+        $bigHex2 = new BigHex($bigHex);
+
+        $this->assertBigHexValues($bigHex2, $hex, $number);
     }
 
     public function testCreateFromSelf()
@@ -31,21 +50,25 @@ class BigHexTest extends TestCase
         $this->assertBigHexValues($bigHex2, $hex, $number);
     }
 
-    public function testCreateFromBigInteger()
+    public function testCreateFromBigIntegerZero()
     {
-        $number = (string) random_int(0, 100000);
-        $bigInt = BigInteger::fromBase($number, 10);
-        $hex = $bigInt->toBase(16);
+        $number = '0';
+        $hex = '0';
+        $bigInt = new BigInteger(0, 10);
         $bigHex = new BigHex($bigInt);
 
         $this->assertBigHexValues($bigHex, $hex, $number);
     }
 
-    public function testCreateFromInt()
+    public function testCreateFromBigInteger()
     {
         $number = (string) random_int(0, 100000);
-        $hex = dechex($number);
-        $bigHex = BigHex::createFromInt($number);
+        $bigInt = new BigInteger($number, 10);
+        $hex = $bigInt->toHex(true);
+        if ($hex !== 0) {
+            $hex = ltrim($hex, '0');
+        }
+        $bigHex = new BigHex($bigInt);
 
         $this->assertBigHexValues($bigHex, $hex, $number);
     }
@@ -133,6 +156,5 @@ class BigHexTest extends TestCase
 
         $this->assertInstanceOf(BigInteger::class, $bigInt);
         $this->assertEquals($number, $bigInt->__toString());
-        $this->assertEquals($hex, $bigInt->toBase(16));
     }
 }

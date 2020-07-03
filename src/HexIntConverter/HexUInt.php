@@ -24,7 +24,7 @@ abstract class HexUInt
 
     public function toBase10(): string
     {
-        return HexConverter::hexToInt($this->value);
+        return HexConverter::hexToUInt($this->value);
     }
 
     public function toDecimal(): string

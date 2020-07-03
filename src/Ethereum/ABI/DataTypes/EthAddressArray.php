@@ -30,7 +30,7 @@ class EthAddressArray
     protected function decode(string $hex)
     {
         $arrayLengthEncoded = substr($hex, 0, 66);
-        $arrayLength = HexConverter::hexToInt($arrayLengthEncoded);
+        $arrayLength = HexConverter::hexToUInt($arrayLengthEncoded);
 
         $decoded = [];
         $dataPosition = 66;

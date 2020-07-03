@@ -4,7 +4,7 @@
     "require": {
         "php": ">=7.2,<7.3",
         "mockery/mockery": "^1.3",
-        "brick/math": "^0.8.15"
+        "phpseclib/phpseclib": "^2.0"
     },
     "autoload": {
         "psr-4": {
