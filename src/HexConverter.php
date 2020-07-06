@@ -88,7 +88,7 @@ class HexConverter
         return $hex;
     }
 
-    public static function uIntToHexPrefixed(string $int, int $length = null): string
+    public static function intToHexUIntPrefixed(string $int, int $length = null): string
     {
         return '0x' . self::intToHexUInt($int, $length);
     }

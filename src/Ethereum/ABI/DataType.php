@@ -2,6 +2,10 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthBoolean;
+use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexUIntConverter;
+
 class DataType
 {
     /**
@@ -81,6 +85,16 @@ class DataType
         return $this->arrayLength !== null;
     }
 
+    public function isDynamicLengthArray()
+    {
+        return $this->isArray() && $this->arrayLength() === 'dynamic';
+    }
+
+    public function isFixedLengthArray()
+    {
+        return $this->isArray() && $this->arrayLength() !== 'dynamic';
+    }
+
     public function decimalPrecision(): ?int
     {
         return $this->decimalPrecision;
@@ -89,6 +103,55 @@ class DataType
     public function aliasedFrom(): ?string
     {
         return $this->aliasedFrom;
+    }
+
+    public function encodeBaseType($value)
+    {
+        $baseType = $this->baseType();
+
+        if ($baseType === 'int') {
+            return HexConverter::intToHexInt($value, 64);
+        }
+
+        if ($baseType === 'uint') {
+            if ($this->aliasedFrom() === 'bool') {
+                $value = (int) $value;
+            }
+
+            return HexConverter::intToHexUInt($value, 64);
+        }
+
+        if ($baseType === 'address') {
+            return HexUIntConverter::padToUInt256($value);
+        }
+
+        if ($baseType === 'bytes') {
+            $hex = null;
+            if ($value) {
+                return HexConverter::bytesToHex($value);
+            }
+
+            return HexConverter::intToHexUInt('0', 64);
+        }
+
+        if ($baseType === 'bool') {
+            return EthBoolean::encode($value);
+        }
+
+        if ($baseType === 'string') {
+            if ($value) {
+                return HexConverter::stringToHex($value, 64);
+            }
+
+            return HexConverter::intToHexUInt('0', 64);
+        }
+    }
+
+    public function encodeArrayValues(array $values): array
+    {
+        return array_map(function ($val) {
+            return $this->encodeBaseType($val);
+        }, $values);
     }
 
     protected function setData(

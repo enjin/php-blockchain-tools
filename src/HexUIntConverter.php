@@ -11,6 +11,13 @@ use Enjin\BlockchainTools\HexIntConverter\HexUInt8;
 
 class HexUIntConverter
 {
+    public static function padToUInt256(string $hex): string
+    {
+        $hex = HexConverter::unPrefix($hex);
+
+        return str_pad($hex, 64, '0', STR_PAD_LEFT);
+    }
+
     public static function fromUInt8(string $uInt8): HexUInt8
     {
         return new HexUInt8($uInt8);

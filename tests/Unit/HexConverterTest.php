@@ -127,7 +127,7 @@ class HexConverterTest extends TestCase
 
     /**
      * @covers \Enjin\BlockchainTools\HexConverter::intToHexUInt
-     * @covers \Enjin\BlockchainTools\HexConverter::uIntToHexPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexUIntPrefixed
      */
     public function testUIntToHex()
     {
@@ -136,13 +136,13 @@ class HexConverterTest extends TestCase
 
         $hex = HexConverter::intToHexUInt($int);
         $this->assertEquals($expected, $hex);
-        $this->assertEquals('0x' . $expected, HexConverter::uIntToHexPrefixed($int));
+        $this->assertEquals('0x' . $expected, HexConverter::intToHexUIntPrefixed($int));
 
         $expected = '00000000000d7752';
         $hex = HexConverter::intToHexUInt($int, 16);
         $this->assertEquals($expected, $hex);
 
-        $hex = HexConverter::uIntToHexPrefixed($int, 16);
+        $hex = HexConverter::intToHexUIntPrefixed($int, 16);
         $this->assertEquals('0x' . $expected, $hex);
     }
 
