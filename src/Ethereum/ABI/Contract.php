@@ -41,7 +41,7 @@ class Contract
 
         foreach ($json as $item) {
             $name = $item['name'];
-            $type = $item['type'];
+            $type = $item['type'] ?? 'function';
             if ($type === 'function') {
                 $this->functions[$name] = $item;
             } elseif ($type === 'event') {

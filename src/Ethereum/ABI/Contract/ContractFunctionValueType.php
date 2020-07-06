@@ -5,7 +5,7 @@ namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\DataType;
 use Enjin\BlockchainTools\Ethereum\ABI\DataTypeParser;
 
-class ContractFunctionInput
+class ContractFunctionValueType
 {
     /**
      * @var string

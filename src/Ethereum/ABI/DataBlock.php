@@ -2,17 +2,11 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
-use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionInput;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\HexConverter;
 
 class DataBlock
 {
-    /**
-     * @var ContractFunction
-     */
-    protected $contractFunction;
-
     /**
      * @var int
      */
@@ -24,17 +18,15 @@ class DataBlock
 
     protected $dynamicLengthData = [];
 
-    public function __construct(ContractFunction $function)
+    public function __construct(array $functionValueTypes)
     {
-        $this->contractFunction = $function;
-
         // Set the dynamic data start position.
-        $inputCount = count($function->inputs());
+        $inputCount = count($functionValueTypes);
         $position = $inputCount * 32;
 
-        /** @var ContractFunctionInput $input */
-        foreach ($function->inputs() as $input) {
-            $dataType = $input->dataType();
+        /** @var ContractFunctionValueType $input */
+        foreach ($functionValueTypes as $item) {
+            $dataType = $item->dataType();
             if ($dataType->isFixedLengthArray()) {
                 $position += ($dataType->arrayLength() - 1) * 32;
             }

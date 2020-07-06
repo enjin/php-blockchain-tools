@@ -5,7 +5,7 @@ namespace Tests\Support;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEventInput;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
-use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionInput;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 
 trait HasContractTestHelpers
 {
@@ -65,7 +65,7 @@ trait HasContractTestHelpers
         ], $data);
     }
 
-    private function assertContractFunctionInput(ContractFunctionInput $input, array $json, string $message = '')
+    private function assertContractFunctionInput(ContractFunctionValueType $input, array $json, string $message = '')
     {
         if ($message) {
             $message = ', ' . $message;

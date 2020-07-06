@@ -46,6 +46,11 @@ class ContractFunction
     protected $inputs;
 
     /**
+     * @var array
+     */
+    protected $outputs;
+
+    /**
      * @var string
      */
     protected $methodId;
@@ -70,6 +75,13 @@ class ContractFunction
             $inputName = $input['name'];
             $this->inputs[$inputName] = $input;
         }
+
+        $outputs = $function['outputs'] ?? [];
+
+        foreach ($outputs as $output) {
+            $outputName = $output['name'];
+            $this->inputs[$outputName] = $output;
+        }
     }
 
     public function name(): string
@@ -92,26 +104,42 @@ class ContractFunction
         return $this->constant;
     }
 
-    public function input(string $name): ContractFunctionInput
+    public function input(string $name): ContractFunctionValueType
     {
         if (!array_key_exists($name, $this->inputs)) {
-            throw new InvalidArgumentException('invalid function input name: ' . $name . ' for Contract Function: ' . $this->name());
+            throw new InvalidArgumentException('invalid function name: ' . $name . ' for Contract Function: ' . $this->name());
         }
 
-        return new ContractFunctionInput($this->inputs[$name]);
+        return new ContractFunctionValueType($this->inputs[$name]);
+    }
+
+    public function outputs(): array
+    {
+        return array_map(function (array $input) {
+            return new ContractFunctionValueType($input);
+        }, $this->outputs);
+    }
+
+    public function output(string $name): ContractFunctionValueType
+    {
+        if (!array_key_exists($name, $this->outputs)) {
+            throw new InvalidArgumentException('invalid function name: ' . $name . ' for Contract Function: ' . $this->name());
+        }
+
+        return new ContractFunctionValueType($this->outputs[$name]);
     }
 
     public function inputs(): array
     {
         return array_map(function (array $input) {
-            return new ContractFunctionInput($input);
+            return new ContractFunctionValueType($input);
         }, $this->inputs);
     }
 
     public function signature(): string
     {
         $args = [];
-        /** @var ContractFunctionInput $input */
+        /** @var ContractFunctionValueType $input */
         foreach ($this->inputs() as $input) {
             $args[] = $input->type();
         }
@@ -140,10 +168,6 @@ class ContractFunction
         }
 
         return $this->topic;
-    }
-
-    public function outputs(): array
-    {
     }
 
     public function encodeInput(array $input): string

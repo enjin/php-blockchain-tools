@@ -82,7 +82,7 @@ class ContractFunctionSerializerTest extends TestCase
             '_data' => '',
         ];
 
-        $encoded = $serializer->encode($function, $data)->toArray();
+        $encoded = $serializer->encode($function->inputs(), $data)->toArray();
 
         $expected = [
             '00000000000000000000000041f502f01195652d3dc55a06f71d8d802ada241b',
@@ -100,16 +100,14 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000000000000000000000000000000000000000000000',
         ];
 
-        // dump($serializer->encode($function, $data)->toArrayWithMeta());
+        // dump($serializer->encode($function->inputs(), $data)->toArrayWithMeta());
         //
-        // $ex = array_map(function($val){
+        // $ex = array_map(function ($val) {
         //     return ltrim($val, '0') ?: '0';
-        //
         // }, $expected);
         //
-        // $en = array_map(function($val){
+        // $en = array_map(function ($val) {
         //     return ltrim($val, '0') ?: '0';
-        //
         // }, $encoded);
         //
         // dump([
