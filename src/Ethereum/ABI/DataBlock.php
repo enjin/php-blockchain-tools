@@ -176,7 +176,7 @@ class DataBlock
 
                 foreach ($values as $value) {
                     $output[] = [
-                        'name' => $name . ' value' . $name,
+                        'name' => $name . ' value',
                         'type' => $type,
                         'value' => $value,
                     ];
