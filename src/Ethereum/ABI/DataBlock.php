@@ -166,9 +166,9 @@ class DataBlock
                     'value' => HexConverter::intToHexUInt($length, 64),
                 ];
 
-                foreach ($values as $value) {
+                foreach ($values as $i => $value) {
                     $output[] = [
-                        'name' => $name . ' value',
+                        'name' => $name . '[' . $i . '] value',
                         'type' => $type,
                         'value' => $value,
                     ];
