@@ -70,13 +70,18 @@ class DataBlock
         ];
     }
 
-    public function addDynamicLengthBytes(string $inputName, string $type, string $value)
+    public function addDynamicLengthBytes(string $inputName, string $type, ?string $value)
     {
+        if ($value === null) {
+            $value = 0;
+        }
+
         $length = strlen($value);
 
         if (ltrim($value, '0') === '') {
             $length = 0;
         }
+
         $this->dynamicLengthData[] = [
             'name' => $inputName,
             'type' => $type,

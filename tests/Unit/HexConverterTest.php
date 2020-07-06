@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use Enjin\BlockchainTools\HexConverter;
-use phpseclib\Math\BigInteger;
 use Tests\TestCase;
 
 class HexConverterTest extends TestCase
@@ -144,6 +143,9 @@ class HexConverterTest extends TestCase
 
         $hex = HexConverter::intToHexUIntPrefixed($int, 16);
         $this->assertEquals('0x' . $expected, $hex);
+
+        $actual = HexConverter::hexToUInt($hex);
+        $this->assertEquals($int, $actual);
     }
 
     /**

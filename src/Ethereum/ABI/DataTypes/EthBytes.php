@@ -4,15 +4,23 @@ namespace Enjin\BlockchainTools\Ethereum\ABI\DataTypes;
 
 use Enjin\BlockchainTools\HexConverter;
 
-class EthBytes32
+class EthBytes
 {
     public static function encode(array $bytes)
     {
-        return HexConverter::bytesToHexPrefixed($bytes);
+        if ($bytes) {
+            return HexConverter::bytesToHex($bytes);
+        }
+
+        return HexConverter::intToHexUInt('0', 64);
     }
 
     public static function decode(string $hex): array
     {
+        if (!$hex) {
+            return [];
+        }
+        // @TODO right trim zeroes?
         return HexConverter::hexToBytes($hex);
     }
 }

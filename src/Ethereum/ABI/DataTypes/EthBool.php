@@ -4,7 +4,7 @@ namespace Enjin\BlockchainTools\Ethereum\ABI\DataTypes;
 
 use Enjin\BlockchainTools\HexConverter;
 
-class EthBoolean
+class EthBool
 {
     public static function encode(bool $value)
     {

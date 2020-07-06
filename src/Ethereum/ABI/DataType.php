@@ -2,9 +2,12 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthBoolean;
-use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexUIntConverter;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthAddress;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthBool;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthBytes;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthInt;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthString;
+use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthUint;
 
 class DataType
 {
@@ -110,7 +113,7 @@ class DataType
         $baseType = $this->baseType();
 
         if ($baseType === 'int') {
-            return HexConverter::intToHexInt($value, 64);
+            return EthInt::encode($value);
         }
 
         if ($baseType === 'uint') {
@@ -118,32 +121,26 @@ class DataType
                 $value = (int) $value;
             }
 
-            return HexConverter::intToHexUInt($value, 64);
+            return EthUint::encode($value);
         }
 
         if ($baseType === 'address') {
-            return HexUIntConverter::padToUInt256($value);
+            return EthAddress::encode($value);
         }
 
         if ($baseType === 'bytes') {
-            $hex = null;
-            if ($value) {
-                return HexConverter::bytesToHex($value);
+            if (!$value) {
+                $value = [];
             }
-
-            return HexConverter::intToHexUInt('0', 64);
+            EthBytes::encode($value);
         }
 
         if ($baseType === 'bool') {
-            return EthBoolean::encode($value);
+            return EthBool::encode($value);
         }
 
         if ($baseType === 'string') {
-            if ($value) {
-                return HexConverter::stringToHex($value, 64);
-            }
-
-            return HexConverter::intToHexUInt('0', 64);
+            EthString::encode($value);
         }
     }
 
@@ -151,6 +148,46 @@ class DataType
     {
         return array_map(function ($val) {
             return $this->encodeBaseType($val);
+        }, $values);
+    }
+
+    public function decodeBaseType($value)
+    {
+        $baseType = $this->baseType();
+
+        if ($baseType === 'int') {
+            return EthInt::decode($value);
+        }
+
+        if ($baseType === 'uint') {
+            if ($this->aliasedFrom() === 'bool') {
+                return (bool) EthUint::decode($value);
+            }
+
+            return EthUint::decode($value);
+        }
+
+        if ($baseType === 'address') {
+            return EthAddress::decode($value);
+        }
+
+        if ($baseType === 'bytes') {
+            return EthBytes::decode($value);
+        }
+
+        if ($baseType === 'bool') {
+            return EthBool::decode($value);
+        }
+
+        if ($baseType === 'string') {
+            return EthString::decode($value);
+        }
+    }
+
+    public function decodeArrayValues(array $values): array
+    {
+        return array_map(function ($val) {
+            return $this->decodeBaseType($val);
         }, $values);
     }
 

@@ -4,11 +4,11 @@ namespace Enjin\BlockchainTools\Ethereum\ABI\DataTypes;
 
 use Enjin\BlockchainTools\HexConverter;
 
-class EthUint128
+class EthUint
 {
-    public static function encode(string $uInt128)
+    public static function encode(string $int)
     {
-        return HexConverter::intToHexPrefixed($uInt128, 32);
+        return HexConverter::intToHexUInt($int, 64);
     }
 
     public static function decode(string $hex)

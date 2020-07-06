@@ -8,10 +8,11 @@ class EthString
 {
     public static function encode(string $string)
     {
-        $stringLength = strlen($string);
-        $stringLengthEncoded = HexConverter::intToHexPrefixed($stringLength);
+        if ($string) {
+            return HexConverter::stringToHex($string, 64);
+        }
 
-        return $stringLengthEncoded . HexConverter::stringToHex($string, 64);
+        return HexConverter::intToHexUInt('0', 64);
     }
 
     public static function decode(string $hex)

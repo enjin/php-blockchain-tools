@@ -79,7 +79,7 @@ class ContractFunctionSerializerTest extends TestCase
                 HexConverter::hexToUInt('0x5000000000001008000000000000000000000000000000000000000000000000'),
             ],
             '_values' => [4, 4],
-            '_data' => '',
+            '_data' => [],
         ];
 
         $encoded = $serializer->encode($function->inputs(), $data)->toArray();
@@ -116,5 +116,10 @@ class ContractFunctionSerializerTest extends TestCase
         // ]);
 
         $this->assertEquals($expected, $encoded);
+
+        $encodedData = implode('', $expected);
+        $actual = $serializer->decode($function->inputs(), $encodedData);
+
+        $this->assertEquals($data, $actual);
     }
 }
