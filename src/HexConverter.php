@@ -60,14 +60,14 @@ class HexConverter
 
         $hex = static::bigIntegerToHex($value);
 
-        if ($length) {
-            $hex = str_pad($hex, $length - 2, '0', STR_PAD_LEFT);
-        }
-
         if ($isNegative) {
             $hex = 'ff' . $hex;
         } else {
             $hex = '00' . $hex;
+        }
+
+        if ($length) {
+            $hex = str_pad($hex, $length, '0', STR_PAD_LEFT);
         }
 
         return $hex;
@@ -76,6 +76,27 @@ class HexConverter
     public static function intToHexIntPrefixed(string $int, int $length = null): string
     {
         return '0x' . self::intToHexInt($int, $length);
+    }
+
+    /**
+     * Convert from a hex signed int to a php string of that number in base 10
+     *
+     * @param string $hex
+     * @return string base 10 value
+     */
+    public static function hexIntToInt(string $hex): string
+    {
+        $first2 = substr($hex, 0, 2);
+        $isNegative = $first2 === 'ff';
+        $hex = substr($hex, 2);
+
+        $int = static::hexToUInt($hex);
+
+        if ($isNegative) {
+            $int = '-' . $int;
+        }
+
+        return $int;
     }
 
     public static function intToHexUInt(string $int, int $length = null): string

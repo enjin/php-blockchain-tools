@@ -116,7 +116,7 @@ class HexConverterTest extends TestCase
         $this->assertEquals($expected, $hex);
         $this->assertEquals('0x' . $expected, HexConverter::intToHexIntPrefixed($int));
 
-        $expected = 'ff000000000d7752';
+        $expected = '000000000ffd7752';
         $hex = HexConverter::intToHexInt($int, 16);
         $this->assertEquals($expected, $hex);
 
