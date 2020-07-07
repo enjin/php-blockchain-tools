@@ -84,7 +84,7 @@ class HexConverterTest extends TestCase
 
     /**
      * @covers \Enjin\BlockchainTools\HexConverter::intToHexInt
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexIntPrefixed
      */
     public function testIntToHexInt()
     {
@@ -105,7 +105,7 @@ class HexConverterTest extends TestCase
 
     /**
      * @covers \Enjin\BlockchainTools\HexConverter::intToHexInt
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexIntPrefixed
      */
     public function testNegativeIntToHexInt()
     {
