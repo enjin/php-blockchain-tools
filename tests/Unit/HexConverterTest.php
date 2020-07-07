@@ -125,6 +125,36 @@ class HexConverterTest extends TestCase
     }
 
     /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexIntToInt
+     */
+    public function testHexIntToInt()
+    {
+        $hex = '00d7752';
+        $expected = 882514;
+
+        $int = HexConverter::hexIntToInt($hex);
+        $this->assertEquals($expected, $int);
+
+        $int = HexConverter::hexIntToInt('0x' . $hex);
+        $this->assertEquals($expected, $int);
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexIntToInt
+     */
+    public function testNegativeHexIntToInt()
+    {
+        $hex = 'ffd7752';
+        $expected = -882514;
+
+        $hex = HexConverter::hexIntToInt($hex);
+        $this->assertEquals($expected, $hex);
+
+        $hex = HexConverter::hexIntToInt('0x' . $hex);
+        $this->assertEquals($expected, $hex);
+    }
+
+    /**
      * @covers \Enjin\BlockchainTools\HexConverter::intToHexUInt
      * @covers \Enjin\BlockchainTools\HexConverter::intToHexUIntPrefixed
      */

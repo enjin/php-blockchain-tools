@@ -86,6 +86,7 @@ class HexConverter
      */
     public static function hexIntToInt(string $hex): string
     {
+        $hex = static::unPrefix($hex);
         $first2 = substr($hex, 0, 2);
         $isNegative = $first2 === 'ff';
         $hex = substr($hex, 2);
