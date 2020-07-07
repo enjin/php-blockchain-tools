@@ -2,6 +2,7 @@
 
 namespace Enjin\BlockchainTools;
 
+use Closure;
 use phpseclib\Math\BigInteger;
 
 class HexConverter
@@ -72,7 +73,7 @@ class HexConverter
         return $hex;
     }
 
-    public static function intToHexPrefixed(string $int, int $length = null): string
+    public static function intToHexIntPrefixed(string $int, int $length = null): string
     {
         return '0x' . self::intToHexInt($int, $length);
     }
@@ -122,6 +123,36 @@ class HexConverter
 
         if ($value === '') {
             return '0';
+        }
+
+        return $value;
+    }
+
+    public static function padTo64Left(string $hex): string
+    {
+        return static::withPrefixIntact($hex, function ($hex) {
+            return str_pad($hex, 64, '0', STR_PAD_LEFT);
+        });
+    }
+
+    public static function padTo64Right(string $hex): string
+    {
+        return static::withPrefixIntact($hex, function ($hex) {
+            return str_pad($hex, 64, '0', STR_PAD_RIGHT);
+        });
+    }
+
+    public static function withPrefixIntact(string $hex, Closure $callback)
+    {
+        $hasPrefix = static::hasPrefix($hex);
+        if ($hasPrefix) {
+            $hex = substr($hex, 2);
+        }
+
+        $value = $callback($hex);
+
+        if ($hasPrefix) {
+            $value = '0x' . $value;
         }
 
         return $value;

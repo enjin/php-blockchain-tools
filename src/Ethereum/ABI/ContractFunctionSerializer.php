@@ -73,7 +73,7 @@ class ContractFunctionSerializer
 
         $results = [];
         foreach ($functionValueTypes as $i => $item) {
-            dump($results);
+
             /** @var ContractFunctionValueType $item */
             $itemName = $item->name() ?: $i;
 
