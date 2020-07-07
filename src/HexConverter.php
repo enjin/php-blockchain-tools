@@ -128,17 +128,17 @@ class HexConverter
         return $value;
     }
 
-    public static function padTo64Left(string $hex): string
+    public static function padLeft(string $hex, int $length): string
     {
-        return static::withPrefixIntact($hex, function ($hex) {
-            return str_pad($hex, 64, '0', STR_PAD_LEFT);
+        return static::withPrefixIntact($hex, function ($hex) use ($length) {
+            return str_pad($hex, $length, '0', STR_PAD_LEFT);
         });
     }
 
-    public static function padTo64Right(string $hex): string
+    public static function padRight(string $hex, int $length): string
     {
-        return static::withPrefixIntact($hex, function ($hex) {
-            return str_pad($hex, 64, '0', STR_PAD_RIGHT);
+        return static::withPrefixIntact($hex, function ($hex) use ($length) {
+            return str_pad($hex, $length, '0', STR_PAD_RIGHT);
         });
     }
 
