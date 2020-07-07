@@ -15,6 +15,6 @@ class EthAddress
 
     public static function decode(string $value)
     {
-        return HexConverter::prefix(substr($value, 24));
+        return substr($value, 24);
     }
 }

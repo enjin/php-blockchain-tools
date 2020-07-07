@@ -108,6 +108,11 @@ class DataBlock
         ];
     }
 
+    public function toString(): string
+    {
+        return implode('', $this->toArray());
+    }
+
     public function toArray(): array
     {
         return array_map(function ($item) {

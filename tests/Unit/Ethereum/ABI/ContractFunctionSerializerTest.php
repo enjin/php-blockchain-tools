@@ -62,18 +62,9 @@ class ContractFunctionSerializerTest extends TestCase
 
         $serializer = new ContractFunctionSerializer();
 
-        $a = HexConverter::hexToUInt('0x123');
-        $this->assertEquals(291, $a);
-
-        $b1 = HexConverter::hexToUInt('0x456');
-        $b2 = HexConverter::hexToUInt('0x789');
-
-        $this->assertEquals(1110, $b1);
-        $this->assertEquals(1929, $b2);
-
         $data = [
-            '_from' => '0x41f502f01195652d3dc55a06f71d8d802ada241b',
-            '_to' => '0x7d68cb169512d47ad39928b63bd97a40db65796d',
+            '_from' => '41f502f01195652d3dc55a06f71d8d802ada241b',
+            '_to' => '7d68cb169512d47ad39928b63bd97a40db65796d',
             '_ids' => [
                 HexConverter::hexToUInt('0x700000000000160e000000000000000000000000000000000000000000000000'),
                 HexConverter::hexToUInt('0x5000000000001008000000000000000000000000000000000000000000000000'),
@@ -100,26 +91,131 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000000000000000000000000000000000000000000000',
         ];
 
-        // dump($serializer->encode($function->inputs(), $data)->toArrayWithMeta());
-        //
-        // $ex = array_map(function ($val) {
-        //     return ltrim($val, '0') ?: '0';
-        // }, $expected);
-        //
-        // $en = array_map(function ($val) {
-        //     return ltrim($val, '0') ?: '0';
-        // }, $encoded);
-        //
-        // dump([
-        //     'expected' => $ex,
-        //     'encoded' => $en,
-        // ]);
-
         $this->assertEquals($expected, $encoded);
 
         $encodedData = implode('', $expected);
         $actual = $serializer->decode($function->inputs(), $encodedData);
 
         $this->assertEquals($data, $actual);
+    }
+
+
+    public function testCase1()
+    {
+        $name = 'foo';
+        $address = 'bar';
+
+        $stateMutability = 'nonpayable';
+
+        $json = [
+            [
+                'name' => 'f',
+                'type' => 'function',
+                'stateMutability' => $stateMutability,
+                'inputs' => [
+                    [
+                        'name' => 'tradeValues',
+                        'type' => 'uint256[8]',
+                    ],
+                    [
+                        'name' => 'tradeAddresses',
+                        'type' => 'address[4]',
+                    ],
+                    [
+                        'name' => 'v',
+                        'type' => 'uint8[2]',
+                    ],
+                    [
+                        'name' => 'rs',
+                        'type' => 'bytes32[4]',
+                    ],
+                ],
+            ],
+        ];
+        $contract = new Contract($name, $address, $json);
+
+        $function = $contract->function('f');
+
+        $serialized = [
+            '000000000000000000000000000000000000000000000000237595b315c3df24',
+            '000000000000000000000000000000000000000000000b45afbd3f51d4dfce10',
+            '0000000000000000000000000000000000000000000000000000000000002710',
+            '0000000000000000000000000000000000000000000000000000016fcca5e611',
+            '00000000000000000000000000000000000000000000000010b8d22f16392b88',
+            '000000000000000000000000000000000000000000000000000000000008a0af',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '00000000000000000000000000000000000000000000000000108a711bccdc05',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '000000000000000000000000037a54aab062628c9bbae1fdb1583c195585fe41',
+            '000000000000000000000000f3cb44e421e1774affb4abbbe691962cea19fa11',
+            '0000000000000000000000005ab9d116a53ef41063e3eae26a7ebe736720e9ba',
+            '000000000000000000000000000000000000000000000000000000000000001c',
+            '000000000000000000000000000000000000000000000000000000000000001b',
+            '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
+            '2124970518d797c13c878280e7b22d9c6d7ad12f8ec076fbe7012b6988ae3aa8',
+            '42666c880cbd67e857257d51dad9daee33d72d8eadfe7d99613294802048329a',
+            '643d5f1a56886692f5246f22c28201eace74755c53fe3870ab6fc7b67b8c5de0',
+        ];
+
+        $expected = [
+            'tradeValues' => [
+                '2555112959999467300',
+                '53231519999999988452880',
+                '10000',
+                '1579686422033',
+                '1204943999999749000',
+                '565423',
+                '0',
+                '4655818029718533',
+            ],
+            'tradeAddresses' => [
+                '0000000000000000000000000000000000000000',
+                '037a54aab062628c9bbae1fdb1583c195585fe41',
+                'f3cb44e421e1774affb4abbbe691962cea19fa11',
+                '5ab9d116a53ef41063e3eae26a7ebe736720e9ba',
+            ],
+            'v' => [
+                28,
+                27,
+            ],
+            'rs' => [
+                HexConverter::hexToBytes('251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df'),
+                HexConverter::hexToBytes('2124970518d797c13c878280e7b22d9c6d7ad12f8ec076fbe7012b6988ae3aa8'),
+                HexConverter::hexToBytes('42666c880cbd67e857257d51dad9daee33d72d8eadfe7d99613294802048329a'),
+                HexConverter::hexToBytes('643d5f1a56886692f5246f22c28201eace74755c53fe3870ab6fc7b67b8c5de0'),
+            ],
+        ];
+
+        $this->assertSerializer($function->inputs(), $expected, $serialized);
+    }
+
+    protected function assertSerializer(array $functionValueTypes, array $data, array $serialized)
+    {
+        $serializer = new ContractFunctionSerializer();
+
+        $encoded = $serializer->encode($functionValueTypes, $data)->toArray();
+
+        dump($serializer->encode($functionValueTypes, $data)->toArrayWithMeta());
+
+        $ex = array_map(function ($val) {
+            return ltrim($val, '0') ?: '0';
+        }, $serialized);
+
+        $en = array_map(function ($val) {
+            return ltrim($val, '0') ?: '0';
+        }, $encoded);
+
+        dump([
+            'expected' => $ex,
+            'encoded' => $en,
+        ]);
+
+
+        $this->assertEquals($serialized, $encoded, 'correctly encoded data');
+
+        $decoded = $serializer->decode($functionValueTypes, implode('',$serialized));
+        $expectedDecoded = $data;
+
+        $this->assertEquals($expectedDecoded, $decoded, 'correctly decoded data');
     }
 }

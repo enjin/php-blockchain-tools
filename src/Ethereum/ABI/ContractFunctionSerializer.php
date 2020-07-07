@@ -73,7 +73,6 @@ class ContractFunctionSerializer
 
         $results = [];
         foreach ($functionValueTypes as $i => $item) {
-
             /** @var ContractFunctionValueType $item */
             $itemName = $item->name() ?: $i;
 
@@ -83,9 +82,8 @@ class ContractFunctionSerializer
             $isArray = $dataType->isArray();
 
             if ($isArray) {
-                $startIndex = $this->uIntFromIndex($data, $index) * 2;
-
                 if ($dataType->isDynamicLengthArray()) {
+                    $startIndex = $this->uIntFromIndex($data, $index) * 2;
                     $length = $this->uIntFromIndex($data, $startIndex);
                     $valuesIndex = $startIndex + 64;
                     $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $length);
@@ -98,7 +96,7 @@ class ContractFunctionSerializer
 
                 // fixed length array
                 $length = $dataType->arrayLength();
-                $hexValues = $this->hexArrayFromIndex($data, $startIndex, $length);
+                $hexValues = $this->hexArrayFromIndex($data, $index, $length);
                 $results[$itemName] = $dataType->decodeArrayValues($hexValues);
 
                 $index += $length * 64;

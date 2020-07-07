@@ -108,6 +108,13 @@ class DataType
         return $this->aliasedFrom;
     }
 
+    public function encodeArrayValues(array $values): array
+    {
+        return array_map(function ($val) {
+            return $this->encodeBaseType($val);
+        }, $values);
+    }
+
     public function encodeBaseType($value)
     {
         $baseType = $this->baseType();
@@ -132,7 +139,8 @@ class DataType
             if (!$value) {
                 $value = [];
             }
-            EthBytes::encode($value);
+
+            return EthBytes::encode($value);
         }
 
         if ($baseType === 'bool') {
@@ -144,10 +152,10 @@ class DataType
         }
     }
 
-    public function encodeArrayValues(array $values): array
+    public function decodeArrayValues(array $values): array
     {
         return array_map(function ($val) {
-            return $this->encodeBaseType($val);
+            return $this->decodeBaseType($val);
         }, $values);
     }
 
@@ -172,6 +180,7 @@ class DataType
         }
 
         if ($baseType === 'bytes') {
+            dump('zxc', $value);
             return EthBytes::decode($value);
         }
 
@@ -182,13 +191,6 @@ class DataType
         if ($baseType === 'string') {
             return EthString::decode($value);
         }
-    }
-
-    public function decodeArrayValues(array $values): array
-    {
-        return array_map(function ($val) {
-            return $this->decodeBaseType($val);
-        }, $values);
     }
 
     protected function setData(
