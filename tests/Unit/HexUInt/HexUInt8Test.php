@@ -117,4 +117,22 @@ class HexUInt8Test extends TestCase
         $actual = (new HexUInt8($value))->toDecimal();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testPadLeft()
+    {
+        $value = 'f';
+        $expected = '0f';
+
+        $actual = HexUInt8::padLeft($value);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testPadRight()
+    {
+        $value = 'a';
+        $expected = 'a0';
+
+        $actual = HexUInt8::padRight($value);
+        $this->assertEquals($expected, $actual);
+    }
 }

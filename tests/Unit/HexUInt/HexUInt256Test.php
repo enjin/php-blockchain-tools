@@ -194,4 +194,23 @@ class HexUInt256Test extends TestCase
         $actual = (new HexUInt256($value))->toDecimal();
         $this->assertEquals($expected, $actual);
     }
+
+
+    public function testPadLeft()
+    {
+        $value = '1234567890abcdef1234567890abcdef';
+        $expected = str_pad('1234567890abcdef1234567890abcdef', 64, '0', STR_PAD_LEFT);
+
+        $actual = HexUInt256::padLeft($value);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testPadRight()
+    {
+        $value = '1234567890abcdef1234567890abcdef';
+        $expected = str_pad('1234567890abcdef1234567890abcdef', 64, '0', STR_PAD_RIGHT);
+
+        $actual = HexUInt256::padRight($value);
+        $this->assertEquals($expected, $actual);
+    }
 }

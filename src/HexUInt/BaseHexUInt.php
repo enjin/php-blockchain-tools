@@ -17,6 +17,16 @@ abstract class BaseHexUInt
         $this->value = $this->parseAndValidate($value);
     }
 
+    public static function padLeft(string $hex)
+    {
+        return HexConverter::padLeft($hex, static::LENGTH);
+    }
+
+    public static function padRight(string $hex)
+    {
+        return HexConverter::padRight($hex, static::LENGTH);
+    }
+
     /**
      * @return string number in base 10
      */
