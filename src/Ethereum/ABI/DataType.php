@@ -2,12 +2,12 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthAddress;
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthBool;
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthBytes;
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthInt;
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthString;
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\EthUint;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthAddress;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBool;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBytes;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthInt;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthString;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthUint;
 
 class DataType
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Enjin\BlockchainTools\Ethereum\ABI\DataTypes;
+namespace Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers;
 
 use Enjin\BlockchainTools\HexConverter;
 

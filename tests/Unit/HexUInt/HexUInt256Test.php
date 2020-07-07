@@ -195,7 +195,6 @@ class HexUInt256Test extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     public function testPadLeft()
     {
         $value = '1234567890abcdef1234567890abcdef';
