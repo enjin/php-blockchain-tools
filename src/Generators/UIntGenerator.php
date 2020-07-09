@@ -112,7 +112,7 @@ class UIntGenerator
 
         $class->addConstant('BIT_SIZE_TO_CLASS', $bitSizeToClass);
 
-        $method = $class->addMethod('fromHexIntBitSize')
+        $method = $class->addMethod('fromHexUIntBitSize')
             ->setStatic()
             ->setBody('
 if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {

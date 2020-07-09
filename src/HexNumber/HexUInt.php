@@ -73,7 +73,7 @@ class HexUInt
         256 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256',
     ];
 
-    public static function fromHexIntBitSize(int $bitSize, string $hex)
+    public static function fromHexUIntBitSize(int $bitSize, string $hex)
     {
         if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
             throw new InvalidArgumentException('Invalid bit size: ' . $bitSize);
