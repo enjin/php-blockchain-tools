@@ -127,7 +127,6 @@ return new $class($hex);
         $method->addParameter('bitSize')
             ->setType(Type::INT);
 
-
         $method->addParameter('hex')
             ->setType(Type::STRING);
 

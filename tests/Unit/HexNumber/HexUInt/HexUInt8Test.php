@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\HexUInt;
 
-use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Tests\TestCase;
@@ -135,56 +134,5 @@ class HexUInt8Test extends TestCase
 
         $actual = HexUInt8::padRight($value);
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @dataProvider uInt8Provider
-     */
-    public function testUInt8($hex, $int)
-    {
-        $message = 'HexUInt8::fromInt($int)->toHex() convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexUInt8::fromInt($int)->toHex(), $message);
-
-        $message = 'HexUInt8::fromHex($hex)->toDecimal() convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals($int, HexUInt8::fromHex($hex)->toDecimal(), $message);
-
-        $message = 'HexUInt8::fromHex($hex)->toUnPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals($hex, HexUInt8::fromHex($hex)->toUnPrefixed(), $message);
-
-        $message = 'HexUInt8::fromHex($hex)->toPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals('0x' . $hex, HexUInt8::fromHex($hex)->toPrefixed(), $message);
-
-        $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexConverter::intToHexUInt($int, HexUInt8::HEX_LENGTH), $message);
-
-        $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals($int, HexConverter::hexToUInt($hex), $message);
-    }
-
-
-    public function uInt8Provider()
-    {
-        return [
-            [
-                'hex' => HexUInt8::HEX_MIN,
-                'int' => HexUInt8::INT_MIN,
-            ],
-            [
-                'hex' => HexUInt8::HEX_MAX,
-                'int' => HexUInt8::INT_MAX,
-            ],
-            [
-                'hex' => '01',
-                'int' => '1',
-            ],
-            [
-                'hex' => '0a',
-                'int' => '10',
-            ],
-            [
-                'hex' => '7f',
-                'int' => '127',
-            ],
-        ];
     }
 }
