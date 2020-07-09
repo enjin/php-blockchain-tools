@@ -30,6 +30,7 @@ class ContractFunctionSerializer
 
             $dataType = $item->dataType();
             $rawType = $item->type();
+
             $baseType = $dataType->baseType();
             $isArray = $dataType->isArray();
 

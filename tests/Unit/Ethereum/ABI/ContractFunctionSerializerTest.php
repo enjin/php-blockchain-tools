@@ -189,32 +189,140 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertSerializer($function->inputs(), $expected, $serialized);
     }
 
-    protected function assertSerializer(array $functionValueTypes, array $data, array $serialized)
+    public function testCase2()
     {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint256',
+                    ],
+                    [
+                        'name' => '_fee',
+                        'type' => 'uint16',
+                    ],
+                ],
+                'name' => 'setMeltFee',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('setMeltFee');
+
+        $expected = [
+            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
+            '_fee' => '500',
+        ];
+
+        $serialized = [
+            '50000000000014ce000000000000000000000000000000000000000000000000',
+            '00000000000000000000000000000000000000000000000000000000000001f4',
+        ];
+        $this->assertSerializer($function->inputs(), $expected, $serialized);
+    }
+
+    public function testCase3()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint256',
+                    ],
+                    [
+                        'name' => '_to',
+                        'type' => 'address[]',
+                    ],
+                    [
+                        'name' => '_values',
+                        'type' => 'uint256[]',
+                    ],
+                ],
+                'name' => 'mintFungibles',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('mintFungibles');
+
+        $expected = [
+            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
+            '_values' => [1, 2, 3],
+            '_to' => [
+                '0xC814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+                '0xC814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+                '0xC814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+            ],
+        ];
+
+        $serialized = [
+            '50000000000014ce000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000060',
+            '00000000000000000000000000000000000000000000000000000000000000e0',
+            '0000000000000000000000000000000000000000000000000000000000000003',
+            '000000000000000000000000C814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+            '000000000000000000000000C814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+            '000000000000000000000000C814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+            '0000000000000000000000000000000000000000000000000000000000000003',
+            '0000000000000000000000000000000000000000000000000000000000000001',
+            '0000000000000000000000000000000000000000000000000000000000000002',
+            '0000000000000000000000000000000000000000000000000000000000000003',
+        ];
+
+        $expectedDecoded = $expected;
+        $expectedDecoded['_to'] = array_map(function ($item) {
+            return HexConverter::unPrefix($item);
+        }, $expectedDecoded['_to']);
+
+        $this->assertSerializer($function->inputs(), $expected, $serialized, $expectedDecoded);
+    }
+
+    protected function assertSerializer(
+        array $functionValueTypes,
+        array $data,
+        array $serialized,
+        array $expectedDecoded = []
+    ) {
         $serializer = new ContractFunctionSerializer();
 
         $encoded = $serializer->encode($functionValueTypes, $data)->toArray();
 
-        dump($serializer->encode($functionValueTypes, $data)->toArrayWithMeta());
-
-        $ex = array_map(function ($val) {
-            return ltrim($val, '0') ?: '0';
-        }, $serialized);
-
-        $en = array_map(function ($val) {
-            return ltrim($val, '0') ?: '0';
-        }, $encoded);
-
-        dump([
-            'expected' => $ex,
-            'encoded' => $en,
-        ]);
+        // dump($serializer->encode($functionValueTypes, $data)->toArrayWithMeta());
+        //
+        // $ex = array_map(function ($val) {
+        //     return ltrim($val, '0') ?: '0';
+        // }, $serialized);
+        //
+        // $en = array_map(function ($val) {
+        //     return ltrim($val, '0') ?: '0';
+        // }, $encoded);
+        //
+        // dump([
+        //     'expected' => $ex,
+        //     'encoded' => $en,
+        // ]);
 
 
         $this->assertEquals($serialized, $encoded, 'correctly encoded data');
 
-        $decoded = $serializer->decode($functionValueTypes, implode('',$serialized));
-        $expectedDecoded = $data;
+        $decoded = $serializer->decode($functionValueTypes, implode('', $serialized));
+        $expectedDecoded = $expectedDecoded ?: $data;
 
         $this->assertEquals($expectedDecoded, $decoded, 'correctly decoded data');
     }

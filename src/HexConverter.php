@@ -53,21 +53,15 @@ class HexConverter
         return (string) pack('H*', static::unPrefix($hex));
     }
 
-    public static function intToHexInt(string $int, int $length = null): string
+    public static function intToHexInt(string $int, int $length): string
     {
-        $isNegative = strpos($int, '-') === 0;
-        $value = (new BigInteger($int, 10))->abs();
-
-        $hex = static::bigIntegerToHex($value);
-
-        if ($isNegative) {
-            $hex = 'ff' . $hex;
-        } else {
-            $hex = '00' . $hex;
-        }
+        $isNegative = $int[0] === '-';
+        $value = new BigInteger($int, 10);
+        $hex = $value->toHex(true);
 
         if ($length) {
-            $hex = str_pad($hex, $length, '0', STR_PAD_LEFT);
+            $pad = $isNegative ? 'f' : '0';
+            $hex = str_pad($hex, $length, $pad, STR_PAD_LEFT);
         }
 
         return $hex;
@@ -84,25 +78,41 @@ class HexConverter
      * @param string $hex
      * @return string base 10 value
      */
-    public static function hexIntToInt(string $hex): string
+    public static function hexIntToInt(string $hex, string $maxDecimalValue): string
     {
         $hex = static::unPrefix($hex);
-        $first2 = substr($hex, 0, 2);
-        $isNegative = $first2 === 'ff';
-        $hex = substr($hex, 2);
 
-        $int = static::hexToUInt($hex);
+        $value = new BigInteger($hex, 16);
+        $max = new BigInteger($maxDecimalValue, 10);
 
-        if ($isNegative) {
-            $int = '-' . $int;
+        $diff = $max->subtract($value);
+
+        $valueGreaterThanDiff = $value->compare($diff) > 0;
+
+        $inverted = null;
+        if ($valueGreaterThanDiff) {
+            $invert = new BigInteger('-1');
+            $inverted = $diff->multiply($invert);
         }
+        dump([
+            'hexdecsXXX',
 
-        return $int;
+            'max' => $max,
+            'value' => $value,
+            'diff' => $diff,
+            'valueGreaterThanDiff' => $valueGreaterThanDiff,
+            'inverted' => $inverted,
+        ]);
+
+        if ($inverted) {
+            return $inverted->toString();
+        }
+        return $value->toString();
     }
 
     public static function intToHexUInt(string $int, int $length = null): string
     {
-        $hex = static::bigIntegerToHex(new BigInteger($int));
+        $hex = (new BigInteger($int))->toHex();
 
         if ($length) {
             $hex = str_pad($hex, $length, '0', STR_PAD_LEFT);
@@ -136,18 +146,6 @@ class HexConverter
     public static function bytesToHexPrefixed(array $bytes): string
     {
         return '0x' . static::bytesToHex($bytes);
-    }
-
-    public static function bigIntegerToHex(BigInteger $number): string
-    {
-        $value = $number->toHex(true);
-        $value = ltrim($value, '0');
-
-        if ($value === '') {
-            return '0';
-        }
-
-        return $value;
     }
 
     public static function padLeft(string $hex, int $length): string
