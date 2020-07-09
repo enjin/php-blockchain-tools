@@ -66,7 +66,6 @@ class IntGenerator
         $class->addConstant('INT_MIN', $intMin)->setPublic();
         $class->addConstant('INT_MAX', $intMax)->setPublic();
 
-
         $intSize = bcsub($intMax, $intMin);
         $class->addConstant('SIZE', $intSize)->setPublic();
 
@@ -81,7 +80,6 @@ class IntGenerator
             }
         }
         $printer = new PsrPrinter;
-
 
         return [
             'className' => $class->getName(),

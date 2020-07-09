@@ -47,7 +47,6 @@ class HexInt32Test extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     public function test32To64Negative()
     {
         $value = 'f234561b';

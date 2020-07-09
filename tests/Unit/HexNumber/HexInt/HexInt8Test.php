@@ -172,6 +172,12 @@ class HexInt8Test extends TestCase
         $message = 'HexInt8::fromHex($hex)->toDecimal() convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, HexInt8::fromHex($hex)->toDecimal(), $message);
 
+        $message = 'HexInt8::fromHex($hex)->toHexUnPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals($hex, HexInt8::fromHex($hex)->toUnPrefixed(), $message);
+
+        $message = 'HexInt8::fromHex($hex)->toHexPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals('0x' . $hex, HexInt8::fromHex($hex)->toPrefixed(), $message);
+
         $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
         $this->assertEquals($hex, HexConverter::intToHexInt($int, HexInt8::LENGTH), $message);
 

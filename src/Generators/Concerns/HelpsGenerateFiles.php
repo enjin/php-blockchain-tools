@@ -1,4 +1,5 @@
 <?php
+
 namespace Enjin\BlockchainTools\Generators\Concerns;
 
 trait HelpsGenerateFiles

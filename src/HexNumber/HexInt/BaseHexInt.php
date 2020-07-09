@@ -3,21 +3,11 @@
 namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 use Enjin\BlockchainTools\HexConverter;
-use InvalidArgumentException;
+use Enjin\BlockchainTools\HexNumber\BaseHexNumber;
 use phpseclib\Math\BigInteger;
 
-abstract class BaseHexInt
+abstract class BaseHexInt extends BaseHexNumber
 {
-    /**
-     * @var string
-     */
-    protected $value;
-
-    public function __construct(string $value)
-    {
-        $this->value = $this->parseAndValidate($value);
-    }
-
     public static function padLeft(string $hex): string
     {
         $string = static::isNegative($hex) ? 'f' : '0';
@@ -25,13 +15,9 @@ abstract class BaseHexInt
         return HexConverter::padLeft($hex, static::LENGTH, $string);
     }
 
-    public static function padRight(string $hex, string $string): string
-    {
-        return HexConverter::padRight($hex, static::LENGTH, $string);
-    }
-
     /**
      * @param string $int
+     *
      * @return static
      */
     public static function fromInt(string $int)
@@ -39,30 +25,6 @@ abstract class BaseHexInt
         $hex = HexConverter::intToHexInt($int, static::LENGTH);
 
         return new static($hex);
-    }
-
-    /**
-     * @param string $hex
-     * @return static
-     */
-    public static function fromHex(string $hex)
-    {
-        return new static($hex);
-    }
-
-    public function toHexPrefixed(): string
-    {
-        return HexConverter::prefix($this->value);
-    }
-
-    public function toHexUnPrefixed(): string
-    {
-        return HexConverter::unPrefix($this->value);
-    }
-
-    public function toHex(): string
-    {
-        return $this->value;
     }
 
     /**
@@ -85,20 +47,5 @@ abstract class BaseHexInt
         $num = new BigInteger($hex, -16);
 
         return $num->toString()[0] === '-';
-    }
-
-    protected function parseAndValidate(string $hex)
-    {
-        $value = HexConverter::unPrefix($hex);
-        $length = strlen($value);
-        $expectedLength = static::LENGTH;
-
-        if ($length !== $expectedLength) {
-            $class = basename(str_replace('\\', '/', get_class($this)));
-
-            throw new InvalidArgumentException("{$class} value provided is invalid. Expected {$expectedLength} characters but has: {$length} (input value: {$hex})");
-        }
-
-        return $hex;
     }
 }

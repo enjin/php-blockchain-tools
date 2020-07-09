@@ -99,7 +99,6 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertEquals($data, $actual);
     }
 
-
     public function testCase1()
     {
         $name = 'foo';
@@ -317,7 +316,6 @@ class ContractFunctionSerializerTest extends TestCase
         //     'expected' => $ex,
         //     'encoded' => $en,
         // ]);
-
 
         $this->assertEquals($serialized, $encoded, 'correctly encoded data');
 

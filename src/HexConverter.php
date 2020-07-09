@@ -73,9 +73,10 @@ class HexConverter
     }
 
     /**
-     * Convert from a hex signed int to a php string of that number in base 10
+     * Convert from a hex signed int to a php string of that number in base 10.
      *
      * @param string $hex
+     *
      * @return string base 10 value
      */
     public static function hexIntToInt(string $hex): string

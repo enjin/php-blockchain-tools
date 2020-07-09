@@ -81,7 +81,6 @@ class UIntGenerator
         }
         $printer = new PsrPrinter;
 
-
         return [
             'className' => $class->getName(),
             'contents' => $printer->printNamespace($namespace),
