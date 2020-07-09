@@ -148,55 +148,43 @@ class HexUInt8Test extends TestCase
         $message = 'HexUInt8::fromHex($hex)->toDecimal() convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, HexUInt8::fromHex($hex)->toDecimal(), $message);
 
-        $message = 'HexUInt8::fromHex($hex)->toHexUnPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals($hex, HexUInt8::fromHex($hex)->toHexUnPrefixed(), $message);
+        $message = 'HexUInt8::fromHex($hex)->toUnPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals($hex, HexUInt8::fromHex($hex)->toUnPrefixed(), $message);
 
-        $message = 'HexUInt8::fromHex($hex)->toHexPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals('0x' . $hex, HexUInt8::fromHex($hex)->toHexPrefixed(), $message);
+        $message = 'HexUInt8::fromHex($hex)->toPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals('0x' . $hex, HexUInt8::fromHex($hex)->toPrefixed(), $message);
 
         $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexUInt8::HEX_LENGTH), $message);
+        $this->assertEquals($hex, HexConverter::intToHexUInt($int, HexUInt8::HEX_LENGTH), $message);
 
         $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals($int, HexConverter::hexIntToInt($hex), $message);
+        $this->assertEquals($int, HexConverter::hexToUInt($hex), $message);
     }
 
-    //
-    // public function uInt8Provider()
-    // {
-    //     return [
-    //         [
-    //             'hex' => HexUInt8::HEX_MIN,
-    //             'int' => HexUInt8::INT_MIN,
-    //         ],
-    //         [
-    //             'hex' => HexUInt8::HEX_MAX,
-    //             'int' => HexUInt8::INT_MAX,
-    //         ],
-    //         [
-    //             'hex' => '01',
-    //             'int' => '1',
-    //         ],
-    //         [
-    //             'hex' => '0a',
-    //             'int' => '10',
-    //         ],
-    //         [
-    //             'hex' => 'ff',
-    //             'int' => '-1',
-    //         ],
-    //         [
-    //             'hex' => 'f0',
-    //             'int' => '-16',
-    //         ],
-    //         [
-    //             'hex' => '80',
-    //             'int' => '-128',
-    //         ],
-    //         [
-    //             'hex' => '7f',
-    //             'int' => '127',
-    //         ],
-    //     ];
-    // }
+
+    public function uInt8Provider()
+    {
+        return [
+            [
+                'hex' => HexUInt8::HEX_MIN,
+                'int' => HexUInt8::INT_MIN,
+            ],
+            [
+                'hex' => HexUInt8::HEX_MAX,
+                'int' => HexUInt8::INT_MAX,
+            ],
+            [
+                'hex' => '01',
+                'int' => '1',
+            ],
+            [
+                'hex' => '0a',
+                'int' => '10',
+            ],
+            [
+                'hex' => '7f',
+                'int' => '127',
+            ],
+        ];
+    }
 }
