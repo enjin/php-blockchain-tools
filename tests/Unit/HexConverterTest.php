@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexInt\HexInt32;
+use Enjin\BlockchainTools\HexNumber\HexInt\HexInt32;
 use Tests\TestCase;
 
 class HexConverterTest extends TestCase

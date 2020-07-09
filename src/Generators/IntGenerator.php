@@ -4,7 +4,7 @@ namespace Enjin\BlockchainTools\Generators;
 
 use Enjin\BlockchainTools\Generators\Concerns\HelpsGenerateFiles;
 use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexInt\BaseHexInt;
+use Enjin\BlockchainTools\HexNumber\HexInt\BaseHexInt;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 use Nette\PhpGenerator\Type;
@@ -13,36 +13,35 @@ class IntGenerator
 {
     use HelpsGenerateFiles;
 
+    protected const NAMESPACE = 'Enjin\BlockchainTools\HexNumber';
+    protected const DIR = __DIR__ . '/../../src/HexNumber';
+
     public function generate()
     {
         $sizes = $this->getIntLengths();
 
-        $namespaceString = 'Enjin\BlockchainTools\HexInt';
-
         foreach ($sizes as $size) {
-            $result = $this->makeHexIntSizeClass($size, $namespaceString, $sizes);
+            $result = $this->makeHexIntSizeClass($size, $sizes);
 
             $className = $result['className'];
             $contents = $result['contents'];
 
-            $destDir = __DIR__ . '/../../src/HexInt/';
+            $destDir = static::DIR . '/HexUInt/';
             $this->writePHPFile($destDir, $className, $contents);
         }
 
-        $result = $this->makeHexIntConverterClass($sizes, 'Enjin\BlockchainTools');
+        $result = $this->makeHexIntConverterClass($sizes);
 
         $className = $result['className'];
         $contents = $result['contents'];
 
-        $destDir = __DIR__ . '/../../src/';
+        $destDir = static::DIR . '/';
         $this->writePHPFile($destDir, $className, $contents);
     }
 
-    public function makeHexIntSizeClass(
-        int $size,
-        string $namespaceString,
-        array $sizes
-    ) {
+    public function makeHexIntSizeClass(int $size, array $sizes)
+    {
+        $namespaceString = static::NAMESPACE . '\HexUInt';
         $namespace = new PhpNamespace($namespaceString);
 
         $className = 'HexInt' . $size;
@@ -76,7 +75,7 @@ class IntGenerator
 
             if ($targetSize < $size) {
             } elseif ($size < $targetSize) {
-                $class->addMethod('toInt' . $targetSize)
+                $class->addMethod('toHexInt' . $targetSize)
                     ->setReturnType(Type::STRING)
                     ->addBody('return $this->convertUpTo($this->value, ' . $targetClassName . '::LENGTH);');
             }
@@ -90,20 +89,20 @@ class IntGenerator
         ];
     }
 
-    public function makeHexIntConverterClass(array $sizes, string $namespaceString)
+    public function makeHexIntConverterClass(array $sizes)
     {
-        $namespace = new PhpNamespace($namespaceString);
+        $namespace = new PhpNamespace(static::NAMESPACE);
 
         $class = $namespace->addClass('HexInt');
 
         foreach ($sizes as $size) {
             $targetClassName = 'HexInt' . $size;
-            $targetClass = $namespaceString . '\\HexInt\\' . $targetClassName;
+            $targetClass = static::NAMESPACE . '\\HexInt\\' . $targetClassName;
 
             $namespace->addUse($targetClass);
 
             $paramName = 'Int' . $size;
-            $method = $class->addMethod('fromInt' . $size)
+            $method = $class->addMethod('fromHexInt' . $size)
                 ->setStatic()
                 ->setBody('return new ' . $targetClassName . '($' . $paramName . ');')
                 ->setReturnType($targetClass);

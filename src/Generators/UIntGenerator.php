@@ -4,7 +4,7 @@ namespace Enjin\BlockchainTools\Generators;
 
 use Enjin\BlockchainTools\Generators\Concerns\HelpsGenerateFiles;
 use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexUInt\BaseHexUInt;
+use Enjin\BlockchainTools\HexNumber\HexUInt\BaseHexUInt;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 use Nette\PhpGenerator\Type;
@@ -13,36 +13,35 @@ class UIntGenerator
 {
     use HelpsGenerateFiles;
 
+    protected const NAMESPACE = 'Enjin\BlockchainTools\HexNumber';
+    protected const DIR = __DIR__ . '/../../src/HexNumber';
+
     public function generate()
     {
         $sizes = $this->getIntLengths();
 
-        $namespaceString = 'Enjin\BlockchainTools\HexUInt';
-
         foreach ($sizes as $size) {
-            $result = $this->makeHexUIntSizeClass($size, $namespaceString, $sizes);
+            $result = $this->makeHexUIntSizeClass($size, $sizes);
 
             $className = $result['className'];
             $contents = $result['contents'];
 
-            $destDir = __DIR__ . '/../../src/HexUInt/';
+            $destDir = static::DIR . '/HexUInt/';
             $this->writePHPFile($destDir, $className, $contents);
         }
 
-        $result = $this->makeHexUIntConverterClass($sizes, 'Enjin\BlockchainTools');
+        $result = $this->makeHexUIntConverterClass($sizes);
 
         $className = $result['className'];
         $contents = $result['contents'];
 
-        $destDir = __DIR__ . '/../../src/';
+        $destDir = static::DIR . '/';
         $this->writePHPFile($destDir, $className, $contents);
     }
 
-    public function makeHexUIntSizeClass(
-        int $size,
-        string $namespaceString,
-        array $sizes
-    ) {
+    public function makeHexUIntSizeClass(int $size, array $sizes)
+    {
+        $namespaceString = static::NAMESPACE . '\HexUInt';
         $namespace = new PhpNamespace($namespaceString);
 
         $className = 'HexUInt' . $size;
@@ -67,15 +66,15 @@ class UIntGenerator
             $targetClassName = 'HexUInt' . $targetSize;
 
             if ($targetSize < $size) {
-                $class->addMethod('toUInt' . $targetSize . 'Top')
+                $class->addMethod('toHexUInt' . $targetSize . 'Top')
                     ->setReturnType(Type::STRING)
                     ->addBody('return $this->convertDownToTop($this->value, ' . $targetClassName . '::LENGTH);');
 
-                $class->addMethod('toUInt' . $targetSize . 'Bottom')
+                $class->addMethod('toHexUInt' . $targetSize . 'Bottom')
                     ->setReturnType(Type::STRING)
                     ->addBody('return $this->convertDownToBottom($this->value, ' . $targetClassName . '::LENGTH);');
             } elseif ($size < $targetSize) {
-                $class->addMethod('toUInt' . $targetSize)
+                $class->addMethod('toHexUInt' . $targetSize)
                     ->setReturnType(Type::STRING)
                     ->addBody('return $this->convertUpTo($this->value, ' . $targetClassName . '::LENGTH);');
             }
@@ -89,20 +88,20 @@ class UIntGenerator
         ];
     }
 
-    public function makeHexUIntConverterClass(array $sizes, string $namespaceString)
+    public function makeHexUIntConverterClass(array $sizes)
     {
-        $namespace = new PhpNamespace($namespaceString);
+        $namespace = new PhpNamespace(static::NAMESPACE);
 
         $class = $namespace->addClass('HexUInt');
 
         foreach ($sizes as $size) {
             $targetClassName = 'HexUInt' . $size;
-            $targetClass = $namespaceString . '\\HexUInt\\' . $targetClassName;
+            $targetClass = static::NAMESPACE . '\\HexUInt\\' . $targetClassName;
 
             $namespace->addUse($targetClass);
 
             $paramName = 'uInt' . $size;
-            $method = $class->addMethod('fromUInt' . $size)
+            $method = $class->addMethod('fromHexUInt' . $size)
                 ->setStatic()
                 ->setBody('return new ' . $targetClassName . '($' . $paramName . ');')
                 ->setReturnType($targetClass);
