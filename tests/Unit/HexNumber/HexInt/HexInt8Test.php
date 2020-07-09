@@ -166,13 +166,30 @@ class HexInt8Test extends TestCase
      */
     public function testInt8($hex, $int)
     {
-        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexInt8::LENGTH), 'convert int: ' . $int . ' into expected hex: ' . $hex);
-        $this->assertEquals($int, HexConverter::hexIntToInt($hex, HexInt8::SIZE), 'convert hex: ' . $hex . ' into expected int: ' . $int);
+        $message = 'HexInt8::fromInt($int)->toHex() convert int: ' . $int . ' into expected hex: ' . $hex;
+        $this->assertEquals($hex, HexInt8::fromInt($int)->toHex(), $message);
+
+        $message = 'HexInt8::fromHex($hex)->toDecimal() convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals($int, HexInt8::fromHex($hex)->toDecimal(), $message);
+
+        $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
+        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexInt8::LENGTH), $message);
+
+        $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals($int, HexConverter::hexIntToInt($hex), $message);
     }
 
     public function int8Provider()
     {
         return [
+            [
+                'hex' => HexInt8::HEX_MIN,
+                'int' => HexInt8::INT_MIN,
+            ],
+            [
+                'hex' => HexInt8::HEX_MAX,
+                'int' => HexInt8::INT_MAX,
+            ],
             [
                 'hex' => '01',
                 'int' => '1',
@@ -199,5 +216,4 @@ class HexInt8Test extends TestCase
             ],
         ];
     }
-
 }

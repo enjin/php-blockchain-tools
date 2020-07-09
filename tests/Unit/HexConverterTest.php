@@ -133,10 +133,10 @@ class HexConverterTest extends TestCase
         $hex = '000D7752';
         $expected = 882514;
 
-        $int = HexConverter::hexIntToInt($hex, HexInt32::INT_MAX);
+        $int = HexConverter::hexIntToInt($hex);
         $this->assertEquals($expected, $int);
 
-        $int = HexConverter::hexIntToInt('0x' . $hex, HexInt32::INT_MAX);
+        $int = HexConverter::hexIntToInt('0x' . $hex);
         $this->assertEquals($expected, $int);
     }
 
@@ -148,10 +148,10 @@ class HexConverterTest extends TestCase
         $hex = 'fff288ae';
         $expected = -882514;
 
-        $int = HexConverter::hexIntToInt($hex, HexInt32::INT_MAX);
+        $int = HexConverter::hexIntToInt($hex);
         $this->assertEquals($expected, $int);
 
-        $int = HexConverter::hexIntToInt('0x' . $hex, HexInt32::INT_MAX);
+        $int = HexConverter::hexIntToInt('0x' . $hex);
         $this->assertEquals($expected, $int);
     }
 

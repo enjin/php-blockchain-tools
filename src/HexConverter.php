@@ -76,30 +76,15 @@ class HexConverter
      * Convert from a hex signed int to a php string of that number in base 10
      *
      * @param string $hex
-     * @param string $maxDecimalValue max decimal value the hex string could represent
      * @return string base 10 value
      */
-    public static function hexIntToInt(string $hex, string $maxDecimalValue): string
+    public static function hexIntToInt(string $hex): string
     {
         $hex = static::unPrefix($hex);
 
         // -16 negative indicates that hex is encoded with two's complement
         $value = new BigInteger($hex, -16);
-        $max = new BigInteger($maxDecimalValue, 10);
 
-        $diff = $max->subtract($value);
-
-        $valueGreaterThanDiff = $value->compare($diff) > 0;
-
-        $inverted = null;
-        if ($valueGreaterThanDiff) {
-            $invert = new BigInteger('-1');
-            $inverted = $diff->multiply($invert);
-        }
-
-        if ($inverted) {
-            return $inverted->toString();
-        }
         return $value->toString();
     }
 

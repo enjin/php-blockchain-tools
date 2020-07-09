@@ -30,6 +30,10 @@ abstract class BaseHexInt
         return HexConverter::padRight($hex, static::LENGTH, $string);
     }
 
+    /**
+     * @param string $int
+     * @return static
+     */
     public static function fromInt(string $int)
     {
         $hex = HexConverter::intToHexInt($int, static::LENGTH);
@@ -37,14 +41,28 @@ abstract class BaseHexInt
         return new static($hex);
     }
 
-    public function toPrefixed(): string
+    /**
+     * @param string $hex
+     * @return static
+     */
+    public static function fromHex(string $hex)
+    {
+        return new static($hex);
+    }
+
+    public function toHexPrefixed(): string
     {
         return HexConverter::prefix($this->value);
     }
 
-    public function toUnPrefixed(): string
+    public function toHexUnPrefixed(): string
     {
         return HexConverter::unPrefix($this->value);
+    }
+
+    public function toHex(): string
+    {
+        return $this->value;
     }
 
     /**
@@ -52,7 +70,7 @@ abstract class BaseHexInt
      */
     public function toDecimal(): string
     {
-        return HexConverter::hexIntToInt($this->value, static::INT_MAX);
+        return HexConverter::hexIntToInt($this->value);
     }
 
     protected function convertUpTo(string $value, int $length): string
