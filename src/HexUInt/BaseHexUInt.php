@@ -17,12 +17,12 @@ abstract class BaseHexUInt
         $this->value = $this->parseAndValidate($value);
     }
 
-    public static function padLeft(string $hex)
+    public static function padLeft(string $hex): string
     {
         return HexConverter::padLeft($hex, static::LENGTH);
     }
 
-    public static function padRight(string $hex)
+    public static function padRight(string $hex): string
     {
         return HexConverter::padRight($hex, static::LENGTH);
     }
@@ -50,21 +50,21 @@ abstract class BaseHexUInt
         return $hex;
     }
 
-    protected function convertUpTo(string $value, int $length)
+    protected function convertUpTo(string $value, int $length): string
     {
         return HexConverter::withPrefixIntact($value, function ($hex) use ($length) {
             return str_pad($hex, $length, '0', STR_PAD_LEFT);
         });
     }
 
-    protected function convertDownToTop(string $value, int $length)
+    protected function convertDownToTop(string $value, int $length): string
     {
         return HexConverter::withPrefixIntact($value, function ($hex) use ($length) {
             return substr($hex, 0, $length);
         });
     }
 
-    protected function convertDownToBottom(string $value, int $length)
+    protected function convertDownToBottom(string $value, int $length): string
     {
         return HexConverter::withPrefixIntact($value, function ($hex) use ($length) {
             return substr($hex, -$length);

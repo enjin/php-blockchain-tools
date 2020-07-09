@@ -23,11 +23,6 @@ class BigHex
             }
         } elseif ($value instanceof self) {
             $value = $value->toStringUnPrefixed();
-        } elseif ($value instanceof BigInteger) {
-            // if ($value->is_negative) {
-            //     throw new InvalidArgumentException('Negative BigIntegers are not supported.');
-            // }
-            // $value = HexConverter::bigIntegerToHex($value);
         } else {
             $value = $this->valueToErrorString($value);
 

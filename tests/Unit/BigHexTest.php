@@ -50,29 +50,6 @@ class BigHexTest extends TestCase
         $this->assertBigHexValues($bigHex2, $hex, $number);
     }
 
-    public function testCreateFromBigIntegerZero()
-    {
-        $number = '0';
-        $hex = '0';
-        $bigInt = new BigInteger(0, 10);
-        $bigHex = new BigHex($bigInt);
-
-        $this->assertBigHexValues($bigHex, $hex, $number);
-    }
-
-    public function testCreateFromBigInteger()
-    {
-        $number = (string) random_int(0, 100000);
-        $bigInt = new BigInteger($number, 10);
-        $hex = $bigInt->toHex(true);
-        if ($hex !== 0) {
-            $hex = ltrim($hex, '0');
-        }
-        $bigHex = new BigHex($bigInt);
-
-        $this->assertBigHexValues($bigHex, $hex, $number);
-    }
-
     public function testBytesSymmetry()
     {
         $hex = '1a2b3c4d5e6f';

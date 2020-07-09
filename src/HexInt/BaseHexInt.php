@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\HexInt;
 
 use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
+use phpseclib\Math\BigInteger;
 
 abstract class BaseHexInt
 {
@@ -17,14 +18,23 @@ abstract class BaseHexInt
         $this->value = $this->parseAndValidate($value);
     }
 
-    public static function padLeft(string $hex)
+    public static function isNegative(string $hex): bool
     {
-        return HexConverter::padLeft($hex, static::LENGTH);
+        $num = new BigInteger($hex, -16);
+
+        return $num->toString()[0] === '-';
     }
 
-    public static function padRight(string $hex)
+    public static function padLeft(string $hex): string
     {
-        return HexConverter::padRight($hex, static::LENGTH);
+        $string = static::isNegative($hex) ? 'f' : '0';
+
+        return HexConverter::padLeft($hex, static::LENGTH, $string);
+    }
+
+    public static function padRight(string $hex, string $string): string
+    {
+        return HexConverter::padRight($hex, static::LENGTH, $string);
     }
 
     /**
@@ -32,6 +42,14 @@ abstract class BaseHexInt
      */
     public function toDecimal(): string
     {
+        return HexConverter::hexIntToInt($this->value, static::INT_MAX);
+    }
+
+    protected function convertUpTo(string $value, int $length): string
+    {
+        $string = static::isNegative($value) ? 'f' : '0';
+
+        return HexConverter::padLeft($value, $length, $string);
     }
 
     protected function parseAndValidate(string $hex)

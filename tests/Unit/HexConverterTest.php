@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexInt\HexInt32;
 use Tests\TestCase;
 
 class HexConverterTest extends TestCase
@@ -89,7 +90,7 @@ class HexConverterTest extends TestCase
     public function testIntToHexInt()
     {
         $int = 882514;
-        $expected = '00d7752';
+        $expected = '0d7752';
 
         $hex = HexConverter::intToHexInt($int);
         $this->assertEquals($expected, $hex);
@@ -110,13 +111,13 @@ class HexConverterTest extends TestCase
     public function testNegativeIntToHexInt()
     {
         $int = -882514;
-        $expected = 'ffd7752';
+        $expected = 'f288ae';
 
         $hex = HexConverter::intToHexInt($int);
         $this->assertEquals($expected, $hex);
         $this->assertEquals('0x' . $expected, HexConverter::intToHexIntPrefixed($int));
 
-        $expected = '000000000ffd7752';
+        $expected = 'fffffffffff288ae';
         $hex = HexConverter::intToHexInt($int, 16);
         $this->assertEquals($expected, $hex);
 
@@ -129,13 +130,13 @@ class HexConverterTest extends TestCase
      */
     public function testHexIntToInt()
     {
-        $hex = '00d7752';
+        $hex = '000D7752';
         $expected = 882514;
 
-        $int = HexConverter::hexIntToInt($hex);
+        $int = HexConverter::hexIntToInt($hex, HexInt32::INT_MAX);
         $this->assertEquals($expected, $int);
 
-        $int = HexConverter::hexIntToInt('0x' . $hex);
+        $int = HexConverter::hexIntToInt('0x' . $hex, HexInt32::INT_MAX);
         $this->assertEquals($expected, $int);
     }
 
@@ -144,14 +145,14 @@ class HexConverterTest extends TestCase
      */
     public function testNegativeHexIntToInt()
     {
-        $hex = 'ffd7752';
+        $hex = 'fff288ae';
         $expected = -882514;
 
-        $hex = HexConverter::hexIntToInt($hex);
-        $this->assertEquals($expected, $hex);
+        $int = HexConverter::hexIntToInt($hex, HexInt32::INT_MAX);
+        $this->assertEquals($expected, $int);
 
-        $hex = HexConverter::hexIntToInt('0x' . $hex);
-        $this->assertEquals($expected, $hex);
+        $int = HexConverter::hexIntToInt('0x' . $hex, HexInt32::INT_MAX);
+        $this->assertEquals($expected, $int);
     }
 
     /**
@@ -161,7 +162,7 @@ class HexConverterTest extends TestCase
     public function testUIntToHex()
     {
         $int = 882514;
-        $expected = 'd7752';
+        $expected = '0d7752';
 
         $hex = HexConverter::intToHexUInt($int);
         $this->assertEquals($expected, $hex);
@@ -246,32 +247,4 @@ class HexConverterTest extends TestCase
         $hex = HexConverter::bytesToHexPrefixed($bytes);
         $this->assertEquals('0x' . $expected, $hex);
     }
-
-    //
-    // public function testBigIntegerToHex()
-    // {
-    //     $number = 10;
-    //     $expected = 'a';
-    //
-    //     $int = new BigInteger($number);
-    //     $hex = HexConverter::bigIntegerToHex($int);
-    //
-    //     $this->assertEquals($expected, $hex);
-    //
-    //     $number = 0;
-    //     $expected = '0';
-    //
-    //     $int = new BigInteger($number);
-    //     $hex = HexConverter::bigIntegerToHex($int);
-    //
-    //     $this->assertEquals($expected, $hex);
-    //
-    //     $number = -10;
-    //     $expected = '0';
-    //
-    //     $int = new BigInteger($number);
-    //     $hex = HexConverter::bigIntegerToHex($int);
-    //
-    //     $this->assertEquals($expected, $hex);
-    // }
 }

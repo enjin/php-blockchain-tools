@@ -53,7 +53,7 @@ class HexConverter
         return (string) pack('H*', static::unPrefix($hex));
     }
 
-    public static function intToHexInt(string $int, int $length): string
+    public static function intToHexInt(string $int, int $length = null): string
     {
         $isNegative = $int[0] === '-';
         $value = new BigInteger($int, 10);
@@ -76,13 +76,15 @@ class HexConverter
      * Convert from a hex signed int to a php string of that number in base 10
      *
      * @param string $hex
+     * @param string $maxDecimalValue max decimal value the hex string could represent
      * @return string base 10 value
      */
     public static function hexIntToInt(string $hex, string $maxDecimalValue): string
     {
         $hex = static::unPrefix($hex);
 
-        $value = new BigInteger($hex, 16);
+        // -16 negative indicates that hex is encoded with two's complement
+        $value = new BigInteger($hex, -16);
         $max = new BigInteger($maxDecimalValue, 10);
 
         $diff = $max->subtract($value);
@@ -94,15 +96,6 @@ class HexConverter
             $invert = new BigInteger('-1');
             $inverted = $diff->multiply($invert);
         }
-        dump([
-            'hexdecsXXX',
-
-            'max' => $max,
-            'value' => $value,
-            'diff' => $diff,
-            'valueGreaterThanDiff' => $valueGreaterThanDiff,
-            'inverted' => $inverted,
-        ]);
 
         if ($inverted) {
             return $inverted->toString();
@@ -148,17 +141,17 @@ class HexConverter
         return '0x' . static::bytesToHex($bytes);
     }
 
-    public static function padLeft(string $hex, int $length): string
+    public static function padLeft(string $hex, int $length, string $string = '0'): string
     {
-        return static::withPrefixIntact($hex, function ($hex) use ($length) {
-            return str_pad($hex, $length, '0', STR_PAD_LEFT);
+        return static::withPrefixIntact($hex, function ($hex) use ($length, $string) {
+            return str_pad($hex, $length, $string, STR_PAD_LEFT);
         });
     }
 
-    public static function padRight(string $hex, int $length): string
+    public static function padRight(string $hex, int $length, string $string = '0'): string
     {
-        return static::withPrefixIntact($hex, function ($hex) use ($length) {
-            return str_pad($hex, $length, '0', STR_PAD_RIGHT);
+        return static::withPrefixIntact($hex, function ($hex) use ($length, $string) {
+            return str_pad($hex, $length, $string, STR_PAD_RIGHT);
         });
     }
 
