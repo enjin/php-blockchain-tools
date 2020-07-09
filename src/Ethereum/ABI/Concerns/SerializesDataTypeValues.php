@@ -31,6 +31,7 @@ trait SerializesDataTypeValues
                 $value = (int) $value;
             }
 
+
             return EthUint::encode($value);
         }
 

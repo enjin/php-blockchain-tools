@@ -143,7 +143,7 @@ class HexInt32Test extends TestCase
         $this->assertEquals($int, HexInt32::fromHex($hex)->toDecimal(), $message);
 
         $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexInt32::LENGTH), $message);
+        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexInt32::HEX_LENGTH), $message);
 
         $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, HexConverter::hexIntToInt($hex), $message);

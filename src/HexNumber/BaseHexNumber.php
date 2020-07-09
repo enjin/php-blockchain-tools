@@ -19,7 +19,7 @@ abstract class BaseHexNumber
 
     public static function padRight(string $hex, string $string = '0'): string
     {
-        return HexConverter::padRight($hex, static::LENGTH, $string);
+        return HexConverter::padRight($hex, static::HEX_LENGTH, $string);
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class BaseHexNumber
     {
         $value = HexConverter::unPrefix($hex);
         $length = strlen($value);
-        $expectedLength = static::LENGTH;
+        $expectedLength = static::HEX_LENGTH;
 
         if ($length !== $expectedLength) {
             $class = basename(str_replace('\\', '/', get_class($this)));

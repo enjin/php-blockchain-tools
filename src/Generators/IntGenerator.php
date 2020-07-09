@@ -26,7 +26,7 @@ class IntGenerator
             $className = $result['className'];
             $contents = $result['contents'];
 
-            $destDir = static::DIR . '/HexUInt/';
+            $destDir = static::DIR . '/HexInt/';
             $this->writePHPFile($destDir, $className, $contents);
         }
 
@@ -41,7 +41,7 @@ class IntGenerator
 
     public function makeHexIntSizeClass(int $size, array $sizes)
     {
-        $namespaceString = static::NAMESPACE . '\HexUInt';
+        $namespaceString = static::NAMESPACE . '\HexInt';
         $namespace = new PhpNamespace($namespaceString);
 
         $className = 'HexInt' . $size;
@@ -50,7 +50,7 @@ class IntGenerator
         $class->setExtends(BaseHexInt::class);
 
         $length = $size / 4;
-        $class->addConstant('LENGTH', $length)->setPublic();
+        $class->addConstant('HEX_LENGTH', $length)->setPublic();
 
         $a = bcpow(2, $size);
         $b = bcdiv($a, 2);
@@ -67,7 +67,7 @@ class IntGenerator
         $class->addConstant('INT_MAX', $intMax)->setPublic();
 
         $intSize = bcsub($intMax, $intMin);
-        $class->addConstant('SIZE', $intSize)->setPublic();
+        $class->addConstant('INT_SIZE', $intSize)->setPublic();
 
         foreach ($sizes as $targetSize) {
             $targetClassName = 'HexInt' . $targetSize;
@@ -76,7 +76,7 @@ class IntGenerator
             } elseif ($size < $targetSize) {
                 $class->addMethod('toHexInt' . $targetSize)
                     ->setReturnType(Type::STRING)
-                    ->addBody('return $this->convertUpTo($this->value, ' . $targetClassName . '::LENGTH);');
+                    ->addBody('return $this->convertUpTo($this->value, ' . $targetClassName . '::HEX_LENGTH);');
             }
         }
         $printer = new PsrPrinter;
@@ -93,11 +93,47 @@ class IntGenerator
 
         $class = $namespace->addClass('HexInt');
 
+        $namespace->addUse('InvalidArgumentException');
+        $targetClasses = [];
+        $bitSizeToClass = [];
+
         foreach ($sizes as $size) {
             $targetClassName = 'HexInt' . $size;
             $targetClass = static::NAMESPACE . '\\HexInt\\' . $targetClassName;
 
+            $targetClasses[] = [
+                'size' => $size,
+                'targetClassName' => $targetClassName,
+                'targetClass' => $targetClass,
+            ];
+            $bitSizeToClass[$size] = $targetClass;
             $namespace->addUse($targetClass);
+        }
+
+        $class->addConstant('BIT_SIZE_TO_CLASS', $bitSizeToClass);
+        $method = $class->addMethod('fromHexIntBitSize')
+            ->setStatic()
+            ->setBody('
+if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
+    throw new InvalidArgumentException(\'Invalid bit size: \' . $bitSize);
+}
+
+$class = static::BIT_SIZE_TO_CLASS[$bitSize];
+
+return new $class($hex);
+                ');
+
+        $method->addParameter('bitSize')
+            ->setType(Type::INT);
+
+
+        $method->addParameter('hex')
+            ->setType(Type::STRING);
+
+        foreach ($targetClasses as $item) {
+            $targetClassName = $item['targetClassName'];
+            $targetClass = $item['targetClass'];
+            $size = $item['size'];
 
             $paramName = 'Int' . $size;
             $method = $class->addMethod('fromHexInt' . $size)

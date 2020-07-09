@@ -9,7 +9,7 @@ abstract class BaseHexUInt extends BaseHexNumber
 {
     public static function padLeft(string $hex, string $string = '0'): string
     {
-        return HexConverter::padLeft($hex, static::LENGTH, $string);
+        return HexConverter::padLeft($hex, static::HEX_LENGTH, $string);
     }
 
     /**
@@ -19,7 +19,7 @@ abstract class BaseHexUInt extends BaseHexNumber
      */
     public static function fromInt(string $int)
     {
-        $hex = HexConverter::intToHexUInt($int, static::LENGTH);
+        $hex = HexConverter::intToHexUInt($int, static::HEX_LENGTH);
 
         return new static($hex);
     }

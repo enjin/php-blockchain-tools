@@ -34,9 +34,56 @@ use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt80;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt88;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt96;
+use InvalidArgumentException;
 
 class HexUInt
 {
+    const BIT_SIZE_TO_CLASS = [
+        8 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8',
+        16 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16',
+        24 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt24',
+        32 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt32',
+        40 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt40',
+        48 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt48',
+        56 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt56',
+        64 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt64',
+        72 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt72',
+        80 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt80',
+        88 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt88',
+        96 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt96',
+        104 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt104',
+        112 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt112',
+        120 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt120',
+        128 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt128',
+        136 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt136',
+        144 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt144',
+        152 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt152',
+        160 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt160',
+        168 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt168',
+        176 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt176',
+        184 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt184',
+        192 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt192',
+        200 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt200',
+        208 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt208',
+        216 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt216',
+        224 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt224',
+        232 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt232',
+        240 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt240',
+        248 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt248',
+        256 => 'Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256',
+    ];
+
+    public static function fromHexIntBitSize(int $bitSize, string $hex)
+    {
+        if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
+            throw new InvalidArgumentException('Invalid bit size: ' . $bitSize);
+        }
+
+        $class = static::BIT_SIZE_TO_CLASS[$bitSize];
+
+        return new $class($hex);
+    }
+
     public static function fromHexUInt8(string $uInt8): HexUInt8
     {
         return new HexUInt8($uInt8);

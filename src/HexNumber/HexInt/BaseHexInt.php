@@ -12,7 +12,7 @@ abstract class BaseHexInt extends BaseHexNumber
     {
         $string = static::isNegative($hex) ? 'f' : '0';
 
-        return HexConverter::padLeft($hex, static::LENGTH, $string);
+        return HexConverter::padLeft($hex, static::HEX_LENGTH, $string);
     }
 
     /**
@@ -22,7 +22,7 @@ abstract class BaseHexInt extends BaseHexNumber
      */
     public static function fromInt(string $int)
     {
-        $hex = HexConverter::intToHexInt($int, static::LENGTH);
+        $hex = HexConverter::intToHexInt($int, static::HEX_LENGTH);
 
         return new static($hex);
     }

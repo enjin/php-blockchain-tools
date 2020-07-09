@@ -155,7 +155,7 @@ class HexUInt8Test extends TestCase
         $this->assertEquals('0x' . $hex, HexUInt8::fromHex($hex)->toHexPrefixed(), $message);
 
         $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexUInt8::LENGTH), $message);
+        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexUInt8::HEX_LENGTH), $message);
 
         $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, HexConverter::hexIntToInt($hex), $message);
