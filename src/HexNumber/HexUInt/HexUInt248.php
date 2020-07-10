@@ -2,7 +2,7 @@
 
 namespace Enjin\BlockchainTools\HexNumber\HexUInt;
 
-class HexUInt248 extends HexUInt
+class HexUInt248 extends BaseHexUInt
 {
     public const HEX_LENGTH = 62;
     public const HEX_MIN = '00000000000000000000000000000000000000000000000000000000000000';

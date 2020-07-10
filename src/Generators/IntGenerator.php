@@ -4,7 +4,7 @@ namespace Enjin\BlockchainTools\Generators;
 
 use Enjin\BlockchainTools\Generators\Concerns\HelpsGenerateFiles;
 use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexNumber\HexInt\HexInt;
+use Enjin\BlockchainTools\HexNumber\HexInt\BaseHexInt;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 use Nette\PhpGenerator\Type;
@@ -47,7 +47,7 @@ class IntGenerator
         $className = 'HexInt' . $size;
         $class = $namespace->addClass($className);
 
-        $class->setExtends(HexInt::class);
+        $class->setExtends(BaseHexInt::class);
 
         $length = $size / 4;
         $class->addConstant('HEX_LENGTH', $length)->setPublic();

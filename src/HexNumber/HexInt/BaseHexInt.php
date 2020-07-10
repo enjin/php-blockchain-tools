@@ -6,7 +6,7 @@ use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
 use phpseclib\Math\BigInteger;
 
-abstract class HexInt extends HexNumber
+abstract class BaseHexInt extends HexNumber
 {
     public static function padLeft(string $hex): string
     {

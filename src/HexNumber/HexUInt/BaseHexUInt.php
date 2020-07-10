@@ -5,7 +5,7 @@ namespace Enjin\BlockchainTools\HexNumber\HexUInt;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
 
-abstract class HexUInt extends HexNumber
+abstract class BaseHexUInt extends HexNumber
 {
     public static function padLeft(string $hex, string $string = '0'): string
     {
