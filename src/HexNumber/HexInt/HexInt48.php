@@ -2,7 +2,7 @@
 
 namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
-class HexInt48 extends BaseHexInt
+class HexInt48 extends HexInt
 {
     public const HEX_LENGTH = 12;
     public const HEX_MIN = '800000000000';

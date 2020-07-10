@@ -2,21 +2,13 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\Exceptions\InvalidFixedDecimalPrecisionException;
-use Enjin\BlockchainTools\Ethereum\ABI\DataTypes\Exceptions\InvalidNumberLengthException;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidFixedDecimalPrecisionException;
+use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidNumberLengthException;
+use Enjin\BlockchainTools\HexNumber\HexNumber;
 use InvalidArgumentException;
 
 class DataTypeParser
 {
-    protected const VALID_NUMBER_LENGTHS = [
-        8,
-        16,
-        32,
-        64,
-        128,
-        256,
-    ];
-
     public function parse(string $type): DataType
     {
         $last1 = substr($type, -1);
@@ -116,7 +108,7 @@ class DataTypeParser
         if ($type === $baseType) {
             $length = 256;
         } else {
-            $length = $this->parseNumberLength($type, $baseType, static::VALID_NUMBER_LENGTHS);
+            $length = $this->parseNumberLength($type, $baseType, HexNumber::VALID_BIT_SIZES);
         }
 
         return new DataType([
@@ -134,12 +126,12 @@ class DataTypeParser
         } else {
             $suffix = $this->removeFromBeginning($type, $baseType);
 
-            list($length, $decimalPrecision) = explode('x', $suffix, 2);
+            [$length, $decimalPrecision] = explode('x', $suffix, 2);
 
             $length = (int) $length;
             $decimalPrecision = (int) $decimalPrecision;
 
-            if (!in_array($length, static::VALID_NUMBER_LENGTHS)) {
+            if (!in_array($length, HexNumber::VALID_BIT_SIZES)) {
                 throw new InvalidNumberLengthException($baseType, $type);
             }
 

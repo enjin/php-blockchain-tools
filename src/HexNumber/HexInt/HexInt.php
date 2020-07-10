@@ -3,10 +3,10 @@
 namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexNumber\BaseHexNumber;
+use Enjin\BlockchainTools\HexNumber\HexNumber;
 use phpseclib\Math\BigInteger;
 
-abstract class BaseHexInt extends BaseHexNumber
+abstract class HexInt extends HexNumber
 {
     public static function padLeft(string $hex): string
     {
