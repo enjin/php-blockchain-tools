@@ -5,7 +5,6 @@ namespace Tests\Unit\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
 use Enjin\BlockchainTools\HexConverter;
-use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Tests\TestCase;
 
@@ -309,20 +308,17 @@ class ContractFunctionSerializerTest extends TestCase
 
         $function = $contract->function('testFunction');
 
-        $expected = [
-            '_id' => HexUInt16::fromHex('1234')->toHexUInt256(),
-        ];
-
         $serialized = [
             '9999999999999999999999999999999999999999999999999999999999991234',
         ];
 
         $serializedString = $function->methodId() . implode('', $serialized);
 
-        $serializer = new ContractFunctionSerializer();
-        $decoded = $serializer->decodeInput($function, $serializedString);
-
-        $this->assertEquals($expected, $decoded, 'correctly decoded data');
+        $expectedMessage = 'attempting to decode: _id, Cannot safely convert down to bottom of 16 from 256, non-zero bits would be lost. (999999999999999999999999999999999999999999999999999999999999) from (9999999999999999999999999999999999999999999999999999999999991234)';
+        $this->assertInvalidArgumentException($expectedMessage, function () use ($function, $serializedString) {
+            $serializer = new ContractFunctionSerializer();
+            $serializer->decodeInput($function, $serializedString);
+        });
     }
 
     protected function assertSerializerInput(
@@ -335,24 +331,23 @@ class ContractFunctionSerializerTest extends TestCase
 
         $encoded = $serializer->encodeInput($function, $data)->toArray();
 
-        dump($serializer->encodeInput($function, $data)->toArrayWithMeta());
+        $expectedSerialized = [
+            'raw' => $serialized,
+            'trimmed' => array_map(function ($val) {
+                return ltrim($val, '0') ?: '0';
+            }, $serialized),
+        ];
 
-        $ex = array_map(function ($val) {
-            return ltrim($val, '0') ?: '0';
-        }, $serialized);
+        $actualEncoded = [
+            'raw' => $encoded,
+            'trimmed' => array_map(function ($val) {
+                return ltrim($val, '0') ?: '0';
+            }, $encoded),
+        ];
 
-        $en = array_map(function ($val) {
-            return ltrim($val, '0') ?: '0';
-        }, $encoded);
+        // dump($serializer->encodeInput($function, $data)->toArrayWithMeta());
 
-        dump([
-            'expected' => $ex,
-            'encoded' => $en,
-        ]);
-
-        $this->assertEquals($ex, $en, 'correctly encoded data');
-
-        $this->assertEquals($serialized, $encoded, 'correctly encoded data');
+        $this->assertEquals($expectedSerialized, $actualEncoded, 'correctly encoded data');
 
         $serializedString = $function->methodId() . implode('', $serialized);
 

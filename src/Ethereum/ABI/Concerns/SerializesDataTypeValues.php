@@ -99,6 +99,7 @@ trait SerializesDataTypeValues
 
         if ($baseType === 'address') {
             $uint = new HexUInt256($value);
+
             return $uint->toHexUInt160Bottom();
         }
 

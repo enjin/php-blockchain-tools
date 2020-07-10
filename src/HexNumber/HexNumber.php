@@ -50,6 +50,7 @@ abstract class HexNumber
 
     /**
      * HexNumber constructor.
+     *
      * @param string $hex hex string
      */
     public function __construct(string $hex)
@@ -58,9 +59,11 @@ abstract class HexNumber
     }
 
     /**
-     * Pad left of $hex with $string until its length matches $length
+     * Pad left of $hex with $string until its length matches $length.
+     *
      * @param string $hex
      * @param int|null $length if null HEX_LENGTH of this class is used
+     *
      * @return string padded hex leaving the prefix intact if it had one
      */
     public static function padLeft(string $hex, int $length = null): string
@@ -73,9 +76,11 @@ abstract class HexNumber
     }
 
     /**
-     * Pad right of $hex with $string until its length matches $length
+     * Pad right of $hex with $string until its length matches $length.
+     *
      * @param string $hex
      * @param int|null $length if null HEX_LENGTH of this class is used
+     *
      * @return string padded hex leaving the prefix intact if it had one
      */
     public static function padRight(string $hex, int $length = null): string

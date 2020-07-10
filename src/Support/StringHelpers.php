@@ -14,6 +14,7 @@ class StringHelpers
         if (static::startsWith($string, $prefix)) {
             return substr($string, strlen($prefix));
         }
+
         return $string;
     }
 }

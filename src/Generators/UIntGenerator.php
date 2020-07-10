@@ -66,7 +66,6 @@ class UIntGenerator
         $class->addConstant('INT_MAX', $intMax)->setPublic();
 
         foreach ($sizes as $targetSize) {
-
             if ($targetSize === $size) {
                 $class->addMethod('toHexUInt' . $targetSize)
                     ->setReturnType(Type::STRING)

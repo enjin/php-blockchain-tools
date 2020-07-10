@@ -5,8 +5,8 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidFixedDecimalPrecisionException;
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidNumberLengthException;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
-use InvalidArgumentException;
 use Enjin\BlockchainTools\Support\StringHelpers as Str;
+use InvalidArgumentException;
 
 class DataTypeParser
 {
@@ -127,7 +127,7 @@ class DataTypeParser
         } else {
             $suffix = Str::removeFromBeginning($type, $baseType);
 
-            [$bitSize, $decimalPrecision] = explode('x', $suffix, 2);
+            list($bitSize, $decimalPrecision) = explode('x', $suffix, 2);
 
             $bitSize = (int) $bitSize;
             $decimalPrecision = (int) $decimalPrecision;

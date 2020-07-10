@@ -73,7 +73,6 @@ class IntGenerator
         $class->addConstant('INT_SIZE', $intSize)->setPublic();
 
         foreach ($sizes as $targetSize) {
-
             if ($targetSize === $size) {
                 $class->addMethod('toHexInt' . $targetSize)
                     ->setReturnType(Type::STRING)
