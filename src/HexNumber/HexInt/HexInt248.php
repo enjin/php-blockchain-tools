@@ -19,6 +19,6 @@ class HexInt248 extends BaseHexInt
 
     public function toHexInt256(): string
     {
-        return $this->convertUpTo($this->value, HexInt256::HEX_LENGTH);
+        return $this->convertUpTo(256);
     }
 }

@@ -19,36 +19,36 @@ class HexInt200 extends BaseHexInt
 
     public function toHexInt208(): string
     {
-        return $this->convertUpTo($this->value, HexInt208::HEX_LENGTH);
+        return $this->convertUpTo(208);
     }
 
     public function toHexInt216(): string
     {
-        return $this->convertUpTo($this->value, HexInt216::HEX_LENGTH);
+        return $this->convertUpTo(216);
     }
 
     public function toHexInt224(): string
     {
-        return $this->convertUpTo($this->value, HexInt224::HEX_LENGTH);
+        return $this->convertUpTo(224);
     }
 
     public function toHexInt232(): string
     {
-        return $this->convertUpTo($this->value, HexInt232::HEX_LENGTH);
+        return $this->convertUpTo(232);
     }
 
     public function toHexInt240(): string
     {
-        return $this->convertUpTo($this->value, HexInt240::HEX_LENGTH);
+        return $this->convertUpTo(240);
     }
 
     public function toHexInt248(): string
     {
-        return $this->convertUpTo($this->value, HexInt248::HEX_LENGTH);
+        return $this->convertUpTo(248);
     }
 
     public function toHexInt256(): string
     {
-        return $this->convertUpTo($this->value, HexInt256::HEX_LENGTH);
+        return $this->convertUpTo(256);
     }
 }

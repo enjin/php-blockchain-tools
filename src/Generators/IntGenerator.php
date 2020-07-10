@@ -73,7 +73,6 @@ class IntGenerator
         $class->addConstant('INT_SIZE', $intSize)->setPublic();
 
         foreach ($sizes as $targetSize) {
-            $targetClassName = 'HexInt' . $targetSize;
 
             if ($targetSize === $size) {
                 $class->addMethod('toHexInt' . $targetSize)
@@ -82,7 +81,7 @@ class IntGenerator
             } elseif ($size < $targetSize) {
                 $class->addMethod('toHexInt' . $targetSize)
                     ->setReturnType(Type::STRING)
-                    ->addBody('return $this->convertUpTo($this->value, ' . $targetClassName . '::HEX_LENGTH);');
+                    ->addBody('return $this->convertUpTo(' . $targetSize . ');');
             }
         }
         $printer = new PsrPrinter;

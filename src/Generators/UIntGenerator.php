@@ -66,7 +66,6 @@ class UIntGenerator
         $class->addConstant('INT_MAX', $intMax)->setPublic();
 
         foreach ($sizes as $targetSize) {
-            $targetClassName = 'HexUInt' . $targetSize;
 
             if ($targetSize === $size) {
                 $class->addMethod('toHexUInt' . $targetSize)
@@ -75,15 +74,15 @@ class UIntGenerator
             } elseif ($targetSize < $size) {
                 $class->addMethod('toHexUInt' . $targetSize . 'Top')
                     ->setReturnType(Type::STRING)
-                    ->addBody('return $this->convertDownToTop($this->value, ' . $targetClassName . '::HEX_LENGTH);');
+                    ->addBody('return $this->convertDownToTop(' . $targetSize . ');');
 
                 $class->addMethod('toHexUInt' . $targetSize . 'Bottom')
                     ->setReturnType(Type::STRING)
-                    ->addBody('return $this->convertDownToBottom($this->value, ' . $targetClassName . '::HEX_LENGTH);');
+                    ->addBody('return $this->convertDownToBottom(' . $targetSize . ');');
             } elseif ($size < $targetSize) {
                 $class->addMethod('toHexUInt' . $targetSize)
                     ->setReturnType(Type::STRING)
-                    ->addBody('return $this->convertUpTo($this->value, ' . $targetClassName . '::HEX_LENGTH);');
+                    ->addBody('return $this->convertUpTo(' . $targetSize . ');');
             }
         }
         $printer = new PsrPrinter;

@@ -4,16 +4,19 @@ namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
-use InvalidArgumentException;
 use phpseclib\Math\BigInteger;
 
 abstract class BaseHexInt extends HexNumber
 {
-    public static function padLeft(string $hex): string
+    public static function padLeft(string $hex, int $length = null): string
     {
+        if ($length === null) {
+            $length = static::HEX_LENGTH;
+        }
+
         $string = static::isNegative($hex) ? 'f' : '0';
 
-        return HexConverter::padLeft($hex, static::HEX_LENGTH, $string);
+        return HexConverter::padLeft($hex, $length, $string);
     }
 
     /**
@@ -38,27 +41,11 @@ abstract class BaseHexInt extends HexNumber
         return HexConverter::hexIntToInt($this->value);
     }
 
-    public function convertUpToBitSize(int $bitSize): string
-    {
-        $method = 'convertUpToInt' . $bitSize;
-
-        if (!method_exists($this, $method)) {
-            throw new InvalidArgumentException('Cannot convert up to int' . $bitSize . ' from int' . static::BIT_SIZE);
-        }
-        return $this->{$method}();
-    }
-
-    protected function convertUpTo(string $value, int $length): string
-    {
-        $string = static::isNegative($value) ? 'f' : '0';
-
-        return HexConverter::padLeft($value, $length, $string);
-    }
-
     protected static function isNegative(string $hex): bool
     {
         $num = new BigInteger($hex, -16);
 
+        // $num->is_negative is not to be trusted when using base -16
         return $num->toString()[0] === '-';
     }
 }

@@ -86,7 +86,7 @@ trait SerializesDataTypeValues
             $uint = new HexUInt256($value);
 
             if ($this->bitSize() !== 256) {
-                $uint = $uint->convertDownToBottomBitSize($this->bitSize());
+                $uint = $uint->convertDownToBottom($this->bitSize());
                 $uint = HexUInt::fromHexUIntBitSize($this->bitSize(), $uint);
             }
 

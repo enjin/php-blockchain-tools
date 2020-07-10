@@ -127,7 +127,7 @@ class HexInt32Test extends TestCase
         $value = 'a';
         $expected = 'a0000000';
 
-        $actual = HexInt32::padRight($value, '0');
+        $actual = HexInt32::padRight($value);
         $this->assertEquals($expected, $actual);
     }
 

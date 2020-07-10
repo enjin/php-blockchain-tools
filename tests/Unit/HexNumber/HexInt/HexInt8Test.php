@@ -157,7 +157,7 @@ class HexInt8Test extends TestCase
         $value = 'a';
         $expected = 'a0';
 
-        $actual = HexInt8::padRight($value, '0');
+        $actual = HexInt8::padRight($value);
         $this->assertEquals($expected, $actual);
     }
 
