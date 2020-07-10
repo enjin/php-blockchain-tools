@@ -7,6 +7,11 @@ use phpseclib\Math\BigInteger;
 
 class HexConverter
 {
+    /**
+     * Add the '0x' prefix to a string if it does not have the prefix
+     * @param string $value
+     * @return string
+     */
     public static function prefix(string $value): string
     {
         if (!self::hasPrefix($value)) {
@@ -16,6 +21,11 @@ class HexConverter
         return $value;
     }
 
+    /**
+     * Remove the '0x' prefix from a string if it has the prefix
+     * @param string $value
+     * @return string
+     */
     public static function unPrefix(string $value): string
     {
         if (self::hasPrefix($value)) {
@@ -25,6 +35,11 @@ class HexConverter
         return $value;
     }
 
+    /**
+     * Check if a string has the prefix '0x'
+     * @param string $value
+     * @return bool true if prefixed
+     */
     public static function hasPrefix(string $value): bool
     {
         return substr($value, 0, 2) == '0x';
@@ -67,17 +82,23 @@ class HexConverter
         return $hex;
     }
 
+    /**
+     * Convert base 10 signed int to a hex signed int
+     *
+     * @param string $int base 10 signed int
+     * @param int|null $length hex string length to pad on left
+     * @return string hex signed int
+     */
     public static function intToHexIntPrefixed(string $int, int $length = null): string
     {
         return '0x' . self::intToHexInt($int, $length);
     }
 
     /**
-     * Convert from a hex signed int to a php string of that number in base 10.
+     * Convert a hex signed int to a base 10 signed int
      *
-     * @param string $hex
-     *
-     * @return string base 10 value
+     * @param string $hex hex signed int
+     * @return string base 10 signed int
      */
     public static function hexIntToInt(string $hex): string
     {
@@ -89,6 +110,13 @@ class HexConverter
         return $value->toString();
     }
 
+    /**
+     * Convert base 10 unsigned int to a hex unsigned int
+     *
+     * @param string $int base 10 unsigned int
+     * @param int|null $length hex string length to pad on left
+     * @return string hex unsigned int
+     */
     public static function intToHexUInt(string $int, int $length = null): string
     {
         $hex = (new BigInteger($int))->toHex();
@@ -105,6 +133,12 @@ class HexConverter
         return '0x' . self::intToHexUInt($int, $length);
     }
 
+    /**
+     * Convert hex unsigned int to a base 10 unsigned int
+     *
+     * @param string $hex hex unsigned int
+     * @return string base 10 unsigned int
+     */
     public static function hexToUInt(string $hex): string
     {
         $hex = self::unPrefix($hex);
@@ -127,6 +161,13 @@ class HexConverter
         return '0x' . static::bytesToHex($bytes);
     }
 
+    /**
+     * pad a hex string on the left leaving the prefix intact if it has one
+     * @param string $hex
+     * @param int $length
+     * @param string $string
+     * @return string
+     */
     public static function padLeft(string $hex, int $length, string $string = '0'): string
     {
         return static::withPrefixIntact($hex, function ($hex) use ($length, $string) {
@@ -134,6 +175,13 @@ class HexConverter
         });
     }
 
+    /**
+     * pad a hex string on the right leaving the prefix intact if it has one
+     * @param string $hex
+     * @param int $length
+     * @param string $string
+     * @return string
+     */
     public static function padRight(string $hex, int $length, string $string = '0'): string
     {
         return static::withPrefixIntact($hex, function ($hex) use ($length, $string) {
@@ -141,6 +189,12 @@ class HexConverter
         });
     }
 
+    /**
+     * mutate a hex string keeping the prefix intact if it has one
+     * @param string $hex
+     * @param Closure $callback performs the mutation, passed a single argument: the unprefixed hex
+     * @return string mutated string with prefix intact if it has one
+     */
     public static function withPrefixIntact(string $hex, Closure $callback)
     {
         $hasPrefix = static::hasPrefix($hex);
