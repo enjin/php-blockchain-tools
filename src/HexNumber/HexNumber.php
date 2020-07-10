@@ -137,29 +137,58 @@ abstract class HexNumber
         return static::padLeft($this->value, $length);
     }
 
-    public function convertDownToTop(int $bitSize): string
+    public function forceConvertDownToTop(int $bitSize): string
+    {
+        return $this->convertDownToTop($bitSize, false);
+    }
+
+    public function convertDownToTop(int $bitSize, bool $preventDataLoss = true): string
     {
         if ($bitSize > static::BIT_SIZE) {
             throw new InvalidArgumentException('Cannot convert down to ' . $bitSize . ' from ' . static::BIT_SIZE . '. Can only convert down to smaller bit sizes');
         }
 
-        $length = $bitSize / 4;
+        return HexConverter::withPrefixIntact($this->value, function ($hex) use ($bitSize, $preventDataLoss) {
+            $length = $bitSize / 4;
+            $top = substr($hex, 0, $length);
 
-        return HexConverter::withPrefixIntact($this->value, function ($hex) use ($length) {
-            return substr($hex, 0, $length);
+            if ($preventDataLoss) {
+                $removed = substr($hex, $length);
+                $nonZeroRemoved = strlen(ltrim($removed, '0'));
+                if ($nonZeroRemoved) {
+                    throw new InvalidArgumentException('Cannot safely convert down to top of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from (' . $hex . ')');
+                }
+            }
+
+            return $top;
         });
     }
 
-    public function convertDownToBottom(int $bitSize): string
+    public function forceConvertDownToBottom(int $bitSize): string
+    {
+        return $this->convertDownToBottom($bitSize, false);
+    }
+
+    public function convertDownToBottom(int $bitSize, bool $preventDataLoss = true)
     {
         if ($bitSize > static::BIT_SIZE) {
             throw new InvalidArgumentException('Cannot convert down to ' . $bitSize . ' from ' . static::BIT_SIZE . '. Can only convert down to smaller bit sizes');
         }
 
-        $length = $bitSize / 4;
+        return HexConverter::withPrefixIntact($this->value, function ($hex) use ($bitSize, $preventDataLoss) {
+            $length = $bitSize / 4;
+            $index = strlen($hex) - $length;
+            $bottom = substr($hex, $index);
 
-        return HexConverter::withPrefixIntact($this->value, function ($hex) use ($length) {
-            return substr($hex, -$length);
+            if ($preventDataLoss) {
+                $removed = substr($hex, 0, $index);
+                $nonZeroRemoved = strlen(ltrim($removed, '0'));
+                if ($nonZeroRemoved) {
+                    throw new InvalidArgumentException('Cannot safely convert down to bottom of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from (' . $hex . ')');
+                }
+            }
+
+            return $bottom;
         });
     }
 
@@ -185,13 +214,13 @@ abstract class HexNumber
         $min = new BigInteger(static::INT_MIN);
         $lessThanMin = $bigInt->compare($min) < 0;
         if ($lessThanMin) {
-            throw new InvalidArgumentException('provided base 10 int (' . $int . ') is less than min value for ' . static::classBaseName() . ' (' . static::INT_MIN . ')');
+            throw new InvalidArgumentException('provided base 10 int(' . $int . ') is less than min value for ' . static::classBaseName() . ' (' . static::INT_MIN . ')');
         }
 
         $max = new BigInteger(static::INT_MAX);
         $greaterThanMax = $bigInt->compare($max) > 0;
         if ($greaterThanMax) {
-            throw new InvalidArgumentException('provided base 10 int (' . $int . ') is greater than max value for ' . static::classBaseName() . ' (' . static::INT_MAX . ')');
+            throw new InvalidArgumentException('provided base 10 int(' . $int . ') is greater than max value for ' . static::classBaseName() . ' (' . static::INT_MAX . ')');
         }
     }
 
