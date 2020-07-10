@@ -18,6 +18,11 @@ class DataBlock
 
     protected $dynamicLengthData = [];
 
+    /**
+     * @var string
+     */
+    protected $methodId;
+
     public function __construct(array $functionValueTypes)
     {
         // Set the dynamic data start position.
@@ -33,6 +38,16 @@ class DataBlock
         }
 
         $this->dynamicDataPosition = $position;
+    }
+
+    public function setMethodId(string $methodId)
+    {
+        $this->methodId = $methodId;
+    }
+
+    public function methodId(): string
+    {
+        return $this->methodId;
     }
 
     public function add(string $inputName, string $type, string $value)
@@ -110,7 +125,7 @@ class DataBlock
 
     public function toString(): string
     {
-        return implode('', $this->toArray());
+        return $this->methodId() . implode('', $this->toArray());
     }
 
     public function toArray(): array

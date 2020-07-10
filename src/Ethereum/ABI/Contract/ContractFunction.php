@@ -2,6 +2,8 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlock;
 use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
 use kornrunner\Keccak;
@@ -170,19 +172,23 @@ class ContractFunction
         return $this->topic;
     }
 
-    public function encodeInput(array $input): string
+    public function encodeInput(array $data): DataBlock
     {
+        return (new ContractFunctionSerializer())->encodeInput($this, $data);
     }
 
-    public function decodeInput(string $input): array
+    public function decodeInput(string $data): array
     {
+        return (new ContractFunctionSerializer())->decodeInput($this, $data);
     }
 
-    public function encodeOutput(array $input): string
+    public function encodeOutput(array $data): DataBlock
     {
+        return (new ContractFunctionSerializer())->encodeOutput($this, $data);
     }
 
-    public function decodeOutput(string $input): array
+    public function decodeOutput(string $data): array
     {
+        return (new ContractFunctionSerializer())->decodeOutput($this, $data);
     }
 }

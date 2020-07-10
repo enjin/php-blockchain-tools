@@ -11,17 +11,18 @@ class ContractFunctionSerializer
 {
     public function encodeInput(ContractFunction $function, array $data): DataBlock
     {
-        return $this->encode($function->inputs(), $data);
+        return $this->encode($function->methodId(), $function->inputs(), $data);
     }
 
     public function encodeOutput(ContractFunction $function, array $data): DataBlock
     {
-        return $this->encode($function->outputs(), $data);
+        return $this->encode($function->methodId(), $function->outputs(), $data);
     }
 
-    public function encode(array $functionValueTypes, array $data): DataBlock
+    public function encode(string $methodId, array $functionValueTypes, array $data): DataBlock
     {
         $dataBlock = new DataBlock($functionValueTypes);
+        $dataBlock->setMethodId($methodId);
 
         foreach ($functionValueTypes as $i => $item) {
             /** @var ContractFunctionValueType $item */
@@ -59,16 +60,17 @@ class ContractFunctionSerializer
 
     public function decodeInput(ContractFunction $function, string $data): array
     {
-        return $this->decode($function->inputs(), $data);
+        return $this->decode($function->methodId(), $function->inputs(), $data);
     }
 
     public function decodeOutput(ContractFunction $function, string $data): array
     {
-        return $this->decode($function->outputs(), $data);
+        return $this->decode($function->methodId(), $function->outputs(), $data);
     }
 
-    public function decode(array $functionValueTypes, string $data)
+    public function decode(string $methodId, array $functionValueTypes, string $data)
     {
+        $data = $this->removeSignatureFromData($methodId, $data);
         $data = HexConverter::unPrefix($data);
         $index = 0;
 
@@ -131,6 +133,11 @@ class ContractFunctionSerializer
         return $results;
     }
 
+    public function removeSignatureFromData(string $methodId, string $data): string
+    {
+        return $this->removeFromBeginning($data, $methodId);
+    }
+
     protected function uIntFromIndex(string $data, int $index): int
     {
         $chunk = $this->hexFromIndex($data, $index);
@@ -149,4 +156,14 @@ class ContractFunctionSerializer
     {
         return substr($data, $index, $length * 64);
     }
+
+    protected function removeFromBeginning(string $str, string $prefix): string
+    {
+        if (substr($str, 0, strlen($prefix)) == $prefix) {
+            $str = substr($str, strlen($prefix));
+        }
+
+        return $str;
+    }
 }
+
