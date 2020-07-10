@@ -6,6 +6,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Tests\TestCase;
 
 class ContractFunctionSerializerTest extends TestCase
@@ -61,30 +62,26 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertFalse($function->payable());
         $this->assertFalse($function->constant());
 
-        $serializer = new ContractFunctionSerializer();
-
-        $data = [
+        $expected = [
             '_from' => '41f502f01195652d3dc55a06f71d8d802ada241b',
             '_to' => '7d68cb169512d47ad39928b63bd97a40db65796d',
             '_ids' => [
-                HexConverter::hexToUInt('0x700000000000160e000000000000000000000000000000000000000000000000'),
-                HexConverter::hexToUInt('0x5000000000001008000000000000000000000000000000000000000000000000'),
+                HexUInt256::INT_MIN,
+                HexUInt256::INT_MAX,
             ],
             '_values' => [4, 4],
             '_data' => [],
         ];
 
-        $encoded = $serializer->encodeInput($function, $data)->toArray();
-
-        $expected = [
+        $serialized = [
             '00000000000000000000000041f502f01195652d3dc55a06f71d8d802ada241b',
             '0000000000000000000000007d68cb169512d47ad39928b63bd97a40db65796d',
             '00000000000000000000000000000000000000000000000000000000000000a0',
             '0000000000000000000000000000000000000000000000000000000000000100',
             '0000000000000000000000000000000000000000000000000000000000000160',
             '0000000000000000000000000000000000000000000000000000000000000002',
-            '700000000000160e000000000000000000000000000000000000000000000000',
-            '5000000000001008000000000000000000000000000000000000000000000000',
+            HexUInt256::HEX_MIN,
+            HexUInt256::HEX_MAX,
             '0000000000000000000000000000000000000000000000000000000000000002',
             '0000000000000000000000000000000000000000000000000000000000000004',
             '0000000000000000000000000000000000000000000000000000000000000004',
@@ -92,12 +89,7 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000000000000000000000000000000000000000000000',
         ];
 
-        $this->assertEquals($expected, $encoded);
-
-        $encodedData = implode('', $expected);
-        $actual = $serializer->decodeInput($function, $encodedData);
-
-        $this->assertEquals($data, $actual);
+        $this->assertSerializerInput($function, $expected, $serialized);
     }
 
     public function testCase1()
@@ -293,6 +285,46 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertSerializerInput($function, $expected, $serialized, $expectedDecoded);
     }
 
+    public function testDecodeInvalid()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint16',
+                    ],
+                ],
+                'name' => 'testFunction',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('testFunction');
+
+        $expected = [
+            '_id' => HexUInt16::fromHex('1234')->toHexUInt256(),
+        ];
+
+        $serialized = [
+            '9999999999999999999999999999999999999999999999999999999999991234',
+        ];
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+
+        $serializer = new ContractFunctionSerializer();
+        $decoded = $serializer->decodeInput($function, $serializedString);
+
+        $this->assertEquals($expected, $decoded, 'correctly decoded data');
+    }
+
     protected function assertSerializerInput(
         Contract\ContractFunction $function,
         array $data,
@@ -302,21 +334,23 @@ class ContractFunctionSerializerTest extends TestCase
         $serializer = new ContractFunctionSerializer();
 
         $encoded = $serializer->encodeInput($function, $data)->toArray();
-        //
-        // dump($serializer->encodeInput($function, $data)->toArrayWithMeta());
-        //
-        // $ex = array_map(function ($val) {
-        //     return ltrim($val, '0') ?: '0';
-        // }, $serialized);
-        //
-        // $en = array_map(function ($val) {
-        //     return ltrim($val, '0') ?: '0';
-        // }, $encoded);
-        //
-        // dump([
-        //     'expected' => $ex,
-        //     'encoded' => $en,
-        // ]);
+
+        dump($serializer->encodeInput($function, $data)->toArrayWithMeta());
+
+        $ex = array_map(function ($val) {
+            return ltrim($val, '0') ?: '0';
+        }, $serialized);
+
+        $en = array_map(function ($val) {
+            return ltrim($val, '0') ?: '0';
+        }, $encoded);
+
+        dump([
+            'expected' => $ex,
+            'encoded' => $en,
+        ]);
+
+        $this->assertEquals($ex, $en, 'correctly encoded data');
 
         $this->assertEquals($serialized, $encoded, 'correctly encoded data');
 

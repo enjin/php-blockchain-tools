@@ -84,6 +84,17 @@ class HexUInt
         return new $class($hex);
     }
 
+    public static function fromUIntBitSize(int $bitSize, string $int)
+    {
+        if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
+            throw new InvalidArgumentException('Invalid bit size: ' . $bitSize);
+        }
+
+        $class = static::BIT_SIZE_TO_CLASS[$bitSize];
+
+        return  $class::fromUInt($int);
+    }
+
     public static function fromHexUInt8(string $uInt8): HexUInt8
     {
         return new HexUInt8($uInt8);

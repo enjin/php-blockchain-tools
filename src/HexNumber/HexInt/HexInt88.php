@@ -4,12 +4,18 @@ namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 class HexInt88 extends BaseHexInt
 {
+    public const BIT_SIZE = 88;
     public const HEX_LENGTH = 22;
     public const HEX_MIN = '8000000000000000000000';
     public const HEX_MAX = '7fffffffffffffffffffff';
     public const INT_MIN = '-154742504910672534362390528';
     public const INT_MAX = '154742504910672534362390527';
     public const INT_SIZE = '309485009821345068724781055';
+
+    public function toHexInt88(): string
+    {
+        return $this->value;
+    }
 
     public function toHexInt96(): string
     {

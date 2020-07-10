@@ -5,6 +5,7 @@ namespace Enjin\BlockchainTools\Generators;
 use Enjin\BlockchainTools\Generators\Concerns\HelpsGenerateFiles;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\BaseHexUInt;
+use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 use Nette\PhpGenerator\Type;
@@ -49,6 +50,8 @@ class UIntGenerator
 
         $class->setExtends(BaseHexUInt::class);
 
+        $class->addConstant('BIT_SIZE', $size)->setPublic();
+
         $length = $size / 4;
         $class->addConstant('HEX_LENGTH', $length)->setPublic();
 
@@ -65,7 +68,11 @@ class UIntGenerator
         foreach ($sizes as $targetSize) {
             $targetClassName = 'HexUInt' . $targetSize;
 
-            if ($targetSize < $size) {
+            if ($targetSize === $size) {
+                $class->addMethod('toHexUInt' . $targetSize)
+                    ->setReturnType(Type::STRING)
+                    ->addBody('return $this->value;');
+            } elseif ($targetSize < $size) {
                 $class->addMethod('toHexUInt' . $targetSize . 'Top')
                     ->setReturnType(Type::STRING)
                     ->addBody('return $this->convertDownToTop($this->value, ' . $targetClassName . '::HEX_LENGTH);');
@@ -112,23 +119,9 @@ class UIntGenerator
 
         $class->addConstant('BIT_SIZE_TO_CLASS', $bitSizeToClass);
 
-        $method = $class->addMethod('fromHexUIntBitSize')
-            ->setStatic()
-            ->setBody('
-if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
-    throw new InvalidArgumentException(\'Invalid bit size: \' . $bitSize);
-}
+        $this->addFromHexBitSizeMethod($class);
 
-$class = static::BIT_SIZE_TO_CLASS[$bitSize];
-
-return new $class($hex);
-                ');
-
-        $method->addParameter('bitSize')
-            ->setType(Type::INT);
-
-        $method->addParameter('hex')
-            ->setType(Type::STRING);
+        $this->addFromNumberBitSizeMethod($class);
 
         foreach ($targetClasses as $item) {
             $targetClassName = $item['targetClassName'];
@@ -151,5 +144,49 @@ return new $class($hex);
             'className' => $class->getName(),
             'contents' => $printer->printNamespace($namespace),
         ];
+    }
+
+    protected function addFromHexBitSizeMethod(ClassType $class)
+    {
+        $method = $class->addMethod('fromHexUIntBitSize')
+            ->setStatic();
+
+        $method->addParameter('bitSize')
+            ->setType(Type::INT);
+
+        $method->addParameter('hex')
+            ->setType(Type::STRING);
+
+        $method->setBody('
+if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
+    throw new InvalidArgumentException(\'Invalid bit size: \' . $bitSize);
+}
+
+$class = static::BIT_SIZE_TO_CLASS[$bitSize];
+
+return new $class($hex);
+                ');
+    }
+
+    protected function addFromNumberBitSizeMethod(ClassType $class)
+    {
+        $method = $class->addMethod('fromUIntBitSize')
+            ->setStatic();
+
+        $method->addParameter('bitSize')
+            ->setType(Type::INT);
+
+        $method->addParameter('int')
+            ->setType(Type::STRING);
+
+        $method->setBody('
+if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
+    throw new InvalidArgumentException(\'Invalid bit size: \' . $bitSize);
+}
+
+$class = static::BIT_SIZE_TO_CLASS[$bitSize];
+
+return  $class::fromUInt($int);
+                ');
     }
 }

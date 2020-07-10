@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\HexNumber\HexUInt;
 
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
+use InvalidArgumentException;
 
 abstract class BaseHexUInt extends HexNumber
 {
@@ -17,8 +18,10 @@ abstract class BaseHexUInt extends HexNumber
      *
      * @return static
      */
-    public static function fromInt(string $int)
+    public static function fromUInt(string $int)
     {
+        static::validateIntRange($int);
+
         $hex = HexConverter::intToHexUInt($int, static::HEX_LENGTH);
 
         return new static($hex);
@@ -30,6 +33,36 @@ abstract class BaseHexUInt extends HexNumber
     public function toDecimal(): string
     {
         return HexConverter::hexToUInt($this->value);
+    }
+
+    public function convertUpToBitSize(int $bitSize): string
+    {
+        $method = 'convertUpToUInt' . $bitSize;
+
+        if (!method_exists($this, $method)) {
+            throw new InvalidArgumentException('Cannot convert up to uInt' . $bitSize . ' from uInt' . static::BIT_SIZE);
+        }
+        return $this->{$method}();
+    }
+
+    public function convertDownToTopBitSize(int $bitSize): string
+    {
+        $method = 'toHexUInt' . $bitSize . 'Top';
+
+        if (!method_exists($this, $method)) {
+            throw new InvalidArgumentException('Cannot convert down to uInt' . $bitSize . ' from uInt' . static::BIT_SIZE);
+        }
+        return $this->{$method}();
+    }
+
+    public function convertDownToBottomBitSize(int $bitSize): string
+    {
+        $method = 'toHexUInt' . $bitSize . 'Bottom';
+
+        if (!method_exists($this, $method)) {
+            throw new InvalidArgumentException('Cannot convert down to uInt' . $bitSize . ' from uInt' . static::BIT_SIZE);
+        }
+        return $this->{$method}();
     }
 
     protected function convertUpTo(string $value, int $length): string

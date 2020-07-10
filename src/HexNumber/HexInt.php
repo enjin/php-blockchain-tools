@@ -84,163 +84,174 @@ class HexInt
         return new $class($hex);
     }
 
-    public static function fromHexInt8(string $Int8): HexInt8
+    public static function fromIntBitSize(int $bitSize, string $int)
     {
-        return new HexInt8($Int8);
+        if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
+            throw new InvalidArgumentException('Invalid bit size: ' . $bitSize);
+        }
+
+        $class = static::BIT_SIZE_TO_CLASS[$bitSize];
+
+        return  $class::fromInt($int);
     }
 
-    public static function fromHexInt16(string $Int16): HexInt16
+    public static function fromHexInt8(string $int8): HexInt8
     {
-        return new HexInt16($Int16);
+        return new HexInt8($int8);
     }
 
-    public static function fromHexInt24(string $Int24): HexInt24
+    public static function fromHexInt16(string $int16): HexInt16
     {
-        return new HexInt24($Int24);
+        return new HexInt16($int16);
     }
 
-    public static function fromHexInt32(string $Int32): HexInt32
+    public static function fromHexInt24(string $int24): HexInt24
     {
-        return new HexInt32($Int32);
+        return new HexInt24($int24);
     }
 
-    public static function fromHexInt40(string $Int40): HexInt40
+    public static function fromHexInt32(string $int32): HexInt32
     {
-        return new HexInt40($Int40);
+        return new HexInt32($int32);
     }
 
-    public static function fromHexInt48(string $Int48): HexInt48
+    public static function fromHexInt40(string $int40): HexInt40
     {
-        return new HexInt48($Int48);
+        return new HexInt40($int40);
     }
 
-    public static function fromHexInt56(string $Int56): HexInt56
+    public static function fromHexInt48(string $int48): HexInt48
     {
-        return new HexInt56($Int56);
+        return new HexInt48($int48);
     }
 
-    public static function fromHexInt64(string $Int64): HexInt64
+    public static function fromHexInt56(string $int56): HexInt56
     {
-        return new HexInt64($Int64);
+        return new HexInt56($int56);
     }
 
-    public static function fromHexInt72(string $Int72): HexInt72
+    public static function fromHexInt64(string $int64): HexInt64
     {
-        return new HexInt72($Int72);
+        return new HexInt64($int64);
     }
 
-    public static function fromHexInt80(string $Int80): HexInt80
+    public static function fromHexInt72(string $int72): HexInt72
     {
-        return new HexInt80($Int80);
+        return new HexInt72($int72);
     }
 
-    public static function fromHexInt88(string $Int88): HexInt88
+    public static function fromHexInt80(string $int80): HexInt80
     {
-        return new HexInt88($Int88);
+        return new HexInt80($int80);
     }
 
-    public static function fromHexInt96(string $Int96): HexInt96
+    public static function fromHexInt88(string $int88): HexInt88
     {
-        return new HexInt96($Int96);
+        return new HexInt88($int88);
     }
 
-    public static function fromHexInt104(string $Int104): HexInt104
+    public static function fromHexInt96(string $int96): HexInt96
     {
-        return new HexInt104($Int104);
+        return new HexInt96($int96);
     }
 
-    public static function fromHexInt112(string $Int112): HexInt112
+    public static function fromHexInt104(string $int104): HexInt104
     {
-        return new HexInt112($Int112);
+        return new HexInt104($int104);
     }
 
-    public static function fromHexInt120(string $Int120): HexInt120
+    public static function fromHexInt112(string $int112): HexInt112
     {
-        return new HexInt120($Int120);
+        return new HexInt112($int112);
     }
 
-    public static function fromHexInt128(string $Int128): HexInt128
+    public static function fromHexInt120(string $int120): HexInt120
     {
-        return new HexInt128($Int128);
+        return new HexInt120($int120);
     }
 
-    public static function fromHexInt136(string $Int136): HexInt136
+    public static function fromHexInt128(string $int128): HexInt128
     {
-        return new HexInt136($Int136);
+        return new HexInt128($int128);
     }
 
-    public static function fromHexInt144(string $Int144): HexInt144
+    public static function fromHexInt136(string $int136): HexInt136
     {
-        return new HexInt144($Int144);
+        return new HexInt136($int136);
     }
 
-    public static function fromHexInt152(string $Int152): HexInt152
+    public static function fromHexInt144(string $int144): HexInt144
     {
-        return new HexInt152($Int152);
+        return new HexInt144($int144);
     }
 
-    public static function fromHexInt160(string $Int160): HexInt160
+    public static function fromHexInt152(string $int152): HexInt152
     {
-        return new HexInt160($Int160);
+        return new HexInt152($int152);
     }
 
-    public static function fromHexInt168(string $Int168): HexInt168
+    public static function fromHexInt160(string $int160): HexInt160
     {
-        return new HexInt168($Int168);
+        return new HexInt160($int160);
     }
 
-    public static function fromHexInt176(string $Int176): HexInt176
+    public static function fromHexInt168(string $int168): HexInt168
     {
-        return new HexInt176($Int176);
+        return new HexInt168($int168);
     }
 
-    public static function fromHexInt184(string $Int184): HexInt184
+    public static function fromHexInt176(string $int176): HexInt176
     {
-        return new HexInt184($Int184);
+        return new HexInt176($int176);
     }
 
-    public static function fromHexInt192(string $Int192): HexInt192
+    public static function fromHexInt184(string $int184): HexInt184
     {
-        return new HexInt192($Int192);
+        return new HexInt184($int184);
     }
 
-    public static function fromHexInt200(string $Int200): HexInt200
+    public static function fromHexInt192(string $int192): HexInt192
     {
-        return new HexInt200($Int200);
+        return new HexInt192($int192);
     }
 
-    public static function fromHexInt208(string $Int208): HexInt208
+    public static function fromHexInt200(string $int200): HexInt200
     {
-        return new HexInt208($Int208);
+        return new HexInt200($int200);
     }
 
-    public static function fromHexInt216(string $Int216): HexInt216
+    public static function fromHexInt208(string $int208): HexInt208
     {
-        return new HexInt216($Int216);
+        return new HexInt208($int208);
     }
 
-    public static function fromHexInt224(string $Int224): HexInt224
+    public static function fromHexInt216(string $int216): HexInt216
     {
-        return new HexInt224($Int224);
+        return new HexInt216($int216);
     }
 
-    public static function fromHexInt232(string $Int232): HexInt232
+    public static function fromHexInt224(string $int224): HexInt224
     {
-        return new HexInt232($Int232);
+        return new HexInt224($int224);
     }
 
-    public static function fromHexInt240(string $Int240): HexInt240
+    public static function fromHexInt232(string $int232): HexInt232
     {
-        return new HexInt240($Int240);
+        return new HexInt232($int232);
     }
 
-    public static function fromHexInt248(string $Int248): HexInt248
+    public static function fromHexInt240(string $int240): HexInt240
     {
-        return new HexInt248($Int248);
+        return new HexInt240($int240);
     }
 
-    public static function fromHexInt256(string $Int256): HexInt256
+    public static function fromHexInt248(string $int248): HexInt248
     {
-        return new HexInt256($Int256);
+        return new HexInt248($int248);
+    }
+
+    public static function fromHexInt256(string $int256): HexInt256
+    {
+        return new HexInt256($int256);
     }
 }

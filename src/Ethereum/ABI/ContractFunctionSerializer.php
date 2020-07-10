@@ -5,8 +5,9 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\HexConverter;
-use phpseclib\Math\BigInteger;
 use Enjin\BlockchainTools\Support\StringHelpers as Str;
+use InvalidArgumentException;
+use phpseclib\Math\BigInteger;
 
 class ContractFunctionSerializer
 {
@@ -36,23 +37,28 @@ class ContractFunctionSerializer
             $baseType = $dataType->baseType();
             $isArray = $dataType->isArray();
 
-            if ($isArray) {
-                $value = $dataType->encodeArrayValues($value);
-                if ($dataType->isDynamicLengthArray()) {
-                    $dataBlock->addDynamicLengthArray($itemName, $rawType, $value);
-                } else {
-                    $dataBlock->addFixedLengthArray($itemName, $rawType, $value);
-                }
-            } else {
-                $value = $dataType->encodeBaseType($value);
+            try {
+                if ($isArray) {
+                    $value = $dataType->encodeArrayValues($value);
 
-                if ($baseType === 'string') {
-                    $dataBlock->addString($itemName, $value);
-                } elseif ($baseType === 'bytes') {
-                    $dataBlock->addDynamicLengthBytes($itemName, $rawType, $value);
+                    if ($dataType->isDynamicLengthArray()) {
+                        $dataBlock->addDynamicLengthArray($itemName, $rawType, $value);
+                    } else {
+                        $dataBlock->addFixedLengthArray($itemName, $rawType, $value);
+                    }
                 } else {
-                    $dataBlock->add($itemName, $rawType, $value);
+                    $value = $dataType->encodeBaseType($value);
+
+                    if ($baseType === 'string') {
+                        $dataBlock->addString($itemName, $value);
+                    } elseif ($baseType === 'bytes') {
+                        $dataBlock->addDynamicLengthBytes($itemName, $rawType, $value);
+                    } else {
+                        $dataBlock->add($itemName, $rawType, $value);
+                    }
                 }
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidArgumentException('name: ' . $itemName . ', ' . $e->getMessage());
             }
         }
 

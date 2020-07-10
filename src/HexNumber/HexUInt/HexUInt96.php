@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\HexNumber\HexUInt;
 
 class HexUInt96 extends BaseHexUInt
 {
+    public const BIT_SIZE = 96;
     public const HEX_LENGTH = 24;
     public const HEX_MIN = '000000000000000000000000';
     public const HEX_MAX = 'ffffffffffffffffffffffff';
@@ -118,6 +119,11 @@ class HexUInt96 extends BaseHexUInt
     public function toHexUInt88Bottom(): string
     {
         return $this->convertDownToBottom($this->value, HexUInt88::HEX_LENGTH);
+    }
+
+    public function toHexUInt96(): string
+    {
+        return $this->value;
     }
 
     public function toHexUInt104(): string

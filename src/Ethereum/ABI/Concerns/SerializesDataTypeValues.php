@@ -2,12 +2,15 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Concerns;
 
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthAddress;
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBool;
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBytes;
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthInt;
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthString;
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthUint;
+use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\HexInt;
+use Enjin\BlockchainTools\HexNumber\HexInt\HexInt256;
+use Enjin\BlockchainTools\HexNumber\HexUInt;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt160;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 
 trait SerializesDataTypeValues
 {
@@ -23,19 +26,26 @@ trait SerializesDataTypeValues
         $baseType = $this->baseType();
 
         if ($baseType === 'int') {
-            return EthInt::encode($value);
+            $int = HexInt::fromIntBitSize($this->bitSize(), $value);
+
+            return $int->toHexInt256();
         }
 
         if ($baseType === 'uint') {
             if ($this->aliasedFrom() === 'bool') {
-                $value = (int) $value;
+                return EthBool::encode($value);
             }
 
-            return EthUint::encode($value);
+            $uint = HexUInt::fromUIntBitSize($this->bitSize(), $value);
+
+            return $uint->toHexUInt256();
         }
 
         if ($baseType === 'address') {
-            return EthAddress::encode($value);
+            $value = HexConverter::unPrefix($value);
+            $uint = (new HexUInt160($value));
+
+            return $uint->toHexUInt256();
         }
 
         if ($baseType === 'bytes') {
@@ -67,19 +77,29 @@ trait SerializesDataTypeValues
         $baseType = $this->baseType();
 
         if ($baseType === 'int') {
-            return EthInt::decode($value);
+            $int = new HexInt256($value);
+
+            return $int->toDecimal();
         }
 
         if ($baseType === 'uint') {
-            if ($this->aliasedFrom() === 'bool') {
-                return (bool) EthUint::decode($value);
+            $uint = new HexUInt256($value);
+
+            if ($this->bitSize() !== 256) {
+                $uint = $uint->convertDownToBottomBitSize($this->bitSize());
+                $uint = HexUInt::fromHexUIntBitSize($this->bitSize(), $uint);
             }
 
-            return EthUint::decode($value);
+            if ($this->aliasedFrom() === 'bool') {
+                return (bool) $uint->toDecimal();
+            }
+
+            return $uint->toDecimal();
         }
 
         if ($baseType === 'address') {
-            return EthAddress::decode($value);
+            $uint = new HexUInt256($value);
+            return $uint->toHexUInt160Bottom();
         }
 
         if ($baseType === 'bytes') {

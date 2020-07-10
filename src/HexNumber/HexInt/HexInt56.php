@@ -4,12 +4,18 @@ namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 class HexInt56 extends BaseHexInt
 {
+    public const BIT_SIZE = 56;
     public const HEX_LENGTH = 14;
     public const HEX_MIN = '80000000000000';
     public const HEX_MAX = '7fffffffffffff';
     public const INT_MIN = '-36028797018963968';
     public const INT_MAX = '36028797018963967';
     public const INT_SIZE = '72057594037927935';
+
+    public function toHexInt56(): string
+    {
+        return $this->value;
+    }
 
     public function toHexInt64(): string
     {

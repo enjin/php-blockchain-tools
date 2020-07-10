@@ -4,12 +4,18 @@ namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 class HexInt160 extends BaseHexInt
 {
+    public const BIT_SIZE = 160;
     public const HEX_LENGTH = 40;
     public const HEX_MIN = '8000000000000000000000000000000000000000';
     public const HEX_MAX = '7fffffffffffffffffffffffffffffffffffffff';
     public const INT_MIN = '-730750818665451459101842416358141509827966271488';
     public const INT_MAX = '730750818665451459101842416358141509827966271487';
     public const INT_SIZE = '1461501637330902918203684832716283019655932542975';
+
+    public function toHexInt160(): string
+    {
+        return $this->value;
+    }
 
     public function toHexInt168(): string
     {

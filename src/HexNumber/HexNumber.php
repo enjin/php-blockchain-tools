@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\HexNumber;
 
 use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
+use phpseclib\Math\BigInteger;
 
 abstract class HexNumber
 {
@@ -68,13 +69,6 @@ abstract class HexNumber
     }
 
     /**
-     * @param string $int
-     *
-     * @return static
-     */
-    abstract public static function fromInt(string $int);
-
-    /**
      * @param string $hex
      *
      * @return static
@@ -120,11 +114,33 @@ abstract class HexNumber
         $expectedLength = static::HEX_LENGTH;
 
         if ($length !== $expectedLength) {
-            $class = basename(str_replace('\\', '/', get_class($this)));
+            $class = $this->classBaseName();
 
             throw new InvalidArgumentException("{$class} value provided is invalid. Expected {$expectedLength} characters but has: {$length} (input value: {$hex})");
         }
 
         return $hex;
+    }
+
+    protected static function validateIntRange(string $int)
+    {
+        $bigInt = new BigInteger($int);
+
+        $min = new BigInteger(static::INT_MIN);
+        $lessThanMin = $bigInt->compare($min) < 0;
+        if ($lessThanMin) {
+            throw new \InvalidArgumentException('provided base 10 int (' . $int . ') is less than min value for ' . static::classBaseName() . ' (' . static::INT_MIN . ')');
+        }
+
+        $max = new BigInteger(static::INT_MAX);
+        $greaterThanMax = $bigInt->compare($max) > 0;
+        if ($greaterThanMax) {
+            throw new \InvalidArgumentException('provided base 10 int (' . $int . ') is greater than max value for ' . static::classBaseName() . ' (' . static::INT_MAX . ')');
+        }
+    }
+
+    protected static function classBaseName(): string
+    {
+        return basename(str_replace('\\', '/', static::class));
     }
 }

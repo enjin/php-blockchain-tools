@@ -36,7 +36,7 @@ class HexUIntTest extends TestCase
         $this->assertEquals($int, HexUInt::fromHexUIntBitSize($bitSize, $hex)->toDecimal(), $message);
 
         $message = $class . '::fromInt($int)->toHex() convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, $class::fromInt($int)->toHex(), $message);
+        $this->assertEquals($hex, $class::fromUInt($int)->toHex(), $message);
 
         $message = $class . '::fromHex($hex)->toDecimal() convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, $class::fromHex($hex)->toDecimal(), $message);

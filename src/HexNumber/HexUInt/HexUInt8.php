@@ -4,11 +4,17 @@ namespace Enjin\BlockchainTools\HexNumber\HexUInt;
 
 class HexUInt8 extends BaseHexUInt
 {
+    public const BIT_SIZE = 8;
     public const HEX_LENGTH = 2;
     public const HEX_MIN = '00';
     public const HEX_MAX = 'ff';
     public const INT_MIN = '0';
     public const INT_MAX = '255';
+
+    public function toHexUInt8(): string
+    {
+        return $this->value;
+    }
 
     public function toHexUInt16(): string
     {
