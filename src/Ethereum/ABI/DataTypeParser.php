@@ -2,8 +2,8 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidFixedDecimalPrecisionException;
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidNumberLengthException;
+use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\InvalidFixedDecimalPrecisionException;
+use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\InvalidNumberLengthException;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
 use Enjin\BlockchainTools\Support\StringHelpers as Str;
 use InvalidArgumentException;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions;
+namespace Enjin\BlockchainTools\Ethereum\ABI\Exceptions;
 
 use Exception;
 use Throwable;
