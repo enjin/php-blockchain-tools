@@ -314,7 +314,7 @@ class ContractFunctionSerializerTest extends TestCase
 
         $serializedString = $function->methodId() . implode('', $serialized);
 
-        $expectedMessage = 'attempting to decode: _id, Cannot safely convert down to bottom of 16 from 256, non-zero bits would be lost. (999999999999999999999999999999999999999999999999999999999999) from (9999999999999999999999999999999999999999999999999999999999991234)';
+        $expectedMessage = 'attempting to decode: _id, Cannot safely convert down to bottom of 16 from 256, non-zero bits would be lost. (999999999999999999999999999999999999999999999999999999999999) from start of (9999999999999999999999999999999999999999999999999999999999991234)';
         $this->assertInvalidArgumentException($expectedMessage, function () use ($function, $serializedString) {
             $serializer = new ContractFunctionSerializer();
             $serializer->decodeInput($function, $serializedString);

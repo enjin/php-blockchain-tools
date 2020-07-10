@@ -147,4 +147,74 @@ class HexUInt32Test extends TestCase
         $actual = (new HexUInt32($value))->toDecimal();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testConvertUpTo()
+    {
+        $message = 'Cannot convert up to 16 from 32. Can only convert up to larger bit sizes';
+        $this->assertInvalidArgumentException($message, function () {
+            $uint = new HexUInt32('ffffffff');
+            $uint->convertUpTo(16);
+        });
+    }
+
+    public function testConvertDownToTop()
+    {
+        $message = 'Cannot convert down to 128 from 32. Can only convert down to smaller bit sizes';
+        $this->assertInvalidArgumentException($message, function () {
+            $uint = new HexUInt32('ffffffff');
+            $uint->convertDownToTop(128);
+        });
+
+        $uint = new HexUInt32('ffff0000');
+        $converted = $uint->convertDownToTop(16);
+        $this->assertEquals('ffff', $converted);
+
+        $message = 'Cannot safely convert down to top of 16 from 32, non-zero bits would be lost. (0090) from end of (ffff0090)';
+        $this->assertInvalidArgumentException($message, function () {
+            $uint = new HexUInt32('ffff0090');
+            $converted = $uint->convertDownToTop(16);
+        });
+
+        $uint = new HexUInt32('ffff0090');
+        $converted = $uint->forceConvertDownToTop(16);
+        $this->assertEquals('ffff', $converted);
+    }
+
+    public function testConvertDownToBottom()
+    {
+        $message = 'Cannot convert down to 128 from 32. Can only convert down to smaller bit sizes';
+        $this->assertInvalidArgumentException($message, function () {
+            $uint = new HexUInt32('ffffffff');
+            $uint->convertDownToBottom(128);
+        });
+
+        $uint = new HexUInt32('0000abcd');
+        $converted = $uint->convertDownToBottom(16);
+        $this->assertEquals('abcd', $converted);
+
+        $message = 'Cannot safely convert down to bottom of 16 from 32, non-zero bits would be lost. (0990) from start of (0990abcd)';
+        $this->assertInvalidArgumentException($message, function () {
+            $uint = new HexUInt32('0990abcd');
+            $converted = $uint->convertDownToBottom(16);
+        });
+
+        $uint = new HexUInt32('0990abcd');
+        $converted = $uint->forceConvertDownToBottom(16);
+        $this->assertEquals('abcd', $converted);
+    }
+
+    public function testValidateIntRange()
+    {
+        $message = 'provided base 10 int(4294967296) is greater than max value for HexUInt32 (4294967295)';
+        $this->assertInvalidArgumentException($message, function () {
+            // one higher than max
+            HexUInt32::fromUInt('4294967296');
+        });
+
+        $message = 'provided base 10 int(-1) is less than min value for HexUInt32 (0)';
+        $this->assertInvalidArgumentException($message, function () {
+            // one lower than min
+            HexUInt32::fromUInt('-1');
+        });
+    }
 }

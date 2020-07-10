@@ -161,7 +161,7 @@ abstract class HexNumber
                 $removed = substr($hex, $length);
                 $nonZeroRemoved = strlen(ltrim($removed, '0'));
                 if ($nonZeroRemoved) {
-                    throw new InvalidArgumentException('Cannot safely convert down to top of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from (' . $hex . ')');
+                    throw new InvalidArgumentException('Cannot safely convert down to top of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from end of (' . $hex . ')');
                 }
             }
 
@@ -189,7 +189,7 @@ abstract class HexNumber
                 $removed = substr($hex, 0, $index);
                 $nonZeroRemoved = strlen(ltrim($removed, '0'));
                 if ($nonZeroRemoved) {
-                    throw new InvalidArgumentException('Cannot safely convert down to bottom of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from (' . $hex . ')');
+                    throw new InvalidArgumentException('Cannot safely convert down to bottom of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from start of (' . $hex . ')');
                 }
             }
 
