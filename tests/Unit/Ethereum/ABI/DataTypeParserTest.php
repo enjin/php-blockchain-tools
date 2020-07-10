@@ -16,31 +16,14 @@ class DataTypeParserTest extends TestCase
                 'baseType' => 'int',
                 'bitSize' => 256,
             ],
-            'int8' => [
-                'baseType' => 'int',
-                'bitSize' => 8,
-            ],
-            'int16' => [
-                'baseType' => 'int',
-                'bitSize' => 16,
-            ],
-            'int32' => [
-                'baseType' => 'int',
-                'bitSize' => 32,
-            ],
-            'int64' => [
-                'baseType' => 'int',
-                'bitSize' => 64,
-            ],
-            'int128' => [
-                'baseType' => 'int',
-                'bitSize' => 128,
-            ],
-            'int256' => [
-                'baseType' => 'int',
-                'bitSize' => 256,
-            ],
         ];
+
+        foreach (HexNumber::VALID_BIT_SIZES as $size) {
+            $cases['int' . $size] = [
+                'baseType' => 'int',
+                'bitSize' => $size,
+            ];
+        }
 
         foreach ($cases as $type => $expected) {
             $this->assertDataTypeValues($type, $expected);
@@ -75,31 +58,14 @@ class DataTypeParserTest extends TestCase
                 'baseType' => 'uint',
                 'bitSize' => 256,
             ],
-            'uint8' => [
-                'baseType' => 'uint',
-                'bitSize' => 8,
-            ],
-            'uint16' => [
-                'baseType' => 'uint',
-                'bitSize' => 16,
-            ],
-            'uint32' => [
-                'baseType' => 'uint',
-                'bitSize' => 32,
-            ],
-            'uint64' => [
-                'baseType' => 'uint',
-                'bitSize' => 64,
-            ],
-            'uint128' => [
-                'baseType' => 'uint',
-                'bitSize' => 128,
-            ],
-            'uint256' => [
-                'baseType' => 'uint',
-                'bitSize' => 256,
-            ],
         ];
+
+        foreach (HexNumber::VALID_BIT_SIZES as $size) {
+            $cases['uint' . $size] = [
+                'baseType' => 'uint',
+                'bitSize' => $size,
+            ];
+        }
 
         foreach ($cases as $type => $expected) {
             $this->assertDataTypeValues($type, $expected);
