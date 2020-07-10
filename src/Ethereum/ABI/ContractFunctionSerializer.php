@@ -6,6 +6,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\HexConverter;
 use phpseclib\Math\BigInteger;
+use Enjin\BlockchainTools\Support\StringHelpers as Str;
 
 class ContractFunctionSerializer
 {
@@ -135,7 +136,7 @@ class ContractFunctionSerializer
 
     public function removeSignatureFromData(string $methodId, string $data): string
     {
-        return $this->removeFromBeginning($data, $methodId);
+        return Str::removeFromBeginning($data, $methodId);
     }
 
     protected function uIntFromIndex(string $data, int $index): int
@@ -155,15 +156,6 @@ class ContractFunctionSerializer
     protected function hexFromIndex(string $data, int $index, int $length = 1): string
     {
         return substr($data, $index, $length * 64);
-    }
-
-    protected function removeFromBeginning(string $str, string $prefix): string
-    {
-        if (substr($str, 0, strlen($prefix)) == $prefix) {
-            $str = substr($str, strlen($prefix));
-        }
-
-        return $str;
     }
 }
 
