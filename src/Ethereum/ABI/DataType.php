@@ -16,7 +16,7 @@ class DataType
     /**
      * @var int|string
      */
-    protected $length;
+    protected $bitSize;
 
     /**
      * @var int|string
@@ -43,7 +43,7 @@ class DataType
         $defaults = [
             'rawType' => null,
             'baseType' => null,
-            'length' => null,
+            'bitSize' => null,
             'arrayLength' => null,
             'decimalPrecision' => null,
             'aliasedFrom' => null,
@@ -53,7 +53,7 @@ class DataType
         $this->setData(
             $data['rawType'],
             $data['baseType'],
-            $data['length'],
+            $data['bitSize'],
             $data['arrayLength'],
             $data['decimalPrecision'],
             $data['aliasedFrom']
@@ -70,9 +70,9 @@ class DataType
         return $this->baseType;
     }
 
-    public function length()
+    public function bitSize()
     {
-        return $this->length;
+        return $this->bitSize;
     }
 
     public function arrayLength()
@@ -108,14 +108,14 @@ class DataType
     protected function setData(
         string $rawType,
         string $baseType,
-        $length = null,
+        $bitSize = null,
         $arrayLength = null,
         int $decimalPrecision = null,
         string $aliasedFrom = null
     ) {
         $this->rawType = $rawType;
         $this->baseType = $baseType;
-        $this->length = $length;
+        $this->bitSize = $bitSize;
         $this->arrayLength = $arrayLength;
         $this->decimalPrecision = $decimalPrecision;
         $this->aliasedFrom = $aliasedFrom;

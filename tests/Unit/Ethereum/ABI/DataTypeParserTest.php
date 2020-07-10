@@ -3,6 +3,7 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\DataTypeParser;
+use Enjin\BlockchainTools\HexNumber\HexNumber;
 use Tests\TestCase;
 
 class DataTypeParserTest extends TestCase
@@ -13,31 +14,31 @@ class DataTypeParserTest extends TestCase
             // alias of int256
             'int' => [
                 'baseType' => 'int',
-                'length' => 256,
+                'bitSize' => 256,
             ],
             'int8' => [
                 'baseType' => 'int',
-                'length' => 8,
+                'bitSize' => 8,
             ],
             'int16' => [
                 'baseType' => 'int',
-                'length' => 16,
+                'bitSize' => 16,
             ],
             'int32' => [
                 'baseType' => 'int',
-                'length' => 32,
+                'bitSize' => 32,
             ],
             'int64' => [
                 'baseType' => 'int',
-                'length' => 64,
+                'bitSize' => 64,
             ],
             'int128' => [
                 'baseType' => 'int',
-                'length' => 128,
+                'bitSize' => 128,
             ],
             'int256' => [
                 'baseType' => 'int',
-                'length' => 256,
+                'bitSize' => 256,
             ],
         ];
 
@@ -72,31 +73,31 @@ class DataTypeParserTest extends TestCase
             // alias of int256
             'uint' => [
                 'baseType' => 'uint',
-                'length' => 256,
+                'bitSize' => 256,
             ],
             'uint8' => [
                 'baseType' => 'uint',
-                'length' => 8,
+                'bitSize' => 8,
             ],
             'uint16' => [
                 'baseType' => 'uint',
-                'length' => 16,
+                'bitSize' => 16,
             ],
             'uint32' => [
                 'baseType' => 'uint',
-                'length' => 32,
+                'bitSize' => 32,
             ],
             'uint64' => [
                 'baseType' => 'uint',
-                'length' => 64,
+                'bitSize' => 64,
             ],
             'uint128' => [
                 'baseType' => 'uint',
-                'length' => 128,
+                'bitSize' => 128,
             ],
             'uint256' => [
                 'baseType' => 'uint',
-                'length' => 256,
+                'bitSize' => 256,
             ],
         ];
 
@@ -131,7 +132,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'uint8',
             'baseType' => 'uint',
-            'length' => 8,
+            'bitSize' => 8,
             'aliasedFrom' => 'bool',
         ];
 
@@ -141,7 +142,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'uint8[]',
             'baseType' => 'uint',
-            'length' => 8,
+            'bitSize' => 8,
             'isArray' => true,
             'arrayLength' => 'dynamic',
             'aliasedFrom' => $type,
@@ -153,7 +154,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'uint8[99]',
             'baseType' => 'uint',
-            'length' => 8,
+            'bitSize' => 8,
             'isArray' => true,
             'arrayLength' => 99,
             'aliasedFrom' => $type,
@@ -168,7 +169,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'bytes24',
             'baseType' => 'bytes',
-            'length' => 24,
+            'bitSize' => 24,
             'isArray' => false,
             'aliasedFrom' => 'function',
         ];
@@ -179,7 +180,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'bytes24[]',
             'baseType' => 'bytes',
-            'length' => 24,
+            'bitSize' => 24,
             'isArray' => true,
             'arrayLength' => 'dynamic',
             'aliasedFrom' => $type,
@@ -191,7 +192,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'bytes24[88]',
             'baseType' => 'bytes',
-            'length' => 24,
+            'bitSize' => 24,
             'isArray' => true,
             'arrayLength' => 88,
             'aliasedFrom' => $type,
@@ -206,7 +207,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'address',
             'baseType' => 'address',
-            'length' => 160,
+            'bitSize' => 160,
         ];
 
         $this->assertDataTypeValues($type, $expected);
@@ -215,7 +216,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'address[]',
             'baseType' => 'address',
-            'length' => 160,
+            'bitSize' => 160,
             'isArray' => true,
             'arrayLength' => 'dynamic',
         ];
@@ -226,7 +227,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'address[88]',
             'baseType' => 'address',
-            'length' => 160,
+            'bitSize' => 160,
             'isArray' => true,
             'arrayLength' => 88,
         ];
@@ -239,7 +240,7 @@ class DataTypeParserTest extends TestCase
         $type = 'string';
         $expected = [
             'baseType' => 'string',
-            'length' => 'dynamic',
+            'bitSize' => 'dynamic',
             'isArray' => false,
         ];
 
@@ -249,7 +250,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'string[]',
             'baseType' => 'string',
-            'length' => 'dynamic',
+            'bitSize' => 'dynamic',
             'isArray' => true,
             'arrayLength' => 'dynamic',
         ];
@@ -260,7 +261,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'string[88]',
             'baseType' => 'string',
-            'length' => 'dynamic',
+            'bitSize' => 'dynamic',
             'isArray' => true,
             'arrayLength' => 88,
         ];
@@ -273,7 +274,7 @@ class DataTypeParserTest extends TestCase
         $type = 'bytes';
         $expected = [
             'baseType' => 'bytes',
-            'length' => 'dynamic',
+            'bitSize' => 'dynamic',
             'isArray' => false,
         ];
 
@@ -283,7 +284,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'bytes[]',
             'baseType' => 'bytes',
-            'length' => 'dynamic',
+            'bitSize' => 'dynamic',
             'isArray' => true,
             'arrayLength' => 'dynamic',
         ];
@@ -294,7 +295,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'bytes[88]',
             'baseType' => 'bytes',
-            'length' => 'dynamic',
+            'bitSize' => 'dynamic',
             'isArray' => true,
             'arrayLength' => 88,
         ];
@@ -307,7 +308,7 @@ class DataTypeParserTest extends TestCase
             $type = $baseType;
             $expected = [
                 'baseType' => 'bytes',
-                'length' => $length,
+                'bitSize' => $length,
                 'isArray' => false,
             ];
 
@@ -316,7 +317,7 @@ class DataTypeParserTest extends TestCase
             $type = $baseType . '[]';
             $expected = [
                 'baseType' => 'bytes',
-                'length' => $length,
+                'bitSize' => $length,
                 'isArray' => true,
                 'arrayLength' => 'dynamic',
             ];
@@ -326,7 +327,7 @@ class DataTypeParserTest extends TestCase
             $type = $baseType . '[55]';
             $expected = [
                 'baseType' => 'bytes',
-                'length' => $length,
+                'bitSize' => $length,
                 'isArray' => true,
                 'arrayLength' => 55,
             ];
@@ -340,7 +341,7 @@ class DataTypeParserTest extends TestCase
         $type = 'fixed';
         $expected = [
             'baseType' => 'fixed',
-            'length' => 128,
+            'bitSize' => 128,
             'decimalPrecision' => 18,
             'isArray' => false,
         ];
@@ -351,7 +352,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'fixed[]',
             'baseType' => 'fixed',
-            'length' => 128,
+            'bitSize' => 128,
             'decimalPrecision' => 18,
             'isArray' => true,
             'arrayLength' => 'dynamic',
@@ -363,7 +364,7 @@ class DataTypeParserTest extends TestCase
         $expected = [
             'rawType' => 'fixed[88]',
             'baseType' => 'fixed',
-            'length' => 128,
+            'bitSize' => 128,
             'decimalPrecision' => 18,
             'isArray' => true,
             'arrayLength' => 88,
@@ -372,22 +373,15 @@ class DataTypeParserTest extends TestCase
         $this->assertDataTypeValues($type, $expected);
 
         foreach (range(1, 80) as $decimalPrecision) {
-            $lengths = [
-                8,
-                16,
-                32,
-                64,
-                128,
-                256,
-            ];
+            $bitSizes = HexNumber::VALID_BIT_SIZES;
 
-            foreach ($lengths as $length) {
-                $baseType = 'fixed' . $length . 'x' . $decimalPrecision;
+            foreach ($bitSizes as $bitSize) {
+                $baseType = 'fixed' . $bitSize . 'x' . $decimalPrecision;
 
                 $type = $baseType;
                 $expected = [
                     'baseType' => 'fixed',
-                    'length' => $length,
+                    'bitSize' => $bitSize,
                     'decimalPrecision' => $decimalPrecision,
                 ];
 
@@ -396,7 +390,7 @@ class DataTypeParserTest extends TestCase
                 $type = $baseType . '[]';
                 $expected = [
                     'baseType' => 'fixed',
-                    'length' => $length,
+                    'bitSize' => $bitSize,
                     'isArray' => true,
                     'arrayLength' => 'dynamic',
                     'decimalPrecision' => $decimalPrecision,
@@ -407,7 +401,7 @@ class DataTypeParserTest extends TestCase
                 $type = $baseType . '[55]';
                 $expected = [
                     'baseType' => 'fixed',
-                    'length' => $length,
+                    'bitSize' => $bitSize,
                     'isArray' => true,
                     'arrayLength' => 55,
                     'decimalPrecision' => $decimalPrecision,
@@ -428,7 +422,7 @@ class DataTypeParserTest extends TestCase
         $defaults = [
             'rawType' => $type,
             'baseType' => null,
-            'length' => null,
+            'bitSize' => null,
             'arrayLength' => null,
             'isArray' => false,
             'aliasedFrom' => null,
@@ -442,7 +436,7 @@ class DataTypeParserTest extends TestCase
         $actual = [
             'baseType' => $dataType->baseType(),
             'rawType' => $dataType->rawType(),
-            'length' => $dataType->length(),
+            'bitSize' => $dataType->bitSize(),
             'arrayLength' => $dataType->arrayLength(),
             'isArray' => $dataType->isArray(),
             'aliasedFrom' => $dataType->aliasedFrom(),

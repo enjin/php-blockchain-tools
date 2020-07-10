@@ -6,6 +6,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidFixedD
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\Exceptions\InvalidNumberLengthException;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
 use InvalidArgumentException;
+use Enjin\BlockchainTools\Support\StringHelpers as Str;
 
 class DataTypeParser
 {
@@ -22,7 +23,7 @@ class DataTypeParser
             $parsed = $this->parseType($arrayType);
 
             $baseType = $parsed->baseType();
-            $length = $parsed->length();
+            $bitSize = $parsed->bitSize();
             $aliasedFrom = $parsed->aliasedFrom();
             $decimalPrecision = $parsed->decimalPrecision();
 
@@ -33,14 +34,14 @@ class DataTypeParser
                     $arraySuffix = '[' . $arrayLength . ']';
                 }
 
-                $type = $baseType . $length . $arraySuffix;
+                $type = $baseType . $bitSize . $arraySuffix;
                 $aliasedFrom = $aliasedFrom . $arraySuffix;
             }
 
             return new DataType([
                 'rawType' => $type,
                 'baseType' => $baseType,
-                'length' => $length,
+                'bitSize' => $bitSize,
                 'arrayLength' => $arrayLength,
                 'decimalPrecision' => $decimalPrecision,
                 'aliasedFrom' => $aliasedFrom,
@@ -56,7 +57,7 @@ class DataTypeParser
             return new DataType([
                 'rawType' => $type,
                 'baseType' => $type,
-                'length' => 'dynamic',
+                'bitSize' => 'dynamic',
             ]);
         }
 
@@ -64,7 +65,7 @@ class DataTypeParser
             return new DataType([
                 'rawType' => 'uint8',
                 'baseType' => 'uint',
-                'length' => 8,
+                'bitSize' => 8,
                 'aliasedFrom' => 'bool',
             ]);
         }
@@ -73,7 +74,7 @@ class DataTypeParser
             return new DataType([
                 'rawType' => 'bytes24',
                 'baseType' => 'bytes',
-                'length' => 24,
+                'bitSize' => 24,
                 'aliasedFrom' => 'function',
             ]);
         }
@@ -82,21 +83,21 @@ class DataTypeParser
             return new DataType([
                 'rawType' => 'address',
                 'baseType' => 'address',
-                'length' => 160,
+                'bitSize' => 160,
             ]);
         }
 
-        if ($this->startsWith($type, 'fixed')) {
+        if (Str::startsWith($type, 'fixed')) {
             return $this->parseFixed($type, 'fixed');
         }
 
-        if ($this->startsWith($type, 'bytes')) {
+        if (Str::startsWith($type, 'bytes')) {
             return $this->parseBytes($type, 'bytes');
         }
 
-        if ($this->startsWith($type, 'int')) {
+        if (Str::startsWith($type, 'int')) {
             return $this->parseInt($type, 'int');
-        } elseif ($this->startsWith($type, 'uint')) {
+        } elseif (Str::startsWith($type, 'uint')) {
             return $this->parseInt($type, 'uint');
         }
 
@@ -106,32 +107,32 @@ class DataTypeParser
     public function parseInt(string $type, string $baseType)
     {
         if ($type === $baseType) {
-            $length = 256;
+            $bitSize = 256;
         } else {
-            $length = $this->parseNumberLength($type, $baseType, HexNumber::VALID_BIT_SIZES);
+            $bitSize = $this->parseNumberBitSize($type, $baseType, HexNumber::VALID_BIT_SIZES);
         }
 
         return new DataType([
             'rawType' => $type,
             'baseType' => $baseType,
-            'length' => $length,
+            'bitSize' => $bitSize,
         ]);
     }
 
     public function parseFixed(string $type, string $baseType)
     {
         if ($type === $baseType) {
-            $length = 128;
+            $bitSize = 128;
             $decimalPrecision = 18;
         } else {
-            $suffix = $this->removeFromBeginning($type, $baseType);
+            $suffix = Str::removeFromBeginning($type, $baseType);
 
-            [$length, $decimalPrecision] = explode('x', $suffix, 2);
+            [$bitSize, $decimalPrecision] = explode('x', $suffix, 2);
 
-            $length = (int) $length;
+            $bitSize = (int) $bitSize;
             $decimalPrecision = (int) $decimalPrecision;
 
-            if (!in_array($length, HexNumber::VALID_BIT_SIZES)) {
+            if (!in_array($bitSize, HexNumber::VALID_BIT_SIZES)) {
                 throw new InvalidNumberLengthException($baseType, $type);
             }
 
@@ -143,7 +144,7 @@ class DataTypeParser
         return new DataType([
             'rawType' => $type,
             'baseType' => $baseType,
-            'length' => $length,
+            'bitSize' => $bitSize,
             'decimalPrecision' => $decimalPrecision,
         ]);
     }
@@ -151,23 +152,23 @@ class DataTypeParser
     public function parseBytes(string $type, string $baseType)
     {
         if ($type === $baseType) {
-            $length = 'dynamic';
+            $bitSize = 'dynamic';
         } else {
-            $length = $this->parseNumberLength($type, $baseType, $this->validByteLengths());
+            $bitSize = $this->parseNumberBitSize($type, $baseType, $this->validByteLengths());
         }
 
         return new DataType([
             'rawType' => $type,
             'baseType' => $baseType,
-            'length' => $length,
+            'bitSize' => $bitSize,
         ]);
     }
 
-    public function parseNumberLength(string $type, string $numberType, array $validLengths): int
+    public function parseNumberBitSize(string $type, string $numberType, array $validBitSizes): int
     {
-        $length = (int) $this->removeFromBeginning($type, $numberType);
+        $length = (int) Str::removeFromBeginning($type, $numberType);
 
-        if (!in_array($length, $validLengths)) {
+        if (!in_array($length, $validBitSizes)) {
             throw new InvalidNumberLengthException($numberType, $type);
         }
 
@@ -194,16 +195,6 @@ class DataTypeParser
             'type' => $matches[1],
             'length' => (int) $matches[2],
         ];
-    }
-
-    protected function startsWith(string $haystack, string $needle)
-    {
-        return substr($haystack, 0, strlen($needle)) === (string) $needle;
-    }
-
-    protected function removeFromBeginning(string $string, string $prefix)
-    {
-        return substr($string, strlen($prefix));
     }
 
     private function validByteLengths(): array
