@@ -3,7 +3,6 @@
 namespace Enjin\BlockchainTools\Ethereum\ABI\Concerns;
 
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBool;
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBytes;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexInt;
 use Enjin\BlockchainTools\HexNumber\HexInt\HexInt256;
