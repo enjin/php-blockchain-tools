@@ -32,7 +32,8 @@ trait SerializesDataTypeValues
 
         if ($baseType === 'uint') {
             if ($this->aliasedFrom() === 'bool') {
-                return EthBool::encode($value);
+                $value = $value ? '1' : '0';
+                return HexUInt256::fromUInt($value);
             }
 
             $uint = HexUInt::fromUIntBitSize($this->bitSize(), $value);
@@ -48,15 +49,16 @@ trait SerializesDataTypeValues
         }
 
         if ($baseType === 'bytes') {
-            if (!$value) {
-                $value = [];
+            if ($value) {
+                return HexConverter::bytesToHex($value);
             }
 
-            return EthBytes::encode($value);
+            return HexUInt256::HEX_MIN;
         }
 
         if ($baseType === 'bool') {
-            return EthBool::encode($value);
+            $value = $value ? 1 : 0;
+            return HexUInt256::fromUInt($value);
         }
 
         if ($baseType === 'string') {
@@ -111,15 +113,13 @@ trait SerializesDataTypeValues
         }
 
         if ($baseType === 'bytes') {
-            if ($value == 0) {
+            $uint = new HexUInt256($value);
+
+            if ($uint->toDecimal() == 0) {
                 return [];
             }
 
-            return EthBytes::decode($value);
-        }
-
-        if ($baseType === 'bool') {
-            return EthBool::decode($value);
+            return HexConverter::hexToBytes($value);
         }
 
         if ($baseType === 'string') {
