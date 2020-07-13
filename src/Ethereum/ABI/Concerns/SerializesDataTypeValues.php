@@ -114,6 +114,7 @@ trait SerializesDataTypeValues
             if ($value == 0) {
                 return [];
             }
+
             return EthBytes::decode($value);
         }
 

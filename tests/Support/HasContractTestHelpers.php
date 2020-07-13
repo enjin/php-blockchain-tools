@@ -57,10 +57,16 @@ trait HasContractTestHelpers
 
     private function makeContractFunctionInputJson(array $data = []): array
     {
+        $types = [
+            'int',
+            'uint',
+            'bytes',
+            'string',
+        ];
+
         return array_merge([
             'name' => $this->faker()->name,
-            // @TODO implement random type
-            'type' => $this->faker()->regexify('[0-9A-Za-z]{20}'),
+            'type' => $this->faker()->randomElement($types),
             'components' => [],
         ], $data);
     }

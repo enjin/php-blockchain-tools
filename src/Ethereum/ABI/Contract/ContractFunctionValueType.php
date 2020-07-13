@@ -22,11 +22,17 @@ class ContractFunctionValueType
      */
     protected $components;
 
+    /**
+     * @var DataType
+     */
+    protected $dataType;
+
     public function __construct(array $input)
     {
         $this->name = $input['name'];
         $this->type = $input['type'];
         $this->components = $input['components'] ?? null;
+        $this->dataType = (new DataTypeParser())->parse($this->type);
     }
 
     public function name(): string
@@ -46,6 +52,6 @@ class ContractFunctionValueType
 
     public function dataType(): DataType
     {
-        return (new DataTypeParser())->parse($this->type());
+        return $this->dataType;
     }
 }

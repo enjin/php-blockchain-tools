@@ -73,7 +73,7 @@ class ContractFunctionSerializerTest extends TestCase
             '_values' => [7, 8, 9],
             '_data' => [],
         ];
-        
+
         $serialized = [
             '00000000000000000000000041f502f01195652d3dc55a06f71d8d802ada241b',
             '0000000000000000000000007d68cb169512d47ad39928b63bd97a40db65796d',

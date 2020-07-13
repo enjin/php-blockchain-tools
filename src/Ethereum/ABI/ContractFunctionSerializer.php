@@ -39,26 +39,18 @@ class ContractFunctionSerializer
 
             try {
                 if ($isArray) {
-                    $value = $dataType->encodeArrayValues($value);
-
                     if ($dataType->isDynamicLengthArray()) {
-                        $dataBlock->addDynamicLengthArray($itemName, $rawType, $value);
+                        $dataBlock->addDynamicLengthArray($item, $value);
                     } else {
-                        $dataBlock->addFixedLengthArray($itemName, $rawType, $value);
+                        $dataBlock->addFixedLengthArray($item, $value);
                     }
                 } else {
                     if ($baseType === 'string') {
-                        $length = strlen($value);
-                        $value = $dataType->encodeBaseType($value);
-
-                        $dataBlock->addString($itemName, $value, $length);
+                        $dataBlock->addString($item, $value);
                     } elseif ($baseType === 'bytes') {
-                        $length = count($value);
-                        $value = $dataType->encodeBaseType($value);
-                        $dataBlock->addDynamicLengthBytes($itemName, $rawType, $value, $length);
+                        $dataBlock->addDynamicLengthBytes($item, $value);
                     } else {
-                        $value = $dataType->encodeBaseType($value);
-                        $dataBlock->add($itemName, $rawType, $value);
+                        $dataBlock->add($item, $value);
                     }
                 }
             } catch (InvalidArgumentException $e) {
@@ -133,7 +125,6 @@ class ContractFunctionSerializer
 
                     $hexValue = $this->hexFromIndex($data, $valuesIndex, $length);
                     $results[$itemName] = $dataType->decodeBaseType($hexValue);
-
 
                     $index += 64;
 
