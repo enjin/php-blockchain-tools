@@ -4,7 +4,6 @@ namespace Enjin\BlockchainTools\Ethereum\ABI\Concerns;
 
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBool;
 use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthBytes;
-use Enjin\BlockchainTools\Ethereum\ABI\ValueSerializers\EthString;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexInt;
 use Enjin\BlockchainTools\HexNumber\HexInt\HexInt256;
@@ -61,7 +60,11 @@ trait SerializesDataTypeValues
         }
 
         if ($baseType === 'string') {
-            EthString::encode($value);
+            if ($value) {
+                return HexConverter::stringToHex($value, 64);
+            }
+
+            return HexUInt256::HEX_MIN;
         }
     }
 
@@ -78,6 +81,10 @@ trait SerializesDataTypeValues
 
         if ($baseType === 'int') {
             $int = new HexInt256($value);
+            if ($this->bitSize() !== 256) {
+                $int = $int->convertDownToBottom($this->bitSize());
+                $int = HexInt::fromHexIntBitSize($this->bitSize(), $int);
+            }
 
             return $int->toDecimal();
         }
@@ -104,6 +111,9 @@ trait SerializesDataTypeValues
         }
 
         if ($baseType === 'bytes') {
+            if ($value == 0) {
+                return [];
+            }
             return EthBytes::decode($value);
         }
 
@@ -112,7 +122,7 @@ trait SerializesDataTypeValues
         }
 
         if ($baseType === 'string') {
-            return EthString::decode($value);
+            return HexConverter::hexToString($value);
         }
     }
 }

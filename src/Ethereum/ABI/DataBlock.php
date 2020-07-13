@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 
 class DataBlock
 {
@@ -85,41 +86,40 @@ class DataBlock
         ];
     }
 
-    public function addDynamicLengthBytes(string $inputName, string $type, ?string $value)
+    public function addDynamicLengthBytes(string $inputName, string $type, ?string $value, int $length)
     {
-        if ($value === null) {
-            $value = 0;
-        }
+        $positionLength = ceil($length / 64);
 
-        $length = strlen($value);
+        $values = str_split($value, 64);
 
-        if (ltrim($value, '0') === '') {
-            $length = 0;
-        }
+        $last = array_pop($values);
+        $values[] = HexUInt256::padRight($last);
 
         $this->dynamicLengthData[] = [
             'name' => $inputName,
             'type' => $type,
             'is_array' => false,
-            'position' => $this->dynamicPositionFor($length),
+            'position' => $this->dynamicPositionFor($positionLength),
             'length' => $length,
-            'values' => $value,
+            'values' => $values,
         ];
     }
 
-    public function addString(string $inputName, string $value)
+    public function addString(string $inputName, string $value, string $length)
     {
-        $length = strlen($value);
+        $positionLength = ceil($length / 32);
 
-        if (!$value) {
-            $length = 0;
-        }
+        $values = str_split($value, 64);
+
+        $last = array_pop($values);
+        $values[] = HexUInt256::padRight($last);
+
         $this->dynamicLengthData[] = [
             'name' => $inputName,
             'type' => 'string',
-            'position' => $this->dynamicPositionFor($length),
+            'position' => $this->dynamicPositionFor($positionLength),
             'length' => $length,
-            'values' => $value,
+            'values' => $values,
         ];
     }
 
@@ -162,7 +162,10 @@ class DataBlock
 
             $output[] = [
                 'name' => $name . ' values position',
-                'value' => $position,
+                'value_decoded' => $position,
+                'value_index' => $position * 2,
+                'chunk_index' => ($position * 2) / 64,
+                'value' => HexConverter::intToHexUInt($position, 64),
             ];
         }
 
@@ -176,14 +179,19 @@ class DataBlock
                 $output[] = [
                     'name' => "{$name} length: {$length}",
                     'type' => $type,
+                    'value_decoded' => $length,
+                    'value_hex_string_length' => $position * 2,
+                    'chunk_size' => ($length * 2) / 64,
                     'value' => HexConverter::intToHexUInt($length, 64),
                 ];
 
-                $output[] = [
-                    'name' => $name . ' value',
-                    'type' => $type,
-                    'value' => $values,
-                ];
+                foreach ($values as $i => $value) {
+                    $output[] = [
+                        'name' => $name . ' value chunk[' . $i . ']',
+                        'type' => $type,
+                        'value' => $value,
+                    ];
+                }
             } else {
                 $output[] = [
                     'name' => "{$name} length: {$length}",
@@ -201,12 +209,19 @@ class DataBlock
             }
         }
 
+        $dataIndex = 0;
+        foreach ($output as $index => $row) {
+            $output[$index]['index_from'] = $dataIndex;
+            $output[$index]['index_to'] = $dataIndex + 64;
+            $dataIndex += 64;
+        }
+
         return $output;
     }
 
     protected function dynamicPositionFor(int $length): string
     {
-        $value = HexConverter::intToHexUInt($this->dynamicDataPosition, 64);
+        $value = $this->dynamicDataPosition;
         $this->dynamicDataPosition += ($length * 32) + 32;
 
         return $value;

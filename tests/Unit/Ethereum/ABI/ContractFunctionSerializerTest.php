@@ -5,6 +5,7 @@ namespace Tests\Unit\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
 use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Tests\TestCase;
 
@@ -67,27 +68,28 @@ class ContractFunctionSerializerTest extends TestCase
             '_ids' => [
                 HexUInt256::INT_MIN,
                 HexUInt256::INT_MAX,
+                // 1,
             ],
-            '_values' => [4, 4],
+            '_values' => [7, 8, 9],
             '_data' => [],
         ];
-
+        
         $serialized = [
             '00000000000000000000000041f502f01195652d3dc55a06f71d8d802ada241b',
             '0000000000000000000000007d68cb169512d47ad39928b63bd97a40db65796d',
             '00000000000000000000000000000000000000000000000000000000000000a0',
             '0000000000000000000000000000000000000000000000000000000000000100',
-            '0000000000000000000000000000000000000000000000000000000000000160',
+            '0000000000000000000000000000000000000000000000000000000000000180',
             '0000000000000000000000000000000000000000000000000000000000000002',
             HexUInt256::HEX_MIN,
             HexUInt256::HEX_MAX,
-            '0000000000000000000000000000000000000000000000000000000000000002',
-            '0000000000000000000000000000000000000000000000000000000000000004',
-            '0000000000000000000000000000000000000000000000000000000000000004',
+            '0000000000000000000000000000000000000000000000000000000000000003',
+            '0000000000000000000000000000000000000000000000000000000000000007',
+            '0000000000000000000000000000000000000000000000000000000000000008',
+            '0000000000000000000000000000000000000000000000000000000000000009',
             '0000000000000000000000000000000000000000000000000000000000000000',
             '0000000000000000000000000000000000000000000000000000000000000000',
         ];
-
         $this->assertSerializerInput($function, $expected, $serialized);
     }
 
@@ -282,6 +284,92 @@ class ContractFunctionSerializerTest extends TestCase
         }, $expectedDecoded['_to']);
 
         $this->assertSerializerInput($function, $expected, $serialized, $expectedDecoded);
+    }
+
+    public function testCase4()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => 'name',
+                        'type' => 'string',
+                    ],
+                    [
+                        'name' => 'numbers',
+                        'type' => 'int16[]',
+                    ],
+                ],
+                'name' => 'mintFungibles',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('mintFungibles');
+
+        $data = [
+            'name' => 'Test Name Test Name this is a test and such so that it is long enough to cause a problem',
+            'numbers' => [1, 2, 3, 4],
+        ];
+
+        $serialized = [
+            '0000000000000000000000000000000000000000000000000000000000000040',
+            '00000000000000000000000000000000000000000000000000000000000000c0',
+            '0000000000000000000000000000000000000000000000000000000000000058',
+            '54657374204e616d652054657374204e616d6520746869732069732061207465',
+            '737420616e64207375636820736f2074686174206974206973206c6f6e672065',
+            '6e6f75676820746f20636175736520612070726f626c656d0000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000004',
+            '0000000000000000000000000000000000000000000000000000000000000001',
+            '0000000000000000000000000000000000000000000000000000000000000002',
+            '0000000000000000000000000000000000000000000000000000000000000003',
+            '0000000000000000000000000000000000000000000000000000000000000004',
+        ];
+
+        $this->assertSerializerInput($function, $data, $serialized);
+    }
+
+
+    public function testEncodeInvalid()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint16',
+                    ],
+                ],
+                'name' => 'testFunction',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('testFunction');
+
+        $data = [
+            '_id' => ((int) HexUInt16::INT_MAX) + 1,
+        ];
+
+        $expectedMessage = 'attempting to encode: _id, provided base 10 int(65536) is greater than max value for HexUInt16 (65535)';
+        $this->assertInvalidArgumentException($expectedMessage, function () use ($function, $data) {
+            $serializer = new ContractFunctionSerializer();
+            $serializer->encodeInput($function, $data);
+        });
     }
 
     public function testDecodeInvalid()

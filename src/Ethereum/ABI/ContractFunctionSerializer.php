@@ -47,18 +47,22 @@ class ContractFunctionSerializer
                         $dataBlock->addFixedLengthArray($itemName, $rawType, $value);
                     }
                 } else {
-                    $value = $dataType->encodeBaseType($value);
-
                     if ($baseType === 'string') {
-                        $dataBlock->addString($itemName, $value);
+                        $length = strlen($value);
+                        $value = $dataType->encodeBaseType($value);
+
+                        $dataBlock->addString($itemName, $value, $length);
                     } elseif ($baseType === 'bytes') {
-                        $dataBlock->addDynamicLengthBytes($itemName, $rawType, $value);
+                        $length = count($value);
+                        $value = $dataType->encodeBaseType($value);
+                        $dataBlock->addDynamicLengthBytes($itemName, $rawType, $value, $length);
                     } else {
+                        $value = $dataType->encodeBaseType($value);
                         $dataBlock->add($itemName, $rawType, $value);
                     }
                 }
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException('attempting to encode: ' . $itemName . ', ' . $e->getMessage());
+                throw new InvalidArgumentException('attempting to encode: ' . $itemName . ', ' . $e->getMessage(), 0, $e);
             }
         }
 
@@ -96,9 +100,11 @@ class ContractFunctionSerializer
                 if ($isArray) {
                     if ($dataType->isDynamicLengthArray()) {
                         $startIndex = $this->uIntFromIndex($data, $index) * 2;
-                        $length = $this->uIntFromIndex($data, $startIndex);
+
                         $valuesIndex = $startIndex + 64;
-                        $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $length);
+                        $arrayLength = $this->uIntFromIndex($data, $startIndex);
+
+                        $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
                         $results[$itemName] = $dataType->decodeArrayValues($hexValues);
 
                         $index += 64;
@@ -107,11 +113,13 @@ class ContractFunctionSerializer
                     }
 
                     // fixed length array
-                    $length = $dataType->arrayLength();
-                    $hexValues = $this->hexArrayFromIndex($data, $index, $length);
+                    $valuesIndex = $index;
+                    $arrayLength = $dataType->arrayLength();
+
+                    $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
                     $results[$itemName] = $dataType->decodeArrayValues($hexValues);
 
-                    $index += $length * 64;
+                    $index += $arrayLength * 64;
 
                     continue;
                 }
@@ -120,25 +128,25 @@ class ContractFunctionSerializer
 
                 if (in_array($baseType, $dynamicLengthTypes)) {
                     $startIndex = $this->uIntFromIndex($data, $index) * 2;
-                    $length = $this->uIntFromIndex($data, $startIndex);
                     $valuesIndex = $startIndex + 64;
+                    $length = $this->uIntFromIndex($data, $startIndex) * 2;
+
                     $hexValue = $this->hexFromIndex($data, $valuesIndex, $length);
-                    $values = $dataType->decodeBaseType($hexValue);
+                    $results[$itemName] = $dataType->decodeBaseType($hexValue);
 
-                    $results[$itemName] = $values;
 
-                    $index += $length * 64;
+                    $index += 64;
 
                     continue;
                 }
 
-                $hex = $this->hexFromIndex($data, $index);
+                $hex = $this->hexFromIndex($data, $index, 64);
 
                 $results[$itemName] = $dataType->decodeBaseType($hex);
 
                 $index += 64;
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException('attempting to decode: ' . $itemName . ', ' . $e->getMessage());
+                throw new InvalidArgumentException('attempting to decode: ' . $itemName . ', ' . $e->getMessage(), 0, $e);
             }
         }
 
@@ -152,20 +160,20 @@ class ContractFunctionSerializer
 
     protected function uIntFromIndex(string $data, int $index): int
     {
-        $chunk = $this->hexFromIndex($data, $index);
+        $chunk = $this->hexFromIndex($data, $index, 64);
 
         return (int) (new BigInteger($chunk, 16))->toString();
     }
 
-    protected function hexArrayFromIndex(string $data, int $index, int $length): array
+    protected function hexArrayFromIndex(string $data, int $index, int $arrayLength): array
     {
-        $chunk = $this->hexFromIndex($data, $index, $length);
+        $chunk = $this->hexFromIndex($data, $index, $arrayLength * 64);
 
         return str_split($chunk, 64);
     }
 
-    protected function hexFromIndex(string $data, int $index, int $length = 1): string
+    protected function hexFromIndex(string $data, int $index, int $length): string
     {
-        return substr($data, $index, $length * 64);
+        return substr($data, $index, $length);
     }
 }
