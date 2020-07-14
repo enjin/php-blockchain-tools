@@ -12,6 +12,15 @@ use Tests\TestCase;
  */
 class BigHexTest extends TestCase
 {
+    public function testCreate()
+    {
+        $number = '0';
+        $hex = '0';
+        $bigHex = BigHex::create($hex);
+
+        $this->assertBigHexValues($bigHex, $hex, $number);
+    }
+
     public function testCreateFromStringZero()
     {
         $number = '0';
