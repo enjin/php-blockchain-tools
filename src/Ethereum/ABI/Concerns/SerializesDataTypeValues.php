@@ -31,6 +31,7 @@ trait SerializesDataTypeValues
         if ($baseType === 'uint') {
             if ($this->aliasedFrom() === 'bool') {
                 $value = $value ? '1' : '0';
+
                 return HexUInt256::fromUInt($value);
             }
 
@@ -56,6 +57,7 @@ trait SerializesDataTypeValues
 
         if ($baseType === 'bool') {
             $value = $value ? 1 : 0;
+
             return HexUInt256::fromUInt($value);
         }
 

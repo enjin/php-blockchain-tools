@@ -2,49 +2,17 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
-class ContractEventInput
+class ContractEventInput extends ContractFunctionValueType
 {
     /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var mixed
-     */
-    protected $type;
-
-    /**
-     * @var mixed
-     */
-    protected $components;
-
-    /**
-     * @var mixed
+     * @var bool
      */
     protected $indexed;
 
     public function __construct(array $input)
     {
-        $this->name = $input['name'];
-        $this->type = $input['type'];
-        $this->components = $input['components'] ?? null;
-        $this->indexed = $input['indexed'];
-    }
-
-    public function name(): string
-    {
-        return $this->name;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
-    }
-
-    public function components(): array
-    {
-        return $this->components;
+        parent::__construct($input);
+        $this->indexed = $input['indexed'] ?? false;
     }
 
     public function indexed(): bool

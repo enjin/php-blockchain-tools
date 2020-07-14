@@ -2,7 +2,10 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
+use Enjin\BlockchainTools\Ethereum\ABI\ContractEventSerializer;
+use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
+use kornrunner\Keccak;
 
 class ContractEvent
 {
@@ -20,6 +23,8 @@ class ContractEvent
      * @var array
      */
     protected $inputs = [];
+
+    protected $topic;
 
     public function __construct(array $event)
     {
@@ -60,11 +65,29 @@ class ContractEvent
         return $this->anonymous;
     }
 
-    public function encodeInput(array $input): string
+    public function signature(): string
     {
+        $args = [];
+        /** @var ContractEventInput $input */
+        foreach ($this->inputs() as $input) {
+            $args[] = $input->type();
+        }
+
+        return $this->name() . '(' . implode(',', $args) . ')';
     }
 
-    public function decodeInput(string $input): array
+    public function signatureTopic(): string
     {
+        if (!$this->topic) {
+            $hash = Keccak::hash($this->signature(), 256);
+            $this->topic = HexConverter::prefix($hash);
+        }
+
+        return $this->topic;
+    }
+
+    public function decodeInput(array $topics, string $data): array
+    {
+        return (new ContractEventSerializer())->decodeInput($this, $topics, $data);
     }
 }

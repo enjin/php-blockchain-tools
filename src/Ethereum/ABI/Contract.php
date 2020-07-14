@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
+use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
 
 class Contract
@@ -23,14 +24,9 @@ class Contract
      */
     protected $json;
 
-    /**
-     * @var array
-     */
+    protected $functionsMeta = [];
     protected $functions = [];
-
-    /**
-     * @var array
-     */
+    protected $eventsMeta = [];
     protected $events = [];
 
     public function __construct(string $name, string $address, array $json)
@@ -43,9 +39,9 @@ class Contract
             $name = $item['name'];
             $type = $item['type'] ?? 'function';
             if ($type === 'function') {
-                $this->functions[$name] = $item;
+                $this->functionsMeta[$name] = $item;
             } elseif ($type === 'event') {
-                $this->events[$name] = $item;
+                $this->eventsMeta[$name] = $item;
             }
         }
     }
@@ -62,41 +58,96 @@ class Contract
 
     public function functions(): array
     {
-        $functions = [];
+        $names = array_keys($this->functionsMeta);
 
-        foreach ($this->functions as $function) {
-            $functions[] = new ContractFunction($function);
-        }
-
-        return $functions;
+        return array_map(function ($name) {
+            return $this->function($name);
+        }, $names);
     }
 
     public function function(string $name): ContractFunction
     {
-        if (!array_key_exists($name, $this->functions)) {
-            throw new InvalidArgumentException('invalid method name input: ' . $name . ' for Contract: ' . $this->name());
+        $isValid = array_key_exists($name, $this->functionsMeta);
+        if (!$isValid) {
+            throw new InvalidArgumentException('method name not found: ' . $name . ' for Contract: ' . $this->name());
         }
 
-        return new ContractFunction($this->functions[$name]);
+        $isInitialized = array_key_exists($name, $this->functions);
+        if (!$isInitialized) {
+            $meta = $this->functionsMeta[$name];
+            $this->functions[$name] = new ContractFunction($meta);
+        }
+
+        return $this->functions[$name];
     }
 
     public function events(): array
     {
-        $events = [];
+        $names = array_keys($this->eventsMeta);
 
-        foreach ($this->events as $event) {
-            $events[] = new ContractEvent($event);
-        }
-
-        return $events;
+        return array_map(function ($name) {
+            return $this->event($name);
+        }, $names);
     }
 
     public function event(string $name): ContractEvent
     {
-        if (!array_key_exists($name, $this->events)) {
-            throw new InvalidArgumentException('invalid event name input: ' . $name . ' for Contract: ' . $this->name());
+        $isValid = array_key_exists($name, $this->eventsMeta);
+        if (!$isValid) {
+            throw new InvalidArgumentException('event name not found: ' . $name . ' for Contract: ' . $this->name());
         }
 
-        return new ContractEvent($this->events[$name]);
+        $isInitialized = array_key_exists($name, $this->events);
+        if (!$isInitialized) {
+            $meta = $this->eventsMeta[$name];
+            $this->events[$name] = new ContractEvent($meta);
+        }
+
+        return $this->events[$name];
+    }
+
+    public function findEventBySignatureTopic(string $topic0): ?ContractEvent
+    {
+        foreach ($this->events() as $event) {
+            if ($event->signatureTopic() == $topic0) {
+                return $event;
+            }
+        }
+
+        return null;
+    }
+
+    public function findFunctionByMethodId(string $methodId): ?ContractFunction
+    {
+        foreach ($this->functions() as $function) {
+            if ($function->methodId() == $methodId) {
+                return $function;
+            }
+        }
+
+        return null;
+    }
+
+    public function decodeFunctionInput(string $data)
+    {
+        $methodId = $this->getMethodIdFromData($data);
+        $function = $this->findFunctionByMethodId($methodId);
+
+        return $function->decodeInput($data);
+    }
+
+    public function decodeFunctionOutput(string $data)
+    {
+        $methodId = $this->getMethodIdFromData($data);
+        $function = $this->findFunctionByMethodId($methodId);
+
+        return $function->decodeOutput($data);
+    }
+
+    protected function getMethodIdFromData(string $data): string
+    {
+        $data = HexConverter::unPrefix($data);
+
+        return substr($data, 0, 8);
     }
 }

@@ -13,6 +13,10 @@ class HexIntTest extends TestCase
         $this->assertInvalidArgumentException('Invalid bit size: 11', function () {
             HexInt::fromHexIntBitSize(11, 'ff')->toDecimal();
         });
+
+        $this->assertInvalidArgumentException('Invalid bit size: 11', function () {
+            HexInt::fromIntBitSize(11, '1')->toDecimal();
+        });
     }
 
     public function testInt()
@@ -34,6 +38,9 @@ class HexIntTest extends TestCase
 
         $message = 'HexInt::fromHexIntBitSize(' . $bitSize . ', $hex)->toDecimal() convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, HexInt::fromHexIntBitSize($bitSize, $hex)->toDecimal(), $message);
+
+        $message = 'HexInt::fromIntBitSize(' . $bitSize . ', $int)->toDecimal() convert int: ' . $int . ' into expected int: ' . $int;
+        $this->assertEquals($int, HexInt::fromIntBitSize($bitSize, $int)->toDecimal(), $message);
 
         $message = $class . '::fromInt($int)->toHex() convert int: ' . $int . ' into expected hex: ' . $hex;
         $this->assertEquals($hex, $class::fromInt($int)->toHex(), $message);

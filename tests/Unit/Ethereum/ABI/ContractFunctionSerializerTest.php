@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ContractFunctionSerializerTest extends TestCase
 {
-    public function testEncode()
+    public function testFunctionCase0()
     {
         $name = 'foo';
         $address = 'bar';
@@ -338,7 +338,6 @@ class ContractFunctionSerializerTest extends TestCase
 
         $this->assertSerializerInput($function, $data, $serialized);
     }
-
 
     public function testEncodeInvalid()
     {

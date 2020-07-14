@@ -2,8 +2,8 @@
 
 namespace Tests\Support;
 
-use Enjin\BlockchainTools\HexIntConverter\UInt128;
-use Enjin\BlockchainTools\HexIntConverter\UInt256;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt128;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Faker\Provider\Base;
 
 class FakerBlockchainProvider extends Base
@@ -20,14 +20,14 @@ class FakerBlockchainProvider extends Base
 
     public function uint128()
     {
-        $max = UInt128::MAX_VALUE;
+        $max = HexUInt128::INT_MAX;
 
         return $this->bigNumberBetween(0, $max);
     }
 
     public function uint256()
     {
-        $max = UInt256::MAX_VALUE;
+        $max = HexUInt256::INT_MAX;
 
         return $this->bigNumberBetween(0, $max);
     }

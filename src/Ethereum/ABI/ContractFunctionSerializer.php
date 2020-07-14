@@ -74,6 +74,12 @@ class ContractFunctionSerializer
     public function decode(string $methodId, array $functionValueTypes, string $data)
     {
         $data = $this->removeSignatureFromData($methodId, $data);
+
+        return $this->decodeWithoutMethodId($functionValueTypes, $data);
+    }
+
+    public function decodeWithoutMethodId(array $functionValueTypes, string $data)
+    {
         $data = HexConverter::unPrefix($data);
         $index = 0;
 

@@ -57,16 +57,9 @@ trait HasContractTestHelpers
 
     private function makeContractFunctionInputJson(array $data = []): array
     {
-        $types = [
-            'int',
-            'uint',
-            'bytes',
-            'string',
-        ];
-
         return array_merge([
             'name' => $this->faker()->name,
-            'type' => $this->faker()->randomElement($types),
+            'type' => $this->randomValueType(),
             'components' => [],
         ], $data);
     }
@@ -122,8 +115,7 @@ trait HasContractTestHelpers
     {
         return array_merge([
             'name' => $this->faker()->name,
-            // @TODO implement random type
-            'type' => $this->faker()->regexify('[0-9A-Za-z]{20}'),
+            'type' => $this->randomValueType(),
             'indexed' => $this->faker()->boolean,
         ], $data);
     }
@@ -136,5 +128,30 @@ trait HasContractTestHelpers
         $this->assertEquals($json['name'], $input->name(), $message . 'assert contract event input name');
         $this->assertEquals($json['type'], $input->type(), $message . 'assert contract event input type');
         $this->assertEquals($json['indexed'], $input->indexed(), $message . 'assert contract event input indexed');
+    }
+
+    private function randomValueType(): string
+    {
+        $types = [
+            'int',
+            'uint',
+            'bytes',
+            'string',
+        ];
+
+        $type = $this->faker()->randomElement($types);
+
+        $makeArray = random_int(0, 1);
+        if ($makeArray) {
+            $makeFixedLength = random_int(0, 1);
+
+            if ($makeFixedLength) {
+                $type .= '[' . random_int(1, 5) . ']';
+            } else {
+                $type .= '[]';
+            }
+        }
+
+        return $type;
     }
 }
