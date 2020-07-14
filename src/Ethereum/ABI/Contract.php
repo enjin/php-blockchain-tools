@@ -106,6 +106,18 @@ class Contract
         return $this->events[$name];
     }
 
+    public function decodeEventInput(array $topics, string $data)
+    {
+        $signatureTopic = $topics[0];
+        $event = $this->findEventBySignatureTopic($signatureTopic);
+
+        if (!$event) {
+            throw new InvalidArgumentException('event with matching topic not found: ' . $signatureTopic);
+        }
+
+        return $event->decodeInput($topics, $data);
+    }
+
     public function findEventBySignatureTopic(string $topic0): ?ContractEvent
     {
         foreach ($this->events() as $event) {
@@ -119,6 +131,7 @@ class Contract
 
     public function findFunctionByMethodId(string $methodId): ?ContractFunction
     {
+        $methodId = HexConverter::unPrefix($methodId);
         foreach ($this->functions() as $function) {
             if ($function->methodId() == $methodId) {
                 return $function;
@@ -133,6 +146,10 @@ class Contract
         $methodId = $this->getMethodIdFromData($data);
         $function = $this->findFunctionByMethodId($methodId);
 
+        if (!$function) {
+            throw new InvalidArgumentException('function with matching methodId not found: ' . $methodId);
+        }
+
         return $function->decodeInput($data);
     }
 
@@ -140,6 +157,10 @@ class Contract
     {
         $methodId = $this->getMethodIdFromData($data);
         $function = $this->findFunctionByMethodId($methodId);
+
+        if (!$function) {
+            throw new InvalidArgumentException('function with matching methodId not found: ' . $methodId);
+        }
 
         return $function->decodeOutput($data);
     }

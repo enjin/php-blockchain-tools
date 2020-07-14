@@ -8,6 +8,7 @@ use Enjin\BlockchainTools\HexNumber\HexInt\HexInt256;
 use Enjin\BlockchainTools\HexNumber\HexUInt;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt160;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use InvalidArgumentException;
 
 trait SerializesDataTypeValues
 {
@@ -32,7 +33,7 @@ trait SerializesDataTypeValues
             if ($this->aliasedFrom() === 'bool') {
                 $value = $value ? '1' : '0';
 
-                return HexUInt256::fromUInt($value);
+                return HexUInt256::fromUInt($value)->toHex();
             }
 
             $uint = HexUInt::fromUIntBitSize($this->bitSize(), $value);
@@ -55,12 +56,6 @@ trait SerializesDataTypeValues
             return HexUInt256::HEX_MIN;
         }
 
-        if ($baseType === 'bool') {
-            $value = $value ? 1 : 0;
-
-            return HexUInt256::fromUInt($value);
-        }
-
         if ($baseType === 'string') {
             if ($value) {
                 return HexConverter::stringToHex($value, 64);
@@ -68,6 +63,8 @@ trait SerializesDataTypeValues
 
             return HexUInt256::HEX_MIN;
         }
+
+        throw new InvalidArgumentException('Invalid base type: ' . $baseType);
     }
 
     public function decodeArrayValues(array $values): array
@@ -94,13 +91,13 @@ trait SerializesDataTypeValues
         if ($baseType === 'uint') {
             $uint = new HexUInt256($value);
 
+            if ($this->aliasedFrom() === 'bool') {
+                return (bool) $uint->toDecimal();
+            }
+
             if ($this->bitSize() !== 256) {
                 $uint = $uint->convertDownToBottom($this->bitSize());
                 $uint = HexUInt::fromHexUIntBitSize($this->bitSize(), $uint);
-            }
-
-            if ($this->aliasedFrom() === 'bool') {
-                return (bool) $uint->toDecimal();
             }
 
             return $uint->toDecimal();
@@ -123,5 +120,7 @@ trait SerializesDataTypeValues
         if ($baseType === 'string') {
             return HexConverter::hexToString($value);
         }
+
+        throw new InvalidArgumentException('Invalid base type: ' . $baseType);
     }
 }

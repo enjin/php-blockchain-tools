@@ -156,7 +156,7 @@ class ContractFunction
             $topic = HexConverter::unPrefix($topic);
 
             // first 4 bytes of method signature
-            return '0x' . substr($topic, 0, 8);
+            return substr($topic, 0, 8);
         }
 
         return $this->methodId;

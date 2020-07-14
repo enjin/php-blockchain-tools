@@ -125,7 +125,7 @@ class DataTypeParser
         } else {
             $suffix = Str::removeFromBeginning($type, $baseType);
 
-            [$bitSize, $decimalPrecision] = explode('x', $suffix, 2);
+            list($bitSize, $decimalPrecision) = explode('x', $suffix, 2);
 
             if (!is_numeric($bitSize)) {
                 throw new InvalidArgumentException('invalid bit size: ' . $bitSize . ', in: ' . $type);
@@ -197,6 +197,7 @@ class DataTypeParser
 
         if (!array_key_exists(1, $matches)) {
             $message = 'invalid array length in type: ' . $type;
+
             throw new InvalidArgumentException($message);
         }
 

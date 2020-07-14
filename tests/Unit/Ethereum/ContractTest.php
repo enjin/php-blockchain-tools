@@ -3,7 +3,6 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
-use InvalidArgumentException;
 use Tests\Support\HasContractTestHelpers;
 use Tests\TestCase;
 
@@ -31,8 +30,10 @@ class ContractTest extends TestCase
 
         $contract = new Contract($name, $address, $json);
 
-        $this->expectException(InvalidArgumentException::class);
-        $contract->function('invalid_function');
+        $message = 'method name not found: invalid_function for Contract: ' . $name;
+        $this->assertInvalidArgumentException($message, function () use ($contract) {
+            $contract->function('invalid_function');
+        });
     }
 
     public function testInvalidEvent()
@@ -43,8 +44,10 @@ class ContractTest extends TestCase
 
         $contract = new Contract($name, $address, $json);
 
-        $this->expectException(InvalidArgumentException::class);
-        $contract->event('invalid_event');
+        $message = 'event name not found: invalid_event for Contract: ' . $name;
+        $this->assertInvalidArgumentException($message, function () use ($contract) {
+            $contract->event('invalid_event');
+        });
     }
 
     public function testEvents()
@@ -99,5 +102,150 @@ class ContractTest extends TestCase
 
         $this->assertContractFunction($contract->function($json[0]['name']), $json[0]);
         $this->assertContractFunction($contract->function($json[1]['name']), $json[1]);
+    }
+
+    public function testDecodeFunctionInput()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint256',
+                    ],
+                    [
+                        'name' => '_fee',
+                        'type' => 'uint16',
+                    ],
+                ],
+                'outputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint256',
+                    ],
+                    [
+                        'name' => '_fee',
+                        'type' => 'uint16',
+                    ],
+                ],
+                'name' => 'setMeltFee',
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('setMeltFee');
+
+        $expected = [
+            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
+            '_fee' => '500',
+        ];
+
+        $serialized = [
+            '50000000000014ce000000000000000000000000000000000000000000000000',
+            '00000000000000000000000000000000000000000000000000000000000001f4',
+        ];
+
+        $data = $function->methodId() . implode('', $serialized);
+        $decoded = $contract->decodeFunctionInput($data);
+
+        $this->assertEquals($expected, $decoded);
+
+        $decoded = $contract->decodeFunctionOutput($data);
+        $this->assertEquals($expected, $decoded);
+    }
+
+    public function testDecodeFunctionInputNotFound()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint256',
+                    ],
+                    [
+                        'name' => '_fee',
+                        'type' => 'uint16',
+                    ],
+                ],
+                'name' => 'setMeltFee',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $message = 'function with matching methodId not found: invalidf';
+        $this->assertInvalidArgumentException($message, function () use ($contract) {
+            $contract->decodeFunctionInput('invalidf');
+        });
+
+        $this->assertInvalidArgumentException($message, function () use ($contract) {
+            $contract->decodeFunctionOutput('invalidf');
+        });
+    }
+
+    public function testDecodeEventInput()
+    {
+        $json = [
+            [
+                'inputs' => [
+                    [
+                        'name' => 'myString',
+                        'type' => 'string',
+                    ],
+                    [
+                        'name' => 'myNumber',
+                        'type' => 'uint256',
+                        'indexed' => true,
+                    ],
+                    [
+                        'name' => 'mySmallNumber',
+                        'type' => 'uint8',
+                        'indexed' => true,
+                    ],
+                ],
+                'name' => 'testEvent',
+                'type' => 'event',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $event = $contract->event('testEvent');
+
+        $topic = $event->signatureTopic();
+
+        $expected = [
+            'myString' => 'Hello%!',
+            'myNumber' => '62224',
+            'mySmallNumber' => 16,
+        ];
+
+        $topics = [
+            $topic,
+            '000000000000000000000000000000000000000000000000000000000000f310',
+            '0000000000000000000000000000000000000000000000000000000000000010',
+        ];
+
+        $serialized = [
+            '0000000000000000000000000000000000000000000000000000000000000020',
+            '0000000000000000000000000000000000000000000000000000000000000007',
+            '48656c6c6f252100000000000000000000000000000000000000000000000000',
+        ];
+
+        $data = implode('', $serialized);
+        $decoded = $contract->decodeEventInput($topics, $data);
+        $this->assertEquals($expected, $decoded);
     }
 }

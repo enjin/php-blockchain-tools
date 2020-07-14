@@ -54,7 +54,7 @@ class ContractFunctionSerializerTest extends TestCase
         $expected = 'f(address,address,uint256[],uint256[],bytes)';
         $this->assertEquals($expected, $function->signature());
 
-        $expected = '0x9ef1e694';
+        $expected = '9ef1e694';
         $this->assertEquals($expected, $function->methodId());
 
         $this->assertEquals($stateMutability, $function->stateMutability());
@@ -199,8 +199,12 @@ class ContractFunctionSerializerTest extends TestCase
                         'name' => '_fee',
                         'type' => 'uint16',
                     ],
+                    [
+                        'name' => '_flagged',
+                        'type' => 'bool',
+                    ],
                 ],
-                'name' => 'setMeltFee',
+                'name' => 'testFunction',
                 'outputs' => [
                 ],
                 'payable' => false,
@@ -211,17 +215,20 @@ class ContractFunctionSerializerTest extends TestCase
 
         $contract = new Contract('foo', 'bar', $json);
 
-        $function = $contract->function('setMeltFee');
+        $function = $contract->function('testFunction');
 
         $expected = [
             '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
             '_fee' => '500',
+            '_flagged' => true,
         ];
 
         $serialized = [
             '50000000000014ce000000000000000000000000000000000000000000000000',
             '00000000000000000000000000000000000000000000000000000000000001f4',
+            '0000000000000000000000000000000000000000000000000000000000000001',
         ];
+
         $this->assertSerializerInput($function, $expected, $serialized);
     }
 
@@ -351,6 +358,51 @@ class ContractFunctionSerializerTest extends TestCase
         $serializedString = $function->methodId() . implode('', $serialized);
         $decoded = $serializer->decodeInput($function, $serializedString);
         $this->assertEquals($data, $decoded, 'correctly decoded input data');
+    }
+
+    public function testEmptyStringAndBytes()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => 'myString',
+                        'type' => 'string',
+                    ],
+                    [
+                        'name' => 'myBytes',
+                        'type' => 'bytes',
+                    ],
+                ],
+                'name' => 'testFunction',
+                'outputs' => [
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('testFunction');
+
+        $expected = [
+            'myString' => '',
+            'myBytes' => [],
+        ];
+
+        $serialized = [
+            '0000000000000000000000000000000000000000000000000000000000000040',
+            '0000000000000000000000000000000000000000000000000000000000000060',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+        ];
+
+        $this->assertSerializerInput($function, $expected, $serialized);
     }
 
     public function testEncodeInvalid()
