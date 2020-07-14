@@ -45,12 +45,12 @@ class ContractFunction
     /**
      * @var array
      */
-    protected $inputs;
+    protected $inputs = [];
 
     /**
      * @var array
      */
-    protected $outputs;
+    protected $outputs = [];
 
     /**
      * @var string
@@ -82,7 +82,7 @@ class ContractFunction
 
         foreach ($outputs as $output) {
             $outputName = $output['name'];
-            $this->inputs[$outputName] = $output;
+            $this->outputs[$outputName] = $output;
         }
     }
 
@@ -117,8 +117,8 @@ class ContractFunction
 
     public function outputs(): array
     {
-        return array_map(function (array $input) {
-            return new ContractFunctionValueType($input);
+        return array_map(function (array $output) {
+            return new ContractFunctionValueType($output);
         }, $this->outputs);
     }
 

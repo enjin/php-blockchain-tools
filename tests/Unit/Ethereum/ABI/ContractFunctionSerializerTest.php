@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ContractFunctionSerializerTest extends TestCase
 {
-    public function testFunctionCase0()
+    public function testCase1()
     {
         $name = 'foo';
         $address = 'bar';
@@ -96,7 +96,7 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertSerializerInput($function, $expected, $serialized);
     }
 
-    public function testCase1()
+    public function testCase2()
     {
         $name = 'foo';
         $address = 'bar';
@@ -185,7 +185,7 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertSerializerInput($function, $expected, $serialized);
     }
 
-    public function testCase2()
+    public function testCase3()
     {
         $json = [
             [
@@ -225,7 +225,7 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertSerializerInput($function, $expected, $serialized);
     }
 
-    public function testCase3()
+    public function testCase4()
     {
         $json = [
             [
@@ -257,7 +257,7 @@ class ContractFunctionSerializerTest extends TestCase
 
         $function = $contract->function('mintFungibles');
 
-        $expected = [
+        $data = [
             '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
             '_values' => [1, 2, 3],
             '_to' => [
@@ -281,15 +281,22 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000000000000000000000000000000000000000000003',
         ];
 
-        $expectedDecoded = $expected;
+        $expectedDecoded = $data;
         $expectedDecoded['_to'] = array_map(function ($item) {
             return HexConverter::unPrefix($item);
         }, $expectedDecoded['_to']);
 
-        $this->assertSerializerInput($function, $expected, $serialized, $expectedDecoded);
+        $serializer = new ContractFunctionSerializer();
+
+        $dataBlock = $serializer->encodeInput($function, $data);
+        $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded input data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $serializer->decodeInput($function, $serializedString);
+        $this->assertEquals($expectedDecoded, $decoded, 'correctly decoded input data');
     }
 
-    public function testCase4()
+    public function testCase5()
     {
         $json = [
             [
@@ -336,7 +343,14 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000000000000000000000000000000000000000000004',
         ];
 
-        $this->assertSerializerInput($function, $data, $serialized);
+        $serializer = new ContractFunctionSerializer();
+
+        $dataBlock = $serializer->encodeInput($function, $data);
+        $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded input data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $serializer->decodeInput($function, $serializedString);
+        $this->assertEquals($data, $decoded, 'correctly decoded input data');
     }
 
     public function testEncodeInvalid()
@@ -411,40 +425,130 @@ class ContractFunctionSerializerTest extends TestCase
         });
     }
 
+    public function testOutputCase1()
+    {
+        $json = [
+            [
+                'constant' => false,
+                'inputs' => [
+                    [
+                        'name' => 'name',
+                        'type' => 'string',
+                    ],
+                    [
+                        'name' => 'values',
+                        'type' => 'uint16[]',
+                    ],
+                ],
+                'name' => 'testOutputFunction',
+                'outputs' => [
+                    [
+                        'name' => '_id',
+                        'type' => 'uint256',
+                    ],
+                    [
+                        'name' => '_fee',
+                        'type' => 'uint16',
+                    ],
+
+                ],
+                'payable' => false,
+                'stateMutability' => 'nonpayable',
+                'type' => 'function',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $function = $contract->function('testOutputFunction');
+
+        $data = [
+            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
+            '_fee' => '500',
+        ];
+
+        $serialized = [
+            '50000000000014ce000000000000000000000000000000000000000000000000',
+            '00000000000000000000000000000000000000000000000000000000000001f4',
+        ];
+
+        $this->assertSerializerOutput($function, $data, $serialized);
+
+        $serializer = new ContractFunctionSerializer();
+
+        $dataBlock = $serializer->encodeOutput($function, $data);
+        $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded output data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $serializer->decodeOutput($function, $serializedString);
+        $this->assertEquals($data, $decoded, 'correctly decoded output data');
+    }
+
     protected function assertSerializerInput(
         Contract\ContractFunction $function,
         array $data,
+        array $serialized
+    ) {
+        $this->assertSerializer($function, $data, $serialized, true);
+    }
+
+    protected function assertSerializerOutput(
+        Contract\ContractFunction $function,
+        array $data,
+        array $serialized
+    ) {
+        $this->assertSerializer($function, $data, $serialized, false);
+    }
+
+    protected function assertSerializer(
+        Contract\ContractFunction $function,
+        array $data,
         array $serialized,
-        array $expectedDecoded = []
+        bool $input = true
     ) {
         $serializer = new ContractFunctionSerializer();
 
-        $encoded = $serializer->encodeInput($function, $data)->toArray();
+        if ($input) {
+            $functionValueTypes = $function->inputs();
+        } else {
+            $functionValueTypes = $function->outputs();
+        }
 
-        $expectedSerialized = [
-            'raw' => $serialized,
+        $encoded = $serializer->encode($function->methodId(), $functionValueTypes, $data)->toArray();
+
+        // uncomment to get debug data
+        // dump($serializer->encode($function->methodId(), $functionValueTypes, $data)->toArrayWithMeta());
+
+        $dataType = $input ? 'input' : 'output';
+        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded ' . $dataType . ' data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $serializer->decode(
+            $function->methodId(),
+            $functionValueTypes,
+            $serializedString
+        );
+
+        $this->assertEquals($data, $decoded, 'correctly decoded ' . $dataType . ' data');
+    }
+
+    protected function assertEncodedEquals(array $expected, array $actual, $message = '')
+    {
+        // format the data in a more human readable way
+        $expectedEncoded = [
+            'raw' => $expected,
             'trimmed' => array_map(function ($val) {
                 return ltrim($val, '0') ?: '0';
-            }, $serialized),
+            }, $expected),
         ];
 
         $actualEncoded = [
-            'raw' => $encoded,
+            'raw' => $actual,
             'trimmed' => array_map(function ($val) {
                 return ltrim($val, '0') ?: '0';
-            }, $encoded),
+            }, $actual),
         ];
 
-        // dump($serializer->encodeInput($function, $data)->toArrayWithMeta());
-
-        $this->assertEquals($expectedSerialized, $actualEncoded, 'correctly encoded data');
-
-        $serializedString = $function->methodId() . implode('', $serialized);
-
-        $decoded = $serializer->decodeInput($function, $serializedString);
-
-        $expectedDecoded = $expectedDecoded ?: $data;
-
-        $this->assertEquals($expectedDecoded, $decoded, 'correctly decoded data');
+        $this->assertEquals($expectedEncoded, $actualEncoded, $message);
     }
 }

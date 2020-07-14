@@ -34,6 +34,7 @@
                 "type": "uint8"
             }
         ],
+        "stateMutability": "view",
         "name": "testFunction1",
         "type": "function"
     }

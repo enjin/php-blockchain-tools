@@ -61,18 +61,22 @@ class ContractStore
     protected function makeContract(string $name): Contract
     {
         if (!isset($this->contractMeta[$name])) {
-            throw new InvalidArgumentException('contract name not found: ' . $name);
+            throw new InvalidArgumentException('contract with name not found: ' . $name);
         }
         $meta = $this->contractMeta[$name];
 
         $jsonFile = $meta['jsonFile'];
         $address = $meta['address'];
 
+        if (!file_exists($jsonFile)) {
+            throw new ContractFileException('Contract file not found: ' . $jsonFile);
+        }
+
         $contents = file_get_contents($jsonFile);
         $json = json_decode($contents, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ContractFileException('Invalid json found in contract file: ' . $jsonFile);
+            throw new ContractFileException('Contract file does not contain valid JSON: ' . $jsonFile);
         }
 
         return new Contract($name, $address, $json);
