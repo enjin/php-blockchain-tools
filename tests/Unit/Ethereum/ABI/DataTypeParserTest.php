@@ -48,6 +48,15 @@ class DataTypeParserTest extends TestCase
             ]);
             $this->assertDataTypeValues($type, $expected);
         }
+
+
+        $this->assertDataTypeValues($type, $expected);
+
+        $message = 'invalid int bit size in type: int299';
+        $this->assertInvalidArgumentException($message, function () {
+            $parser = new DataTypeParser();
+            $parser->parse('int299');
+        });
     }
 
     public function testParseUInt()
@@ -90,6 +99,14 @@ class DataTypeParserTest extends TestCase
             ]);
             $this->assertDataTypeValues($type, $expected);
         }
+
+        $this->assertDataTypeValues($type, $expected);
+
+        $message = 'invalid uint bit size in type: uint299';
+        $this->assertInvalidArgumentException($message, function () {
+            $parser = new DataTypeParser();
+            $parser->parse('uint299');
+        });
     }
 
     public function testParseBool()
@@ -125,8 +142,6 @@ class DataTypeParserTest extends TestCase
             'arrayLength' => 99,
             'aliasedFrom' => $type,
         ];
-
-        $this->assertDataTypeValues($type, $expected);
     }
 
     public function testParseFunction()
@@ -300,6 +315,12 @@ class DataTypeParserTest extends TestCase
 
             $this->assertDataTypeValues($type, $expected);
         }
+
+        $message = 'invalid bytes bit size in type: bytes33';
+        $this->assertInvalidArgumentException($message, function () {
+            $parser = new DataTypeParser();
+            $parser->parse('bytes33');
+        });
     }
 
     public function testParseFixed()
@@ -376,6 +397,53 @@ class DataTypeParserTest extends TestCase
                 $this->assertDataTypeValues($type, $expected);
             }
         }
+
+        $message = 'invalid bit size: 1, in: fixed1x8';
+        $this->assertInvalidArgumentException($message, function(){
+
+            $parser = new DataTypeParser();
+            $parser->parse('fixed1x8');
+        });
+
+        $message = 'invalid bit size: a, in: fixedax8';
+        $this->assertInvalidArgumentException($message, function(){
+
+            $parser = new DataTypeParser();
+            $parser->parse('fixedax8');
+        });
+
+
+        $message = 'invalid decimal precision: 99, in: fixed16x99';
+        $this->assertInvalidArgumentException($message, function(){
+
+            $parser = new DataTypeParser();
+            $parser->parse('fixed16x99');
+        });
+
+        $message = 'invalid decimal precision: a, in: fixed1xa';
+        $this->assertInvalidArgumentException($message, function(){
+
+            $parser = new DataTypeParser();
+            $parser->parse('fixed1xa');
+        });
+    }
+
+    public function testParseInvalid()
+    {
+        $message = 'Invalid type: invalid-type';
+        $this->assertInvalidArgumentException($message, function () {
+            $parser = new DataTypeParser();
+            $parser->parse('invalid-type');
+        });
+    }
+
+    public function testParseInvalidArrayLength()
+    {
+        $message = 'invalid array length in type: int[abc]';
+        $this->assertInvalidArgumentException($message, function () {
+            $parser = new DataTypeParser();
+            $parser->parse('int[abc]');
+        });
     }
 
     private function assertDataTypeValues(string $type, array $expected, string $message = '')

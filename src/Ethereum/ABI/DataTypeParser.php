@@ -2,8 +2,6 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\InvalidFixedDecimalPrecisionException;
-use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\InvalidNumberLengthException;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
 use Enjin\BlockchainTools\Support\StringHelpers as Str;
 use InvalidArgumentException;
@@ -127,17 +125,25 @@ class DataTypeParser
         } else {
             $suffix = Str::removeFromBeginning($type, $baseType);
 
-            list($bitSize, $decimalPrecision) = explode('x', $suffix, 2);
+            [$bitSize, $decimalPrecision] = explode('x', $suffix, 2);
+
+            if (!is_numeric($bitSize)) {
+                throw new InvalidArgumentException('invalid bit size: ' . $bitSize . ', in: ' . $type);
+            }
+
+            if (!is_numeric($decimalPrecision)) {
+                throw new InvalidArgumentException('invalid decimal precision: ' . $decimalPrecision . ', in: ' . $type);
+            }
 
             $bitSize = (int) $bitSize;
             $decimalPrecision = (int) $decimalPrecision;
 
             if (!in_array($bitSize, HexNumber::VALID_BIT_SIZES)) {
-                throw new InvalidNumberLengthException($baseType, $type);
+                throw new InvalidArgumentException('invalid bit size: ' . $bitSize . ', in: ' . $type);
             }
 
             if ($decimalPrecision < 1 || 80 < $decimalPrecision) {
-                throw new InvalidFixedDecimalPrecisionException($baseType, $type);
+                throw new InvalidArgumentException('invalid decimal precision: ' . $decimalPrecision . ', in: ' . $type);
             }
         }
 
@@ -169,7 +175,9 @@ class DataTypeParser
         $length = (int) Str::removeFromBeginning($type, $numberType);
 
         if (!in_array($length, $validBitSizes)) {
-            throw new InvalidNumberLengthException($numberType, $type);
+            $message = 'invalid ' . $numberType . ' bit size in type: ' . $type;
+
+            throw new InvalidArgumentException($message);
         }
 
         return $length;
@@ -188,7 +196,8 @@ class DataTypeParser
         preg_match('/(.*?)\[([0-9]+)\]/', $type, $matches);
 
         if (!array_key_exists(1, $matches)) {
-            throw new \Exception('could not parse fixed array length of type: ' . $type);
+            $message = 'invalid array length in type: ' . $type;
+            throw new InvalidArgumentException($message);
         }
 
         return [
