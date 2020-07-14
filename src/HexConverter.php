@@ -158,12 +158,26 @@ class HexConverter
 
     public static function hexToBytes(string $hex): array
     {
-        return BigHex::create($hex)->toBytes();
+        $hex = self::unPrefix($hex);
+        if (ltrim($hex, '0') === '') {
+            return [];
+        }
+        $bin = hex2bin($hex);
+        $array = unpack('C*', $bin);
+
+        return array_values($array);
     }
 
     public static function bytesToHex(array $bytes): string
     {
-        return BigHex::createFromBytes($bytes)->toStringUnPrefixed();
+        if (!$bytes) {
+            return '00';
+        }
+
+        $bytes = array_map('chr', $bytes);
+        $bytes = implode('', $bytes);
+
+        return bin2hex($bytes);
     }
 
     public static function bytesToHexPrefixed(array $bytes): string

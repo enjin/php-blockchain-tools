@@ -4,7 +4,6 @@ namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlock;
-use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
 use kornrunner\Keccak;
 
@@ -109,7 +108,7 @@ class ContractFunction
     public function input(string $name): ContractFunctionValueType
     {
         if (!array_key_exists($name, $this->inputs)) {
-            throw new InvalidArgumentException('invalid function name: ' . $name . ' for Contract Function: ' . $this->name());
+            throw new InvalidArgumentException('invalid input name: ' . $name . ' for Contract Function: ' . $this->name());
         }
 
         return new ContractFunctionValueType($this->inputs[$name]);
@@ -125,7 +124,7 @@ class ContractFunction
     public function output(string $name): ContractFunctionValueType
     {
         if (!array_key_exists($name, $this->outputs)) {
-            throw new InvalidArgumentException('invalid function name: ' . $name . ' for Contract Function: ' . $this->name());
+            throw new InvalidArgumentException('invalid output name: ' . $name . ' for Contract Function: ' . $this->name());
         }
 
         return new ContractFunctionValueType($this->outputs[$name]);
@@ -152,24 +151,13 @@ class ContractFunction
     public function methodId(): string
     {
         if (!$this->methodId) {
-            $topic = $this->topic();
-            $topic = HexConverter::unPrefix($topic);
+            $hash = Keccak::hash($this->signature(), 256);
 
             // first 4 bytes of method signature
-            return substr($topic, 0, 8);
+            $this->methodId = substr($hash, 0, 8);
         }
 
         return $this->methodId;
-    }
-
-    public function topic(): string
-    {
-        if (!$this->topic) {
-            $hash = Keccak::hash($this->signature(), 256);
-            $this->topic = HexConverter::prefix($hash);
-        }
-
-        return $this->topic;
     }
 
     public function encodeInput(array $data): DataBlock

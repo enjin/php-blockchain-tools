@@ -37,14 +37,6 @@ class BigHex
         return $this->toStringUnPrefixed();
     }
 
-    public static function createFromBytes(array $bytes): self
-    {
-        $bytes = array_map('chr', $bytes);
-        $bytes = implode('', $bytes);
-
-        return new self(bin2hex($bytes));
-    }
-
     public static function create(string $value): self
     {
         return new self($value);
@@ -58,14 +50,6 @@ class BigHex
     public function toBigInt(): BigInteger
     {
         return new BigInteger($this->value, 16);
-    }
-
-    public function toBytes(): array
-    {
-        $bin = hex2bin($this->value);
-        $array = unpack('C*', $bin);
-
-        return array_values($array);
     }
 
     public function toStringUnPrefixed(): string

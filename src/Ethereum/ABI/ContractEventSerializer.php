@@ -31,7 +31,7 @@ class ContractEventSerializer
 
             $dynamicLengthTypes = ['bytes', 'string'];
             if ($isArray || in_array($baseType, $dynamicLengthTypes)) {
-                $results[$itemName] = 'cannot decode topics with type:' . $item->type();
+                $results[$itemName] = 'cannot decode topics with type: ' . $item->type();
 
                 continue;
             }
@@ -41,10 +41,15 @@ class ContractEventSerializer
         }
 
         $nonIndexedValues = (new ContractFunctionSerializer())->decodeWithoutMethodId($nonIndexedInputs, $data);
-
         $results = array_merge($results, $nonIndexedValues);
 
-        return $results;
+        // reorder to match spec
+        $output = [];
+        foreach ($eventInputs as $input) {
+            $name = $input->name();
+            $output[$name] = $results[$name];
+        }
+        return $output;
     }
 
     protected function separateInputs(array $eventInputs): array

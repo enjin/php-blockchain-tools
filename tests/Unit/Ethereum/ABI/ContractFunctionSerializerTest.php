@@ -358,6 +358,9 @@ class ContractFunctionSerializerTest extends TestCase
         $serializedString = $function->methodId() . implode('', $serialized);
         $decoded = $serializer->decodeInput($function, $serializedString);
         $this->assertEquals($data, $decoded, 'correctly decoded input data');
+
+        $this->assertEquals($function->methodId(), $dataBlock->methodId());
+        $this->assertEquals($serializedString, $dataBlock->toString());
     }
 
     public function testEmptyStringAndBytes()
@@ -403,6 +406,18 @@ class ContractFunctionSerializerTest extends TestCase
         ];
 
         $this->assertSerializerInput($function, $expected, $serialized);
+
+        $encoded = $function->encodeInput($expected)->toArray();
+
+        // uncomment to get debug data
+        // dump($function->encodeInput($expected)->toArrayWithMeta());
+
+        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded input data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $function->decodeInput($serializedString);
+
+        $this->assertEquals($expected, $decoded, 'correctly decoded input data');
     }
 
     public function testEncodeInvalid()
@@ -528,11 +543,17 @@ class ContractFunctionSerializerTest extends TestCase
 
         $serializer = new ContractFunctionSerializer();
 
-        $dataBlock = $serializer->encodeOutput($function, $data);
-        $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded output data');
+        $encoded = $serializer->encodeOutput($function, $data)->toArray();
+        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded output data');
 
         $serializedString = $function->methodId() . implode('', $serialized);
         $decoded = $serializer->decodeOutput($function, $serializedString);
+        $this->assertEquals($data, $decoded, 'correctly decoded output data');
+
+        $encoded = $function->encodeOutput($data)->toArray();
+        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded output data');
+
+        $decoded = $function->decodeOutput($serializedString);
         $this->assertEquals($data, $decoded, 'correctly decoded output data');
     }
 

@@ -50,28 +50,6 @@ class BigHexTest extends TestCase
         $this->assertBigHexValues($bigHex2, $hex, $number);
     }
 
-    public function testBytesSymmetry()
-    {
-        $hex = '1a2b3c4d5e6f';
-
-        $bigHex = BigHex::create($hex);
-
-        $bytes = [
-            26,
-            43,
-            60,
-            77,
-            94,
-            111,
-        ];
-
-        $this->assertEquals($bytes, $bigHex->toBytes());
-
-        $bigHex2 = BigHex::createFromBytes($bytes);
-
-        $this->assertEquals($hex, $bigHex2->toStringUnPrefixed());
-    }
-
     public function testCreateFromInvalid()
     {
         $message = 'BigHex constructor input is not a valid hexadecimal string: "invalid_string"';

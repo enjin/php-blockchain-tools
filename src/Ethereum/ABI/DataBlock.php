@@ -19,6 +19,8 @@ class DataBlock
 
     protected $dynamicLengthData = [];
 
+    protected $keys = [];
+
     /**
      * @var string
      */
@@ -36,6 +38,8 @@ class DataBlock
             if ($dataType->isFixedLengthArray()) {
                 $position += ($dataType->arrayLength() - 1) * 32;
             }
+
+            $this->keys[] = $item->name();
         }
 
         $this->dynamicDataPosition = $position;
@@ -65,7 +69,7 @@ class DataBlock
 
     public function addRaw(string $inputName, string $type, string $valueEncoded, $valueDecoded)
     {
-        $this->data[] = [
+        $this->data[$inputName] = [
             'name' => $inputName,
             'type' => $type,
             'value' => $valueEncoded,
@@ -87,7 +91,7 @@ class DataBlock
 
     public function addFixedLengthArrayRaw(string $inputName, string $type, array $valuesEncoded, array $valuesDecoded)
     {
-        $this->fixedLengthData[] = [
+        $this->fixedLengthData[$inputName] = [
             'name' => $inputName,
             'type' => $type,
             'values' => $valuesEncoded,
@@ -115,10 +119,7 @@ class DataBlock
     ) {
         $length = count($valuesEncoded);
 
-        if (!$valuesEncoded) {
-            $length = 0;
-        }
-        $this->dynamicLengthData[] = [
+        $this->dynamicLengthData[$inputName] = [
             'name' => $inputName,
             'is_array' => true,
             'type' => $type,
@@ -158,7 +159,7 @@ class DataBlock
         $last = array_pop($values);
         $values[] = HexUInt256::padRight($last);
 
-        $this->dynamicLengthData[] = [
+        $this->dynamicLengthData[$inputName] = [
             'name' => $inputName,
             'type' => $type,
             'is_array' => false,
@@ -191,7 +192,7 @@ class DataBlock
         $last = array_pop($values);
         $values[] = HexUInt256::padRight($last);
 
-        $this->dynamicLengthData[] = [
+        $this->dynamicLengthData[$inputName] = [
             'name' => $inputName,
             'type' => 'string',
             'position' => $this->dynamicPositionFor($positionLength),
@@ -216,87 +217,65 @@ class DataBlock
     public function toArrayWithMeta(): array
     {
         $output = [];
-        foreach ($this->data as $item) {
-            $output[] = $item;
-        }
 
-        foreach ($this->fixedLengthData as $item) {
-            $name = $item['name'];
-            $values = $item['values'];
-            $valuesDecoded = $item['values_decoded'];
-            $type = $item['type'];
-
-            foreach ($values as $i => $value) {
-                $decoded = null;
-                if (!in_array($type, ['string', 'bytes'])) {
-                    $decoded = $valuesDecoded[$i];
-                }
-                $output[] = [
-                    'name' => $name . '[' . $i . '] value',
-                    'type' => $type,
-                    'value_decoded' => $decoded,
-                    'value' => $value,
-                ];
+        foreach ($this->keys as $key) {
+            if ($this->data[$key] ?? false) {
+                $output[] = $this->data[$key];
+                continue;
+            } else if ($this->fixedLengthData[$key] ?? false) {
+                $output = $this->addFixedLengthDataToOutput($output, $this->fixedLengthData[$key]);
+            } else if ($this->dynamicLengthData[$key] ?? false) {
+                $output = $this->addDynamicLengthDataToOutput($output, $this->dynamicLengthData[$key]);
             }
         }
 
-        foreach ($this->dynamicLengthData as $item) {
-            $name = $item['name'];
-            $position = $item['position'];
+        foreach ($this->keys as $key) {
+            if ($this->dynamicLengthData[$key] ?? false) {
+                $item = $this->dynamicLengthData[$key];
+                $name = $item['name'];
+                $values = $item['values'];
+                $valuesDecoded = $item['values_decoded'];
+                $length = $item['length'];
+                $type = $item['type'];
 
-            $output[] = [
-                'name' => $name . ' data position',
-                'value_decoded' => $position,
-                'position_string_index' => $position * 2,
-                'position_chunk_index' => ($position * 2) / 64,
-                'value' => HexConverter::intToHexUInt($position, 64),
-            ];
-        }
+                if ($type === 'bytes' || $type === 'string') {
+                    $output[] = [
+                        'name' => "{$name} length: {$length}",
+                        'type' => $type,
+                        'value_decoded' => $length,
+                        'length_hex_string' => $length * 2,
+                        'length_chunk_size' => ($length * 2) / 64,
+                        'value' => HexConverter::intToHexUInt($length, 64),
+                    ];
 
-        foreach ($this->dynamicLengthData as $item) {
-            $name = $item['name'];
-            $values = $item['values'];
-            $valuesDecoded = $item['values_decoded'];
-            $length = $item['length'];
-            $type = $item['type'];
+                    foreach ($values as $i => $value) {
+                        $decoded = null;
+                        if (!in_array($type, ['string', 'bytes'])) {
+                            $decoded = $valuesDecoded[$i] ?? null;
+                        }
 
-            if ($type === 'bytes' || $type === 'string') {
-                $output[] = [
-                    'name' => "{$name} length: {$length}",
-                    'type' => $type,
-                    'value_decoded' => $length,
-                    'length_hex_string' => $length * 2,
-                    'length_chunk_size' => ($length * 2) / 64,
-                    'value' => HexConverter::intToHexUInt($length, 64),
-                ];
-
-                foreach ($values as $i => $value) {
-                    $decoded = null;
-                    if (!in_array($type, ['string', 'bytes'])) {
-                        $decoded = $valuesDecoded[$i] ?? null;
+                        $output[] = [
+                            'name' => $name . ' value chunk[' . $i . ']',
+                            'type' => $type,
+                            'value_decoded' => $decoded,
+                            'value' => $value,
+                        ];
                     }
-
+                } else {
                     $output[] = [
-                        'name' => $name . ' value chunk[' . $i . ']',
+                        'name' => "{$name} length: {$length}",
                         'type' => $type,
-                        'value_decoded' => $decoded,
-                        'value' => $value,
+                        'value' => HexConverter::intToHexUInt($length, 64),
                     ];
-                }
-            } else {
-                $output[] = [
-                    'name' => "{$name} length: {$length}",
-                    'type' => $type,
-                    'value' => HexConverter::intToHexUInt($length, 64),
-                ];
 
-                foreach ($values as $i => $value) {
-                    $output[] = [
-                        'name' => $name . '[' . $i . '] value',
-                        'type' => $type,
-                        'value_decoded' => $valuesDecoded[$i],
-                        'value' => $value,
-                    ];
+                    foreach ($values as $i => $value) {
+                        $output[] = [
+                            'name' => $name . '[' . $i . '] value',
+                            'type' => $type,
+                            'value_decoded' => $valuesDecoded[$i],
+                            'value' => $value,
+                        ];
+                    }
                 }
             }
         }
@@ -311,7 +290,46 @@ class DataBlock
         return $output;
     }
 
-    protected function dynamicPositionFor(int $length): string
+    private function addFixedLengthDataToOutput(array $output, array $item): array
+    {
+        $name = $item['name'];
+        $values = $item['values'];
+        $valuesDecoded = $item['values_decoded'];
+        $type = $item['type'];
+
+        foreach ($values as $i => $value) {
+            $decoded = null;
+            if (!in_array($type, ['string', 'bytes'])) {
+                $decoded = $valuesDecoded[$i];
+            }
+            $output[] = [
+                'name' => $name . '[' . $i . '] value',
+                'type' => $type,
+                'value_decoded' => $decoded,
+                'value' => $value,
+            ];
+        }
+
+        return $output;
+    }
+
+    private function addDynamicLengthDataToOutput(array $output, array $item): array
+    {
+        $name = $item['name'];
+        $position = $item['position'];
+
+        $output[] = [
+            'name' => $name . ' data position',
+            'value_decoded' => $position,
+            'position_string_index' => $position * 2,
+            'position_chunk_index' => ($position * 2) / 64,
+            'value' => HexConverter::intToHexUInt($position, 64),
+        ];
+
+        return $output;
+    }
+
+    private function dynamicPositionFor(int $length): string
     {
         $value = $this->dynamicDataPosition;
         $this->dynamicDataPosition += ($length * 32) + 32;

@@ -47,7 +47,7 @@ class ContractEvent
     public function input(string $name): ContractEventInput
     {
         if (!array_key_exists($name, $this->inputs)) {
-            throw new InvalidArgumentException('invalid event input name: ' . $name . ' for Contract Event: ' . $this->name());
+            throw new InvalidArgumentException('invalid input name: ' . $name . ' for Contract Event: ' . $this->name());
         }
 
         return new ContractEventInput($this->inputs[$name]);

@@ -36,6 +36,14 @@ class ContractTest extends TestCase
         });
     }
 
+
+    public function testFindEventBySignatureTopicNotFound()
+    {
+        $contract = new Contract('foo', 'bar', []);
+
+        $this->assertEquals(null, $contract->findEventBySignatureTopic('invalid'));
+    }
+
     public function testInvalidEvent()
     {
         $name = $this->faker()->name;
@@ -246,6 +254,40 @@ class ContractTest extends TestCase
 
         $data = implode('', $serialized);
         $decoded = $contract->decodeEventInput($topics, $data);
+
         $this->assertEquals($expected, $decoded);
+    }
+
+    public function testDecodeEventInputNotFound()
+    {
+        $json = [
+            [
+                'inputs' => [
+                    [
+                        'name' => 'myString',
+                        'type' => 'string',
+                    ],
+                    [
+                        'name' => 'myNumber',
+                        'type' => 'uint256',
+                        'indexed' => true,
+                    ],
+                    [
+                        'name' => 'mySmallNumber',
+                        'type' => 'uint8',
+                        'indexed' => true,
+                    ],
+                ],
+                'name' => 'testEvent',
+                'type' => 'event',
+            ],
+        ];
+
+        $contract = new Contract('foo', 'bar', $json);
+
+        $message = 'event with matching topic not found: invalid';
+        $this->assertInvalidArgumentException($message, function () use ($contract) {
+            $contract->decodeEventInput(['invalid'], '');
+        });
     }
 }

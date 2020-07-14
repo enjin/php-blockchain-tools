@@ -209,41 +209,63 @@ class HexConverterTest extends TestCase
     }
 
     /**
+     * @covers \Enjin\BlockchainTools\HexConverter::bytesToHex
      * @covers \Enjin\BlockchainTools\HexConverter::hexToBytes
+     * @covers \Enjin\BlockchainTools\HexConverter::bytesToHexPrefixed
      */
     public function testHexToBytes()
     {
         $hex = 'd77522';
-        $expected = [
-            215,
-            117,
-            34,
-        ];
-
-        $bytes = HexConverter::hexToBytes($hex);
-        $this->assertEquals($expected, $bytes);
-
-        $bytes = HexConverter::hexToBytes('0x' . $hex);
-        $this->assertEquals($expected, $bytes);
-    }
-
-    /**
-     * @covers \Enjin\BlockchainTools\HexConverter::bytesToHex
-     * @covers \Enjin\BlockchainTools\HexConverter::bytesToHexPrefixed
-     */
-    public function testBytesToHex()
-    {
-        $expected = 'd77522';
         $bytes = [
             215,
             117,
             34,
         ];
 
-        $hex = HexConverter::bytesToHex($bytes);
-        $this->assertEquals($expected, $hex);
+        $this->assertEquals($bytes, HexConverter::hexToBytes($hex));
+        $this->assertEquals($hex, HexConverter::bytesToHex($bytes));
+        $this->assertEquals('0x' . $hex, HexConverter::bytesToHexPrefixed($bytes));
 
-        $hex = HexConverter::bytesToHexPrefixed($bytes);
-        $this->assertEquals('0x' . $expected, $hex);
+        $hex = '1a2b3c4d5e6f';
+
+        $bytes = [
+            26,
+            43,
+            60,
+            77,
+            94,
+            111,
+        ];
+
+        $this->assertEquals($bytes, HexConverter::hexToBytes($hex));
+        $this->assertEquals($hex, HexConverter::bytesToHex($bytes));
+        $this->assertEquals('0x' . $hex, HexConverter::bytesToHexPrefixed($bytes));
+    }
+
+    public function testHexToBytesZero()
+    {
+        $hex = '00';
+        $bytes = [];
+
+        $this->assertEquals($hex, HexConverter::bytesToHex($bytes));
+        $this->assertEquals($bytes, HexConverter::hexToBytes($hex));
+    }
+
+    public function testBytesSymmetry()
+    {
+        $hex = '1a2b3c4d5e6f';
+
+        $bytes = [
+            26,
+            43,
+            60,
+            77,
+            94,
+            111,
+        ];
+
+        $this->assertEquals($bytes, HexConverter::hexToBytes($hex));
+
+        $this->assertEquals($hex, HexConverter::bytesToHex($bytes));
     }
 }

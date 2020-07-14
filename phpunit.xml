@@ -15,7 +15,7 @@
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
             <exclude>
-                <directory suffix=".php">./src/Generators</directory>
+                <directory suffix=".php">./src/Support</directory>
             </exclude>
         </whitelist>
     </filter>
