@@ -25,6 +25,8 @@ Contains static utility functions for handling decimal and hex data.
 | `bytesToHex` | array of bytes | hex encoded bytes (base 16) |
 | `bytesToHexPrefixed` | - | - | returns hex prefixed with `0x`### BigHex
 
+### BigHex
+
 See: [`Enjin\BlockchainTools\BigHex`](src/BigHex.php)
 
 Object for handling large hex numbers.
@@ -117,6 +119,16 @@ HexInt::fromHexInt24('0x123456')->toHexInt64(); // '0x0000000000123456'
 $paddedHex = HexInt16::padLeft('0x12'); // '0x0012'
 ```
 
+## ABI Contracts
+
+### Contract Data Types not currently supported
+ - string[]
+ - bytes[]
+ - multi-dimensional arrays (uint16[][])
+ - tuple
+ - fixed
+ - ufixed
+ 
 ### ContractStore
 
 Used to lazy load and re-use parsed abi json data. Create and re-use an instance of this class in your application to lazy load and cache processed abi files. 
