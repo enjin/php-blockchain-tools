@@ -8,12 +8,25 @@ See: [`Enjin\BlockchainTools\HexConverter`](src/HexConverter.php)
 
 Contains static utility functions for handling decimal and hex data.
 
-
 ### BigHex
 
 See: [`Enjin\BlockchainTools\BigHex`](src/BigHex.php)
 
-Contains static utility functions for handling decimal and hex data.
+Object for handling large hex numbers.
+
+```php
+
+$longHex = '0xabc1234...';
+
+$hex = new BigHex($longHex);
+
+$hex->toStringPrefixed(); // '0xabc1234...'
+$hex->toStringUnPrefixed(); // 'abc1234...'
+
+// convert to phpseclib\Math\BigInteger
+$bigInt = $hex->toBigInt();
+
+```
 
 
 ## ABI Contracts
