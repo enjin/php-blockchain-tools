@@ -245,7 +245,7 @@ class DataBlock
                         'value_decoded' => $length,
                         'length_hex_string' => $length * 2,
                         'length_chunk_size' => ($length * 2) / 64,
-                        'value' => HexConverter::intToHexUInt($length, 64),
+                        'value' => HexConverter::uintToHex($length, 64),
                     ];
 
                     foreach ($values as $i => $value) {
@@ -260,7 +260,7 @@ class DataBlock
                     $output[] = [
                         'name' => "{$name} length: {$length}",
                         'type' => $type,
-                        'value' => HexConverter::intToHexUInt($length, 64),
+                        'value' => HexConverter::uintToHex($length, 64),
                     ];
 
                     foreach ($values as $i => $value) {
@@ -317,7 +317,7 @@ class DataBlock
             'position_string_index' => $position * 2,
             'position_chunk_index' => ($position * 2) / 64,
             'data_value_decoded' => $dataValuesDecoded,
-            'value' => HexConverter::intToHexUInt($position, 64),
+            'value' => HexConverter::uintToHex($position, 64),
         ];
 
         return $output;

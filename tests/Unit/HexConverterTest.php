@@ -83,95 +83,95 @@ class HexConverterTest extends TestCase
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexInt
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexIntPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexPrefixed
      */
     public function testIntToHexInt()
     {
         $int = 882514;
         $expected = '0d7752';
 
-        $hex = HexConverter::intToHexInt($int);
+        $hex = HexConverter::intToHex($int);
         $this->assertEquals($expected, $hex);
-        $this->assertEquals('0x' . $expected, HexConverter::intToHexIntPrefixed($int));
+        $this->assertEquals('0x' . $expected, HexConverter::intToHexPrefixed($int));
 
         $expected = '00000000000d7752';
-        $hex = HexConverter::intToHexInt($int, 16);
+        $hex = HexConverter::intToHex($int, 16);
         $this->assertEquals($expected, $hex);
 
-        $hex = HexConverter::intToHexIntPrefixed($int, 16);
+        $hex = HexConverter::intToHexPrefixed($int, 16);
         $this->assertEquals('0x' . $expected, $hex);
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexInt
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexIntPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::intToHexPrefixed
      */
     public function testNegativeIntToHexInt()
     {
         $int = -882514;
         $expected = 'f288ae';
 
-        $hex = HexConverter::intToHexInt($int);
+        $hex = HexConverter::intToHex($int);
         $this->assertEquals($expected, $hex);
-        $this->assertEquals('0x' . $expected, HexConverter::intToHexIntPrefixed($int));
+        $this->assertEquals('0x' . $expected, HexConverter::intToHexPrefixed($int));
 
         $expected = 'fffffffffff288ae';
-        $hex = HexConverter::intToHexInt($int, 16);
+        $hex = HexConverter::intToHex($int, 16);
         $this->assertEquals($expected, $hex);
 
-        $hex = HexConverter::intToHexIntPrefixed($int, 16);
+        $hex = HexConverter::intToHexPrefixed($int, 16);
         $this->assertEquals('0x' . $expected, $hex);
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::hexIntToInt
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToInt
      */
     public function testHexIntToInt()
     {
         $hex = '000D7752';
         $expected = 882514;
 
-        $int = HexConverter::hexIntToInt($hex);
+        $int = HexConverter::hexToInt($hex);
         $this->assertEquals($expected, $int);
 
-        $int = HexConverter::hexIntToInt('0x' . $hex);
+        $int = HexConverter::hexToInt('0x' . $hex);
         $this->assertEquals($expected, $int);
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::hexIntToInt
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToInt
      */
     public function testNegativeHexIntToInt()
     {
         $hex = 'fff288ae';
         $expected = -882514;
 
-        $int = HexConverter::hexIntToInt($hex);
+        $int = HexConverter::hexToInt($hex);
         $this->assertEquals($expected, $int);
 
-        $int = HexConverter::hexIntToInt('0x' . $hex);
+        $int = HexConverter::hexToInt('0x' . $hex);
         $this->assertEquals($expected, $int);
     }
 
     /**
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexUInt
-     * @covers \Enjin\BlockchainTools\HexConverter::intToHexUIntPrefixed
+     * @covers \Enjin\BlockchainTools\HexConverter::uintToHex
+     * @covers \Enjin\BlockchainTools\HexConverter::uintToHexPrefixed
      */
     public function testUIntToHex()
     {
         $int = 882514;
         $expected = '0d7752';
 
-        $hex = HexConverter::intToHexUInt($int);
+        $hex = HexConverter::uintToHex($int);
         $this->assertEquals($expected, $hex);
-        $this->assertEquals('0x' . $expected, HexConverter::intToHexUIntPrefixed($int));
+        $this->assertEquals('0x' . $expected, HexConverter::uintToHexPrefixed($int));
 
         $expected = '00000000000d7752';
-        $hex = HexConverter::intToHexUInt($int, 16);
+        $hex = HexConverter::uintToHex($int, 16);
         $this->assertEquals($expected, $hex);
 
-        $hex = HexConverter::intToHexUIntPrefixed($int, 16);
+        $hex = HexConverter::uintToHexPrefixed($int, 16);
         $this->assertEquals('0x' . $expected, $hex);
 
         $actual = HexConverter::hexToUInt($hex);

@@ -28,7 +28,7 @@ abstract class BaseHexInt extends HexNumber
     {
         static::validateIntRange($int);
 
-        $hex = HexConverter::intToHexInt($int, static::HEX_LENGTH);
+        $hex = HexConverter::intToHex($int, static::HEX_LENGTH);
 
         return new static($hex);
     }
@@ -38,7 +38,7 @@ abstract class BaseHexInt extends HexNumber
      */
     public function toDecimal(): string
     {
-        return HexConverter::hexIntToInt($this->value);
+        return HexConverter::hexToInt($this->value);
     }
 
     protected static function isNegative(string $hex): bool

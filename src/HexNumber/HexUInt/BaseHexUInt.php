@@ -16,7 +16,7 @@ abstract class BaseHexUInt extends HexNumber
     {
         static::validateIntRange($int);
 
-        $hex = HexConverter::intToHexUInt($int, static::HEX_LENGTH);
+        $hex = HexConverter::uintToHex($int, static::HEX_LENGTH);
 
         return new static($hex);
     }

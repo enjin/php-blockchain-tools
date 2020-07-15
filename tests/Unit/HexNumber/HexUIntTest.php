@@ -54,10 +54,10 @@ class HexUIntTest extends TestCase
         $message = $class . '::fromHex($hex)->toPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals('0x' . $hex, $class::fromHex($hex)->toPrefixed(), $message);
 
-        $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexConverter::intToHexUInt($int, $class::HEX_LENGTH), $message);
+        $message = 'HexConverter::intToHex convert int: ' . $int . ' into expected hex: ' . $hex;
+        $this->assertEquals($hex, HexConverter::uintToHex($int, $class::HEX_LENGTH), $message);
 
-        $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
+        $message = 'HexConverter::hexToInt convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals($int, HexConverter::hexToUInt($hex), $message);
     }
 

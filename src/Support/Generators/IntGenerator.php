@@ -60,8 +60,8 @@ class IntGenerator
         $intMin = bcmul($b, -1);
         $intMax = bcsub($b, 1);
 
-        $hexMin = HexConverter::intToHexInt($intMin, $length);
-        $hexMax = HexConverter::intToHexInt($intMax, $length);
+        $hexMin = HexConverter::intToHex($intMin, $length);
+        $hexMax = HexConverter::intToHex($intMax, $length);
 
         $class->addConstant('HEX_MIN', $hexMin)->setPublic();
         $class->addConstant('HEX_MAX', $hexMax)->setPublic();

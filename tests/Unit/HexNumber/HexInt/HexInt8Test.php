@@ -178,11 +178,11 @@ class HexInt8Test extends TestCase
         $message = 'HexInt8::fromHex($hex)->toPrefixed() convert hex: ' . $hex . ' into expected int: ' . $int;
         $this->assertEquals('0x' . $hex, HexInt8::fromHex($hex)->toPrefixed(), $message);
 
-        $message = 'HexConverter::intToHexInt convert int: ' . $int . ' into expected hex: ' . $hex;
-        $this->assertEquals($hex, HexConverter::intToHexInt($int, HexInt8::HEX_LENGTH), $message);
+        $message = 'HexConverter::intToHex convert int: ' . $int . ' into expected hex: ' . $hex;
+        $this->assertEquals($hex, HexConverter::intToHex($int, HexInt8::HEX_LENGTH), $message);
 
-        $message = 'HexConverter::hexIntToInt convert hex: ' . $hex . ' into expected int: ' . $int;
-        $this->assertEquals($int, HexConverter::hexIntToInt($hex), $message);
+        $message = 'HexConverter::hexToInt convert hex: ' . $hex . ' into expected int: ' . $int;
+        $this->assertEquals($int, HexConverter::hexToInt($hex), $message);
     }
 
     public function int8Provider()
