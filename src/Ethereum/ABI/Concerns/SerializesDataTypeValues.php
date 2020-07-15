@@ -110,10 +110,6 @@ trait SerializesDataTypeValues
         }
 
         if ($baseType === 'bytes') {
-            if ($value == '0') {
-                return [];
-            }
-
             return HexConverter::hexToBytes($value);
         }
 

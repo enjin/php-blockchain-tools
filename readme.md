@@ -18,6 +18,41 @@ Contains static utility functions for handling decimal and hex data.
 
 ## ABI Contracts
 
+
+### Contract Data Types not supported
+ - string[]
+ - bytes[]
+ - multi-dimensional arrays (uint16[][])
+ - tuple
+ - fixed
+ - ufixed
+ 
+#### Types used by CryptoItems.abi
+ - address
+ - address[]
+ - bool
+ - bytes
+ - bytes32
+ - bytes4
+ - bytes4[]
+ - string
+ - uint128
+ - uint128[]
+ - uint16
+ - uint256
+ - uint256[3]
+ - uint256[4]
+ - uint256[]
+ - uint32
+ - uint8
+
+#### Types used by ENJ.abi
+ - address
+ - bool
+ - string
+ - uint256
+ - uint8
+
 ### ContractStore
 
 Used to lazy load and re-use parsed abi json data. Create and re-use an instance of this class in your application to lazy load and cache processed abi files. 

@@ -249,15 +249,10 @@ class DataBlock
                     ];
 
                     foreach ($values as $i => $value) {
-                        $decoded = null;
-                        if (!in_array($type, ['string', 'bytes'])) {
-                            $decoded = $valuesDecoded[$i] ?? null;
-                        }
 
                         $output[] = [
                             'name' => $name . ' value chunk[' . $i . ']',
                             'type' => $type,
-                            'value_decoded' => $decoded,
                             'value' => $value,
                         ];
                     }
@@ -298,10 +293,7 @@ class DataBlock
         $type = $item['type'];
 
         foreach ($values as $i => $value) {
-            $decoded = null;
-            if (!in_array($type, ['string', 'bytes'])) {
-                $decoded = $valuesDecoded[$i];
-            }
+            $decoded = $valuesDecoded[$i];
             $output[] = [
                 'name' => $name . '[' . $i . '] value',
                 'type' => $type,
@@ -317,12 +309,14 @@ class DataBlock
     {
         $name = $item['name'];
         $position = $item['position'];
+        $dataValuesDecoded = $item['values_decoded'];
 
         $output[] = [
             'name' => $name . ' data position',
             'value_decoded' => $position,
             'position_string_index' => $position * 2,
             'position_chunk_index' => ($position * 2) / 64,
+            'data_value_decoded' => $dataValuesDecoded,
             'value' => HexConverter::intToHexUInt($position, 64),
         ];
 

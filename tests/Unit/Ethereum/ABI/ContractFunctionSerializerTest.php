@@ -355,6 +355,9 @@ class ContractFunctionSerializerTest extends TestCase
         $dataBlock = $serializer->encodeInput($function, $data);
         $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded input data');
 
+        // uncomment for debug data
+        // dump($dataBlock->toArrayWithMeta());
+
         $serializedString = $function->methodId() . implode('', $serialized);
         $decoded = $serializer->decodeInput($function, $serializedString);
         $this->assertEquals($data, $decoded, 'correctly decoded input data');
