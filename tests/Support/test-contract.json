@@ -1,0 +1,41 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "myString",
+                "type": "string"
+            },
+            {
+                "name": "myNumber",
+                "type": "uint256",
+                "indexed": true
+            },
+            {
+                "name": "mySmallNumber",
+                "type": "uint8",
+                "indexed": true
+            }
+        ],
+        "name": "testEvent1",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "name": "myString",
+                "type": "string"
+            },
+            {
+                "name": "myNumber",
+                "type": "uint256"
+            },
+            {
+                "name": "mySmallNumber",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "name": "testFunction1",
+        "type": "function"
+    }
+]
