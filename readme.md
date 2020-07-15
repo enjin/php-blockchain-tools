@@ -10,8 +10,6 @@ Contains static utility functions for handling decimal and hex data.
 
 #### Conversion Method Reference
 
-Method names indicate different types of values.
-
 | Method  | From | To | Note |
 | ----- | ---- | ---- | ---- |
 | `hexToInt` | signed int (base 16) | signed int (base 10) |
