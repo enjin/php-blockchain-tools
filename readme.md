@@ -49,7 +49,7 @@ Classes to represent and convert all valid UInt values are in the `HexNumber\Hex
 
 ```php
 // ways to create a HexNumber instance
-// all with throw an exception if an invalid value is provided
+// all will throw an exception if an invalid value is provided
 // the value must be within the min/max range 
 // if it is a hex it must have the correct number of characters
 $hexUInt16 = new HexUInt16('0x1234');
@@ -87,7 +87,7 @@ Classes to represent and convert all valid Int values are in the `HexNumber\HexI
 
 ```php
 // ways to create a HexNumber instance
-// all with throw an exception if an invalid value is provided
+// all will throw an exception if an invalid value is provided
 // the value must be within the min/max range 
 // if it is a hex it must have the correct number of characters
 $HexInt16 = new HexInt16('0xfefc');
@@ -128,7 +128,7 @@ $paddedHex = HexInt16::padLeft('0x12'); // '0x0012'
  - tuple
  - fixed
  - ufixed
- 
+
 ### ContractStore
 
 Used to lazy load and re-use parsed abi json data. Create and re-use an instance of this class in your application to lazy load and cache processed abi files. 
