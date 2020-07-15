@@ -1,5 +1,5 @@
 {
-    "name": "enjin/blockchain-tools",
+    "name": "enjin/php-blockchain-tools",
     "type": "library",
     "require": {
         "php": ">=7.2,<7.3",
