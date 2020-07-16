@@ -212,4 +212,44 @@ class HexUInt256Test extends TestCase
         $actual = HexUInt256::padRight($value);
         $this->assertEquals($expected, $actual);
     }
+
+    public function testTop()
+    {
+        $a = str_repeat('a', 16);
+        $b = str_repeat('b', 48);
+
+        $value = $a . $b;
+
+        $actual = HexUInt256::fromHex($value)->top(16);
+        $this->assertEquals($a, $actual);
+    }
+
+    public function testTopInvalid()
+    {
+        $message = 'Cannot take 65 characters from top of string with length: 64';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = str_repeat('0', 64);
+            HexUInt256::fromHex($value)->top(65);
+        });
+    }
+
+    public function testBottom()
+    {
+        $a = str_repeat('a', 48);
+        $b = str_repeat('b', 16);
+
+        $value = $a . $b;
+
+        $actual = HexUInt256::fromHex($value)->bottom(16);
+        $this->assertEquals($b, $actual);
+    }
+
+    public function testBottomInvalid()
+    {
+        $message = 'Cannot take 65 characters from bottom of string with length: 64';
+        $this->assertInvalidArgumentException($message, function () {
+            $value = str_repeat('0', 64);
+            HexUInt256::fromHex($value)->bottom(65);
+        });
+    }
 }
