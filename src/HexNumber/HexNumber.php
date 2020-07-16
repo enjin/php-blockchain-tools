@@ -3,11 +3,14 @@
 namespace Enjin\BlockchainTools\HexNumber;
 
 use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\Concerns\ConvertsByBitSize;
 use InvalidArgumentException;
 use phpseclib\Math\BigInteger;
 
 abstract class HexNumber
 {
+    use ConvertsByBitSize;
+
     public const VALID_BIT_SIZES = [
         8,
         16,
@@ -131,37 +134,52 @@ abstract class HexNumber
         return $this->value;
     }
 
-    public function convertUpTo(int $bitSize): string
+    /**
+     * @param int $characters number of characters to take from top (left) of hex
+     * @return string
+     */
+    public function top(int $characters): string
     {
-        if ($bitSize < static::BIT_SIZE) {
-            throw new InvalidArgumentException('Cannot convert up to ' . $bitSize . ' from ' . static::BIT_SIZE . '. Can only convert up to larger bit sizes');
+        $length = strlen($this->value);
+        if ($length < $characters) {
+            throw new InvalidArgumentException('Cannot take ' . $characters . ' characters from top of string with length: ' . $length);
         }
 
-        $length = $bitSize / 4;
+        $message = 'Cannot safely convert down to top ' . $characters . ' characters';
 
-        return static::padLeft($this->value, $length);
+        return $this->topCharacters($characters, false, $message);
     }
 
-    public function forceConvertDownToTop(int $bitSize): string
+    /**
+     * @param int $characters number of characters to take from bottom (right) of hex
+     * @return string
+     */
+    public function bottom(int $characters): string
     {
-        return $this->convertDownToTop($bitSize, false);
-    }
-
-    public function convertDownToTop(int $bitSize, bool $preventDataLoss = true): string
-    {
-        if ($bitSize > static::BIT_SIZE) {
-            throw new InvalidArgumentException('Cannot convert down to ' . $bitSize . ' from ' . static::BIT_SIZE . '. Can only convert down to smaller bit sizes');
+        $length = strlen($this->value);
+        if ($length < $characters) {
+            throw new InvalidArgumentException('Cannot take ' . $characters . ' characters from bottom of string with length: ' . $length);
         }
 
-        return HexConverter::withPrefixIntact($this->value, function ($hex) use ($bitSize, $preventDataLoss) {
-            $length = $bitSize / 4;
+        $message = 'Cannot safely convert down to bottom ' . $characters . ' characters';
+
+        return $this->bottomCharacters($characters, false, $message);
+    }
+
+    protected function topCharacters(int $length, bool $preventDataLoss, string $exceptionMessage): string
+    {
+        return HexConverter::withPrefixIntact($this->value, function ($hex) use (
+            $length,
+            $preventDataLoss,
+            $exceptionMessage
+        ) {
             $top = substr($hex, 0, $length);
 
             if ($preventDataLoss) {
                 $removed = substr($hex, $length);
                 $nonZeroRemoved = strlen(ltrim($removed, '0'));
                 if ($nonZeroRemoved) {
-                    throw new InvalidArgumentException('Cannot safely convert down to top of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from end of (' . $hex . ')');
+                    throw new InvalidArgumentException($exceptionMessage . ', non-zero bits would be lost. (' . $removed . ') from end of (' . $hex . ')');
                 }
             }
 
@@ -169,19 +187,13 @@ abstract class HexNumber
         });
     }
 
-    public function forceConvertDownToBottom(int $bitSize): string
+    protected function bottomCharacters(int $length, bool $preventDataLoss, string $exceptionMessage): string
     {
-        return $this->convertDownToBottom($bitSize, false);
-    }
-
-    public function convertDownToBottom(int $bitSize, bool $preventDataLoss = true)
-    {
-        if ($bitSize > static::BIT_SIZE) {
-            throw new InvalidArgumentException('Cannot convert down to ' . $bitSize . ' from ' . static::BIT_SIZE . '. Can only convert down to smaller bit sizes');
-        }
-
-        return HexConverter::withPrefixIntact($this->value, function ($hex) use ($bitSize, $preventDataLoss) {
-            $length = $bitSize / 4;
+        return HexConverter::withPrefixIntact($this->value, function ($hex) use (
+            $length,
+            $preventDataLoss,
+            $exceptionMessage
+        ) {
             $index = strlen($hex) - $length;
             $bottom = substr($hex, $index);
 
@@ -189,7 +201,7 @@ abstract class HexNumber
                 $removed = substr($hex, 0, $index);
                 $nonZeroRemoved = strlen(ltrim($removed, '0'));
                 if ($nonZeroRemoved) {
-                    throw new InvalidArgumentException('Cannot safely convert down to bottom of ' . $bitSize . ' from ' . static::BIT_SIZE . ', non-zero bits would be lost. (' . $removed . ') from start of (' . $hex . ')');
+                    throw new InvalidArgumentException($exceptionMessage . ', non-zero bits would be lost. (' . $removed . ') from start of (' . $hex . ')');
                 }
             }
 
