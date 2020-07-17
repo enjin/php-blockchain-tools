@@ -132,6 +132,13 @@ class ContractFunctionSerializerTest extends TestCase
 
         $function = $contract->function('f');
 
+        $serializedBytes = [
+            '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
+            '2124970518d797c13c878280e7b22d9c6d7ad12f8ec076fbe7012b6988ae3aa8',
+            '42666c880cbd67e857257d51dad9daee33d72d8eadfe7d99613294802048329a',
+            '643d5f1a56886692f5246f22c28201eace74755c53fe3870ab6fc7b67b8c5de0',
+        ];
+
         $serialized = [
             '000000000000000000000000000000000000000000000000237595b315c3df24',
             '000000000000000000000000000000000000000000000b45afbd3f51d4dfce10',
@@ -147,10 +154,10 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000005ab9d116a53ef41063e3eae26a7ebe736720e9ba',
             '000000000000000000000000000000000000000000000000000000000000001c',
             '000000000000000000000000000000000000000000000000000000000000001b',
-            '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
-            '2124970518d797c13c878280e7b22d9c6d7ad12f8ec076fbe7012b6988ae3aa8',
-            '42666c880cbd67e857257d51dad9daee33d72d8eadfe7d99613294802048329a',
-            '643d5f1a56886692f5246f22c28201eace74755c53fe3870ab6fc7b67b8c5de0',
+            $serializedBytes[0],
+            $serializedBytes[1],
+            $serializedBytes[2],
+            $serializedBytes[3],
         ];
 
         $expected = [
@@ -175,13 +182,31 @@ class ContractFunctionSerializerTest extends TestCase
                 27,
             ],
             'rs' => [
-                HexConverter::hexToBytes('251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df'),
-                HexConverter::hexToBytes('2124970518d797c13c878280e7b22d9c6d7ad12f8ec076fbe7012b6988ae3aa8'),
-                HexConverter::hexToBytes('42666c880cbd67e857257d51dad9daee33d72d8eadfe7d99613294802048329a'),
-                HexConverter::hexToBytes('643d5f1a56886692f5246f22c28201eace74755c53fe3870ab6fc7b67b8c5de0'),
+                HexConverter::hexToBytes($serializedBytes[0]),
+                HexConverter::hexToBytes($serializedBytes[1]),
+                HexConverter::hexToBytes($serializedBytes[2]),
+                HexConverter::hexToBytes($serializedBytes[3]),
             ],
         ];
 
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decodedRaw = $function->decodeInputRaw($serializedString);
+
+        $expectedRaw = [
+            'tradeValues' => array_map(function ($value) {
+                return HexConverter::intToHex($value, 64);
+            }, $expected['tradeValues']),
+            'tradeAddresses' => array_map(function ($value) {
+                return HexConverter::padLeft($value, 64);
+            }, $expected['tradeAddresses']),
+            'v' => [
+                HexConverter::intToHex($expected['v'][0], 64),
+                HexConverter::intToHex($expected['v'][1], 64),
+            ],
+            'rs' => $serializedBytes,
+        ];
+
+        $this->assertEquals($expectedRaw, $decodedRaw, 'correctly decodes raw');
         $this->assertSerializerInput($function, $expected, $serialized);
     }
 

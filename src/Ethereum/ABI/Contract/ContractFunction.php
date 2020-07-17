@@ -170,6 +170,11 @@ class ContractFunction
         return (new ContractFunctionSerializer())->decodeInput($this, $data);
     }
 
+    public function decodeInputRaw(string $data): array
+    {
+        return (new ContractFunctionSerializer())->decodeInputRaw($this, $data);
+    }
+
     public function encodeOutput(array $data): DataBlock
     {
         return (new ContractFunctionSerializer())->encodeOutput($this, $data);
@@ -178,5 +183,10 @@ class ContractFunction
     public function decodeOutput(string $data): array
     {
         return (new ContractFunctionSerializer())->decodeOutput($this, $data);
+    }
+
+    public function decodeOutputRaw(string $data): array
+    {
+        return (new ContractFunctionSerializer())->decodeOutputRaw($this, $data);
     }
 }

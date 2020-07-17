@@ -119,25 +119,45 @@ class ContractEventSerializerTest extends TestCase
             'indexedData' => 'cannot decode topics with type: bytes',
         ];
 
+        $indexedIdHex = '0000000000000000000000000000000000000000000000000000000000000020';
         $topics = [
             $event->signatureTopic(),
             'would-be-kekak-encoded-string',
-            '0000000000000000000000000000000000000000000000000000000000000020',
+            $indexedIdHex,
             'would-be-kekak-encoded-bytes',
         ];
 
+        $nameHex = '6d79206e616d6500000000000000000000000000000000000000000000000000';
+        $idHex = '0000000000000000000000000000000000000000000000000000000000000058';
+        $dataHex = 'abcdef1234000000000000000000000000000000000000000000000000000000';
+
         $serialized = [
             '0000000000000000000000000000000000000000000000000000000000000060',
-            '0000000000000000000000000000000000000000000000000000000000000058',
+            $idHex,
             '00000000000000000000000000000000000000000000000000000000000000a0',
             '0000000000000000000000000000000000000000000000000000000000000007',
-            '6d79206e616d6500000000000000000000000000000000000000000000000000',
+            $nameHex,
             '0000000000000000000000000000000000000000000000000000000000000005',
-            'abcdef1234000000000000000000000000000000000000000000000000000000',
+            $dataHex,
         ];
 
         $serialized = '0x' . implode('', $serialized);
-        $result = (new ContractEventSerializer())->decode($event->inputs(), $topics, $serialized);
+        $eventSerializer = new ContractEventSerializer();
+        $result = $eventSerializer->decode($event->inputs(), $topics, $serialized);
+
         $this->assertEquals($expected, $result);
+
+        $expectedRaw = [
+            'name' => rtrim($nameHex, '0'),
+            'indexedName' => 'cannot decode topics with type: string',
+            'id' => $idHex,
+            'indexedId' => $indexedIdHex,
+            'data' => rtrim($dataHex, '0'),
+            'indexedData' => 'cannot decode topics with type: bytes',
+        ];
+
+        $resultRaw = $eventSerializer->decodeRaw($event->inputs(), $topics, $serialized);
+
+        $this->assertEquals($expectedRaw, $resultRaw);
     }
 }

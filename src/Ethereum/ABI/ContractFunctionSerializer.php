@@ -63,29 +63,75 @@ class ContractFunctionSerializer
 
     public function decodeInput(ContractFunction $function, string $data): array
     {
-        return $this->decode($function->methodId(), $function->inputs(), $data);
+        return $this->decode(
+            $function->methodId(),
+            $function->inputs(),
+            $data
+        );
+    }
+
+    public function decodeInputRaw(ContractFunction $function, string $data): array
+    {
+        return $this->decodeRaw(
+            $function->methodId(),
+            $function->inputs(),
+            $data
+        );
     }
 
     public function decodeOutput(ContractFunction $function, string $data): array
     {
-        return $this->decode($function->methodId(), $function->outputs(), $data);
+        return $this->decode(
+            $function->methodId(),
+            $function->outputs(),
+            $data
+        );
     }
 
-    public function decode(string $methodId, array $functionValueTypes, string $data)
+    public function decodeOutputRaw(ContractFunction $function, string $data): array
+    {
+        return $this->decodeRaw(
+            $function->methodId(),
+            $function->outputs(),
+            $data
+        );
+    }
+
+    public function decode(string $methodId, array $valueTypes, string $data)
     {
         $data = $this->removeSignatureFromData($methodId, $data);
 
-        return $this->decodeWithoutMethodId($functionValueTypes, $data);
+        return $this->decodeData($valueTypes, $data, true);
     }
 
-    public function decodeWithoutMethodId(array $functionValueTypes, string $data)
+    /**
+     * Decode without converting hex values based on type
+     */
+    public function decodeRaw(string $methodId, array $valueTypes, string $data)
+    {
+        $data = $this->removeSignatureFromData($methodId, $data);
+
+        return $this->decodeData($valueTypes, $data, false);
+    }
+
+    public function decodeWithoutMethodId(array $valueTypes, string $data)
+    {
+        return $this->decodeData($valueTypes, $data, true);
+    }
+
+    public function decodeRawWithoutMethodId(array $valueTypes, string $data)
+    {
+        return $this->decodeData($valueTypes, $data, false);
+    }
+
+    protected function decodeData(array $valueTypes, string $data, bool $decodeValues)
     {
         $data = HexConverter::unPrefix($data);
         $index = 0;
 
         $results = [];
 
-        foreach ($functionValueTypes as $i => $item) {
+        foreach ($valueTypes as $i => $item) {
             /** @var ContractFunctionValueType $item */
             $itemName = $item->name() ?: $i;
 
@@ -103,7 +149,12 @@ class ContractFunctionSerializer
                         $arrayLength = $this->uIntFromIndex($data, $startIndex);
 
                         $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
-                        $results[$itemName] = $dataType->decodeArrayValues($hexValues);
+                        $values = $hexValues;
+                        if ($decodeValues) {
+                            $values = $dataType->decodeArrayValues($values);
+                        }
+
+                        $results[$itemName] = $values;
 
                         $index += 64;
 
@@ -115,7 +166,14 @@ class ContractFunctionSerializer
                     $arrayLength = $dataType->arrayLength();
 
                     $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
-                    $results[$itemName] = $dataType->decodeArrayValues($hexValues);
+
+                    $values = $hexValues;
+
+                    if ($decodeValues) {
+                        $values = $dataType->decodeArrayValues($values);
+                    }
+
+                    $results[$itemName] = $values;
 
                     $index += $arrayLength * 64;
 
@@ -130,7 +188,14 @@ class ContractFunctionSerializer
                     $length = $this->uIntFromIndex($data, $startIndex) * 2;
 
                     $hexValue = $this->hexFromIndex($data, $valuesIndex, $length);
-                    $results[$itemName] = $dataType->decodeBaseType($hexValue);
+
+                    $value = $hexValue;
+
+                    if ($decodeValues) {
+                        $value = $dataType->decodeBaseType($value);
+                    }
+
+                    $results[$itemName] = $value;
 
                     $index += 64;
 
@@ -139,7 +204,13 @@ class ContractFunctionSerializer
 
                 $hex = $this->hexFromIndex($data, $index, 64);
 
-                $results[$itemName] = $dataType->decodeBaseType($hex);
+                $value = $hex;
+
+                if ($decodeValues) {
+                    $value = $dataType->decodeBaseType($value);
+                }
+
+                $results[$itemName] = $value;
 
                 $index += 64;
             } catch (InvalidArgumentException $e) {

@@ -8,10 +8,43 @@ class ContractEventSerializer
 {
     public function decodeInput(ContractEvent $function, array $topics, string $data): array
     {
-        return $this->decode($function->inputs(), $topics, $data);
+        return $this->decode(
+            $function->inputs(),
+            $topics,
+            $data
+        );
+    }
+
+    public function decodeInputRaw(ContractEvent $function, array $topics, string $data): array
+    {
+        return $this->decodeRaw(
+            $function->inputs(),
+            $topics,
+            $data
+        );
     }
 
     public function decode(array $eventInputs, array $topics, string $data)
+    {
+        return $this->decodeData(
+            $eventInputs,
+            $topics,
+            $data,
+            true
+        );
+    }
+
+    public function decodeRaw(array $eventInputs, array $topics, string $data)
+    {
+        return $this->decodeData(
+            $eventInputs,
+            $topics,
+            $data,
+            false
+        );
+    }
+
+    protected function decodeData(array $eventInputs, array $topics, string $data, bool $decodeValues)
     {
         $results = [];
 
@@ -37,10 +70,22 @@ class ContractEventSerializer
             }
 
             $indexedValue = $indexedValues[$i];
-            $results[$itemName] = $dataType->decodeBaseType($indexedValue);
+
+            $value = $indexedValue;
+            if ($decodeValues) {
+                $value = $dataType->decodeBaseType($indexedValue);
+            }
+            $results[$itemName] = $value;
         }
 
-        $nonIndexedValues = (new ContractFunctionSerializer())->decodeWithoutMethodId($nonIndexedInputs, $data);
+        $functionSerializer = new ContractFunctionSerializer();
+
+        if ($decodeValues) {
+            $nonIndexedValues = $functionSerializer->decodeWithoutMethodId($nonIndexedInputs, $data);
+        } else {
+            $nonIndexedValues = $functionSerializer->decodeRawWithoutMethodId($nonIndexedInputs, $data);
+        }
+
         $results = array_merge($results, $nonIndexedValues);
 
         // reorder to match spec
