@@ -90,4 +90,9 @@ class ContractEvent
     {
         return (new ContractEventSerializer())->decodeInput($this, $topics, $data);
     }
+
+    public function decodeInputRaw(array $topics, string $data): array
+    {
+        return (new ContractEventSerializer())->decodeInputRaw($this, $topics, $data);
+    }
 }
