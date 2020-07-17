@@ -10,20 +10,20 @@ Contains static utility functions for handling decimal and hex data.
 
 #### Conversion Method Reference
 
-| Method  | From | To | Note |
-| ----- | ---- | ---- | ---- |
+| Method  | From | To |
+| ----- | ---- | ---- |
 | `hexToInt` | signed int (base 16) | signed int (base 10) |
 | `intToHex` | signed int (base 10) | signed int (base 16) |
-| `intToHexPrefixed` | - | - | returns hex prefixed with `0x`
+| `intToHexPrefixed` |  | `0x` prefixed |
 | `hexToUInt` | unsigned int (base 16) | unsigned int (base 10) |
 | `uIntToHex` | unsigned int (base 10) | unsigned int (base 16) |
-| `uIntToHexPrefixed` | - | - | returns hex prefixed with `0x`
+| `uIntToHexPrefixed` |  | `0x` prefixed |
 | `hexToString` | hex encoded string (base 16) | decoded string
 | `stringToHex` | decoded string | hex encoded string (base 16) |
-| `stringToHexPrefixed` | - | - | returns hex prefixed with `0x`
+| `stringToHexPrefixed` |  | `0x` prefixed |
 | `hexToBytes` | hex encoded bytes (base 16) | array of bytes
 | `bytesToHex` | array of bytes | hex encoded bytes (base 16) |
-| `bytesToHexPrefixed` | - | - | returns hex prefixed with `0x`### BigHex
+| `bytesToHexPrefixed` |  | `0x` prefixed |
 
 ### BigHex
 
