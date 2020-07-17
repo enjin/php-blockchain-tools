@@ -67,8 +67,8 @@ $hexUInt16->toDecimal(); // '4660'
 $hexUInt16->toHexUInt64(); // '0x0000000000001234'
 
 // can only convert to top/bottom of lower bit sizes
-$hexUInt16->toHexUInt8Top(); // '0x12'
-$hexUInt16->toHexUInt8Bottom(); // '0x34'
+HexUInt16::fromHex('0x1200')->toHexInt8Top(); // '0x12'
+HexUInt16::fromHex('0x0034')->toHexInt8Bottom(); // '0x34'
 
 // returned exactly as provided (with our without prefix)
 $hexUInt16->toHex(); // '0x1234'
@@ -105,8 +105,8 @@ $HexInt16->toDecimal(); // '-260'
 $HexInt16->toHexInt64(); // '0x000000000000fefc'
 
 // can only convert to top/bottom of lower bit sizes
-$HexInt16->toHexInt8Top(); // '0xfe'
-$HexInt16->toHexInt8Bottom(); // '0xfc'
+HexInt16::fromHex('0xfe00')->toHexInt8Top(); // '0xfe'
+HexInt16::fromHex('0x00fc')->toHexInt8Bottom(); // '0xfc'
 
 // returned exactly as provided (with our without prefix)
 $HexInt16->toHex(); // '0xfefc'
