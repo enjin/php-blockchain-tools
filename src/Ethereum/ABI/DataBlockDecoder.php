@@ -39,7 +39,7 @@ class DataBlockDecoder
         $this->data[$valueType->name()] = $values;
     }
 
-    public function addDynamicLengthBytes(ContractFunctionValueType $valueType, string $value)
+    public function addDynamicLengthBytes(ContractFunctionValueType $valueType, $value)
     {
         $this->data[$valueType->name()] = $value;
     }

@@ -96,7 +96,17 @@ class Contract
         $isInitialized = array_key_exists($name, $this->functions);
         if (!$isInitialized) {
             $meta = $this->functionsMeta[$name];
-            $this->functions[$name] = new ContractFunction($meta);
+
+            $input = $this->functionInputSerializers[$name] ?? $this->defaultSerializers();
+            $output = $this->functionOutputSerializers[$name] ?? $this->defaultSerializers();
+
+            $this->functions[$name] = new ContractFunction(
+                $meta,
+                $input['decoder'],
+                $input['encoder'],
+                $output['decoder'],
+                $output['encoder']
+            );
         }
 
         return $this->functions[$name];
@@ -128,7 +138,14 @@ class Contract
         $isInitialized = array_key_exists($name, $this->events);
         if (!$isInitialized) {
             $meta = $this->eventsMeta[$name];
-            $this->events[$name] = new ContractEvent($meta);
+
+            $input = $this->eventInputSerializers[$name] ?? $this->defaultSerializers();
+
+            $this->events[$name] = new ContractEvent(
+                $meta,
+                $input['decoder'],
+                $input['encoder']
+            );
         }
 
         return $this->events[$name];
@@ -254,5 +271,13 @@ class Contract
 
             throw new InvalidArgumentException($message);
         }
+    }
+
+    protected function defaultSerializers(): array
+    {
+        return [
+            'encoder' => $this->defaultEncoderClass,
+            'decoder' => $this->defaultDecoderClass,
+        ];
     }
 }

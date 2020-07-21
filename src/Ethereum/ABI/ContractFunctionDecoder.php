@@ -62,6 +62,7 @@ class ContractFunctionDecoder
         $data = HexConverter::unPrefix($data);
         $index = 0;
 
+        /** @var DataBlockDecoder $results */
         $results = new $this->decoderClass($valueTypes);
 
         foreach ($valueTypes as $i => $item) {
