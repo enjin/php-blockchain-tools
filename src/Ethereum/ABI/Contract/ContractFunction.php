@@ -2,6 +2,7 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
+use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionDecoder;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
@@ -61,10 +62,41 @@ class ContractFunction
     /**
      * @var string
      */
-    protected $topic;
+    protected $inputDecoderClass;
 
-    public function __construct(array $function)
-    {
+    /**
+     * @var string
+     */
+    protected $inputEncoderClass;
+
+    /**
+     * @var string
+     */
+    protected $outputDecoderClass;
+
+    /**
+     * @var string
+     */
+    protected $outputEncoderClass;
+
+    public function __construct(
+        array $function,
+        string $inputDecoderClass = DataBlockDecoder::class,
+        string $inputEncoderClass = DataBlockEncoder::class,
+        string $outputDecoderClass = DataBlockDecoder::class,
+        string $outputEncoderClass = DataBlockEncoder::class
+    ) {
+        Contract::validateDecoderClass($inputDecoderClass);
+        Contract::validateEncoderClass($inputEncoderClass);
+
+        Contract::validateDecoderClass($outputDecoderClass);
+        Contract::validateEncoderClass($outputEncoderClass);
+
+        $this->inputDecoderClass = $inputDecoderClass;
+        $this->inputEncoderClass = $inputEncoderClass;
+        $this->outputDecoderClass = $outputDecoderClass;
+        $this->outputEncoderClass = $outputEncoderClass;
+
         $stateMutability = $function['stateMutability'];
 
         $this->name = $function['name'];
@@ -164,21 +196,29 @@ class ContractFunction
 
     public function encodeInput(array $data): DataBlockEncoder
     {
-        return (new ContractFunctionEncoder())->encodeInput($this, $data);
+        $functionEncoder = new ContractFunctionEncoder($this->inputEncoderClass);
+
+        return $functionEncoder->encodeInput($this, $data);
     }
 
     public function decodeInput(string $data): DataBlockDecoder
     {
-        return (new ContractFunctionDecoder())->decodeInput($this, $data);
+        $functionDecoder = new ContractFunctionDecoder($this->inputDecoderClass);
+
+        return $functionDecoder->decodeInput($this, $data);
     }
 
     public function encodeOutput(array $data): DataBlockEncoder
     {
-        return (new ContractFunctionEncoder())->encodeOutput($this, $data);
+        $functionEncoder = new ContractFunctionEncoder($this->outputEncoderClass);
+
+        return $functionEncoder->encodeOutput($this, $data);
     }
 
     public function decodeOutput(string $data): DataBlockDecoder
     {
-        return (new ContractFunctionDecoder())->decodeOutput($this, $data);
+        $functionDecoder = new ContractFunctionDecoder($this->outputDecoderClass);
+
+        return $functionDecoder->decodeOutput($this, $data);
     }
 }

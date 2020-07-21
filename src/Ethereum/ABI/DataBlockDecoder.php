@@ -58,4 +58,9 @@ class DataBlockDecoder
 
         return $output;
     }
+
+    public function merge(self $decoder)
+    {
+        $this->data = array_merge($this->data, $decoder->toArray());
+    }
 }

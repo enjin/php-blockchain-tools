@@ -14,49 +14,42 @@ class ContractFunctionDecoder
     /**
      * @var string
      */
-    protected $dataBlockDecoderClass;
+    protected $decoderClass;
 
-    public function __construct(string $dataBlockDecoderClass = DataBlockDecoder::class)
+    public function __construct(string $decoderClass = DataBlockDecoder::class)
     {
-        $this->dataBlockDecoderClass = $dataBlockDecoderClass;
+        Contract::validateDecoderClass($decoderClass);
+        $this->decoderClass = $decoderClass;
     }
 
-    public function decodeInput(
-        ContractFunction $function,
-        string $data,
-        DataBlockDecoder $dataBlockDecoder = null
-    ): DataBlockDecoder {
+    public function decodeInput(ContractFunction $function, string $data): DataBlockDecoder
+    {
         return $this->decode(
             $function->methodId(),
             $function->inputs(),
-            $data,
-            $dataBlockDecoder
+            $data
         );
     }
 
-    public function decodeOutput(
-        ContractFunction $function,
-        string $data,
-        DataBlockDecoder $dataBlockDecoder = null
-    ): DataBlockDecoder {
+    public function decodeOutput(ContractFunction $function, string $data): DataBlockDecoder
+    {
         return $this->decode(
             $function->methodId(),
             $function->outputs(),
-            $data,
-            $dataBlockDecoder
+            $data
         );
     }
 
-    public function decode(string $methodId, array $valueTypes, string $data, DataBlockDecoder $dataBlockDecoder = null)
+    public function decode(string $methodId, array $valueTypes, string $data)
     {
         $data = $this->removeSignatureFromData($methodId, $data);
 
-        return $this->decodeData($valueTypes, $data, $dataBlockDecoder);
+        return $this->decodeData($valueTypes, $data);
     }
 
-    public function decodeWithoutMethodId(array $valueTypes, string $data, DataBlockDecoder $dataBlockDecoder = null)
+    public function decodeWithoutMethodId(array $valueTypes, string $data)
     {
-        return $this->decodeData($valueTypes, $data, $dataBlockDecoder);
+        return $this->decodeData($valueTypes, $data);
     }
 
     public function removeSignatureFromData(string $methodId, string $data): string
@@ -64,19 +57,12 @@ class ContractFunctionDecoder
         return Str::removeFromBeginning($data, $methodId);
     }
 
-    protected function decodeData(
-        array $valueTypes,
-        string $data,
-        DataBlockDecoder $dataBlockDecoder = null
-    ): DataBlockDecoder {
+    protected function decodeData(array $valueTypes, string $data): DataBlockDecoder
+    {
         $data = HexConverter::unPrefix($data);
         $index = 0;
 
-        if ($dataBlockDecoder) {
-            $results = $dataBlockDecoder;
-        } else {
-            $results = new $this->dataBlockDecoderClass($valueTypes);
-        }
+        $results = new $this->decoderClass($valueTypes);
 
         foreach ($valueTypes as $i => $item) {
             /** @var ContractFunctionValueType $item */

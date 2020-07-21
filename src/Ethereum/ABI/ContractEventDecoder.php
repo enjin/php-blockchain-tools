@@ -65,8 +65,10 @@ class ContractEventDecoder
             $results->addEventTopic($item, $indexedValue);
         }
 
-        $functionSerializer = new ContractFunctionDecoder();
-        $results = $functionSerializer->decodeWithoutMethodId($nonIndexedInputs, $data, $results);
+        $functionSerializer = new ContractFunctionDecoder($this->dataBlockDecoderClass);
+        $nonIndexedResults = $functionSerializer->decodeWithoutMethodId($nonIndexedInputs, $data);
+
+        $results->merge($nonIndexedResults);
 
         return $results;
     }

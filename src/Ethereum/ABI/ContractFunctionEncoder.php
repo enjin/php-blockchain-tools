@@ -11,11 +11,12 @@ class ContractFunctionEncoder
     /**
      * @var string
      */
-    protected $dataBlockEncoderClass;
+    protected $encoderClass;
 
-    public function __construct(string $dataBlockEncoderClass = DataBlockEncoder::class)
+    public function __construct(string $encoderClass = DataBlockEncoder::class)
     {
-        $this->dataBlockEncoderClass = $dataBlockEncoderClass;
+        Contract::validateEncoderClass($encoderClass);
+        $this->encoderClass = $encoderClass;
     }
 
     public function encodeInput(ContractFunction $function, array $data): DataBlockEncoder
@@ -31,7 +32,7 @@ class ContractFunctionEncoder
     public function encode(string $methodId, array $functionValueTypes, array $data): DataBlockEncoder
     {
         /** @var DataBlockEncoder $dataBlock */
-        $dataBlock = new $this->dataBlockEncoderClass($functionValueTypes);
+        $dataBlock = new $this->encoderClass($functionValueTypes);
         $dataBlock->setMethodId($methodId);
 
         foreach ($functionValueTypes as $i => $item) {
