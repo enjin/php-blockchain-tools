@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use Enjin\BlockchainTools\BigHex;
+use Enjin\BlockchainTools\HexNumber\HexInt\HexInt16;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use phpseclib\Math\BigInteger;
 use stdClass;
 use Tests\TestCase;

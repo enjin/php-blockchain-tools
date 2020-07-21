@@ -2,8 +2,10 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
-use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
-use Enjin\BlockchainTools\Ethereum\ABI\DataBlock;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder;
 use InvalidArgumentException;
 use kornrunner\Keccak;
 
@@ -160,33 +162,23 @@ class ContractFunction
         return $this->methodId;
     }
 
-    public function encodeInput(array $data): DataBlock
+    public function encodeInput(array $data): DataBlockEncoder
     {
-        return (new ContractFunctionSerializer())->encodeInput($this, $data);
+        return (new ContractFunctionEncoder())->encodeInput($this, $data);
     }
 
-    public function decodeInput(string $data): array
+    public function decodeInput(string $data): DataBlockDecoder
     {
-        return (new ContractFunctionSerializer())->decodeInput($this, $data);
+        return (new ContractFunctionDecoder())->decodeInput($this, $data);
     }
 
-    public function decodeInputRaw(string $data): array
+    public function encodeOutput(array $data): DataBlockEncoder
     {
-        return (new ContractFunctionSerializer())->decodeInputRaw($this, $data);
+        return (new ContractFunctionEncoder())->encodeOutput($this, $data);
     }
 
-    public function encodeOutput(array $data): DataBlock
+    public function decodeOutput(string $data): DataBlockDecoder
     {
-        return (new ContractFunctionSerializer())->encodeOutput($this, $data);
-    }
-
-    public function decodeOutput(string $data): array
-    {
-        return (new ContractFunctionSerializer())->decodeOutput($this, $data);
-    }
-
-    public function decodeOutputRaw(string $data): array
-    {
-        return (new ContractFunctionSerializer())->decodeOutputRaw($this, $data);
+        return (new ContractFunctionDecoder())->decodeOutput($this, $data);
     }
 }
