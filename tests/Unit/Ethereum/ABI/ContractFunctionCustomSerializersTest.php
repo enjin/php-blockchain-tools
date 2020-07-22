@@ -15,17 +15,27 @@ class ContractFunctionCustomSerializersTest extends TestCase
 {
     use HasContractTestHelpers;
 
-    public function testCustomContractInputSerializer()
+    public function testCustomContractInputDefaultSerializer()
     {
         $name = 'foo';
         $address = 'bar';
         $json = $this->functionJSON();
-        $contract = new Contract($name, $address, $json, BasicDecoder::class, BasicEncoder::class);
+
+        $serializers = [
+            'functions' => [
+                'f' => [
+                    'decoder' => BasicDecoder::class,
+                    'encoder' => BasicEncoder::class,
+                ],
+            ],
+        ];
+
+        $contract = new Contract($name, $address, $json, $serializers);
 
         $this->assertContractFunctionInputSerialization($contract);
     }
 
-    public function testCustomContractOutputSerializer()
+    public function testCustomContractOutputDefaultSerializer()
     {
         $name = 'foo';
         $address = 'bar';
@@ -33,7 +43,17 @@ class ContractFunctionCustomSerializersTest extends TestCase
 
         $json[0]['outputs'] = $json[0]['inputs'];
         unset($json[0]['inputs']);
-        $contract = new Contract($name, $address, $json, BasicDecoder::class, BasicEncoder::class);
+
+        $serializers = [
+            'functions' => [
+                'f' => [
+                    'decoder' => BasicDecoder::class,
+                    'encoder' => BasicEncoder::class,
+                ],
+            ],
+        ];
+
+        $contract = new Contract($name, $address, $json, $serializers);
 
         $this->assertContractFunctionOutputSerialization($contract);
     }
@@ -43,9 +63,19 @@ class ContractFunctionCustomSerializersTest extends TestCase
         $name = 'foo';
         $address = 'bar';
         $json = $this->functionJSON();
-        $contract = new Contract($name, $address, $json);
 
-        $contract->registerFunctionInputSerializers('f', BasicDecoder::class, BasicEncoder::class);
+        $serializers = [
+            'functions' => [
+                'f' => [
+                    'input' => [
+                        'decoder' => BasicDecoder::class,
+                        'encoder' => BasicEncoder::class,
+                    ],
+                ],
+            ],
+        ];
+
+        $contract = new Contract($name, $address, $json, $serializers);
 
         $this->assertContractFunctionInputSerialization($contract);
     }
@@ -58,9 +88,19 @@ class ContractFunctionCustomSerializersTest extends TestCase
 
         $json[0]['outputs'] = $json[0]['inputs'];
         unset($json[0]['inputs']);
-        $contract = new Contract($name, $address, $json);
 
-        $contract->registerFunctionOutputSerializers('f', BasicDecoder::class, BasicEncoder::class);
+        $serializers = [
+            'functions' => [
+                'f' => [
+                    'output' => [
+                        'decoder' => BasicDecoder::class,
+                        'encoder' => BasicEncoder::class,
+                    ],
+                ],
+            ],
+        ];
+
+        $contract = new Contract($name, $address, $json, $serializers);
 
         $this->assertContractFunctionOutputSerialization($contract);
     }
@@ -85,7 +125,12 @@ class ContractFunctionCustomSerializersTest extends TestCase
             ],
         ];
 
-        $contract = new Contract('foo', 'bar', $json, BasicDecoder::class, BasicEncoder::class);
+        $serializers = [
+            'decoder' => BasicDecoder::class,
+            'encoder' => BasicEncoder::class,
+        ];
+
+        $contract = new Contract('foo', 'bar', $json, $serializers);
 
         $function = $contract->function('testFunction');
 
@@ -129,7 +174,12 @@ class ContractFunctionCustomSerializersTest extends TestCase
             ],
         ];
 
-        $contract = new Contract('foo', 'bar', $json, BasicDecoder::class, BasicEncoder::class);
+        $serializers = [
+            'decoder' => BasicDecoder::class,
+            'encoder' => BasicEncoder::class,
+        ];
+
+        $contract = new Contract('foo', 'bar', $json, $serializers);
 
         $function = $contract->function('testFunction');
 

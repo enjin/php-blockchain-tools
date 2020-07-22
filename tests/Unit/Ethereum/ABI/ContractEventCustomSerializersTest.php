@@ -4,7 +4,6 @@ namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder\BasicDecoder;
-use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder\BasicEncoder;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Tests\Support\HasContractTestHelpers;
@@ -19,7 +18,14 @@ class ContractEventCustomSerializersTest extends TestCase
         $name = 'foo';
         $address = 'bar';
         $json = $this->functionJSON();
-        $contract = new Contract($name, $address, $json, BasicDecoder::class, BasicEncoder::class);
+
+        $serializers = [
+            'events' => [
+                'e' => BasicDecoder::class,
+            ],
+        ];
+
+        $contract = new Contract($name, $address, $json, $serializers);
         // $contract = new Contract($name, $address, $json);
 
         $this->assertContractEventInputSerialization($contract);
@@ -30,9 +36,14 @@ class ContractEventCustomSerializersTest extends TestCase
         $name = 'foo';
         $address = 'bar';
         $json = $this->functionJSON();
-        $contract = new Contract($name, $address, $json);
+        $serializers = [
+            'events' => [
+                'e' => BasicDecoder::class,
 
-        $contract->registerEventInputSerializers('e', BasicDecoder::class);
+            ],
+        ];
+
+        $contract = new Contract($name, $address, $json, $serializers);
 
         $this->assertContractEventInputSerialization($contract);
     }

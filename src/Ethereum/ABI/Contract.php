@@ -29,9 +29,8 @@ class Contract
     protected $eventsMeta = [];
     protected $events = [];
 
-    protected $functionInputSerializers = [];
-    protected $functionOutputSerializers = [];
-    protected $eventInputSerializers = [];
+    protected $functionSerializers = [];
+    protected $eventInputDecoders = [];
 
     /**
      * @var string
@@ -47,9 +46,10 @@ class Contract
         string $name,
         string $address,
         array $json,
-        string $defaultDecoderClass = DataBlockDecoder::class,
-        string $defaultEncoderClass = DataBlockEncoder::class
+        array $serializers = []
     ) {
+        $defaultDecoderClass = $serializers['decoder'] ?? DataBlockDecoder::class;
+        $defaultEncoderClass = $serializers['encoder'] ?? DataBlockEncoder::class;
         static::validateDecoderClass($defaultDecoderClass);
         static::validateEncoderClass($defaultEncoderClass);
 
@@ -67,6 +67,14 @@ class Contract
             } elseif ($type === 'event') {
                 $this->eventsMeta[$name] = $item;
             }
+        }
+
+        foreach ($serializers['functions'] ?? [] as $name => $config) {
+            $this->registerFunctionSerializers($name, $config);
+        }
+
+        foreach ($serializers['events'] ?? [] as $name => $decoder) {
+            $this->registerEventInputDecoder($name, $decoder);
         }
     }
 
@@ -97,8 +105,14 @@ class Contract
         if (!$isInitialized) {
             $meta = $this->functionsMeta[$name];
 
-            $input = $this->functionInputSerializers[$name] ?? $this->defaultSerializers();
-            $output = $this->functionOutputSerializers[$name] ?? $this->defaultSerializers();
+            $default = $this->functionSerializers[$name]['default'] ?? [];
+            $default = $default ?: $this->defaultSerializer();
+
+            $input = $this->functionSerializers[$name]['input'] ?? [];
+            $output = $this->functionSerializers[$name]['output'] ?? [];
+
+            $input = array_merge($default, $input);
+            $output = array_merge($default, $output);
 
             $this->functions[$name] = new ContractFunction(
                 $meta,
@@ -110,16 +124,6 @@ class Contract
         }
 
         return $this->functions[$name];
-    }
-
-    public function registerFunctionInputSerializers(string $name, string $decoderClass, string $encoderClass)
-    {
-        $this->functionInputSerializers[$name] = $this->parseFunctionSerializers($name, $decoderClass, $encoderClass);
-    }
-
-    public function registerFunctionOutputSerializers(string $name, string $decoderClass, string $encoderClass)
-    {
-        $this->functionOutputSerializers[$name] = $this->parseFunctionSerializers($name, $decoderClass, $encoderClass);
     }
 
     public function events(): array
@@ -139,25 +143,15 @@ class Contract
         if (!$isInitialized) {
             $meta = $this->eventsMeta[$name];
 
-            $input = $this->eventInputSerializers[$name] ?? $this->defaultSerializers();
+            $decoder = $this->eventInputDecoders[$name] ?? $this->defaultDecoderClass;
 
             $this->events[$name] = new ContractEvent(
                 $meta,
-                $input['decoder']
+                $decoder
             );
         }
 
         return $this->events[$name];
-    }
-
-    public function registerEventInputSerializers(string $name, string $decoderClass)
-    {
-        $this->validateEventName($name);
-        static::validateDecoderClass($decoderClass);
-
-        $this->eventInputSerializers[$name] = [
-            'decoder' => $decoderClass,
-        ];
     }
 
     public function decodeEventInput(array $topics, string $data)
@@ -233,18 +227,6 @@ class Contract
         }
     }
 
-    protected function parseFunctionSerializers(string $name, string $decoderClass, string $encoderClass): array
-    {
-        $this->validateFunctionName($name);
-        static::validateDecoderClass($decoderClass);
-        static::validateEncoderClass($encoderClass);
-
-        return [
-            'decoder' => $decoderClass,
-            'encoder' => $encoderClass,
-        ];
-    }
-
     protected function getMethodIdFromData(string $data): string
     {
         $data = HexConverter::unPrefix($data);
@@ -270,11 +252,58 @@ class Contract
         }
     }
 
-    protected function defaultSerializers(): array
+    protected function defaultSerializer(): array
     {
         return [
             'encoder' => $this->defaultEncoderClass,
             'decoder' => $this->defaultDecoderClass,
         ];
+    }
+
+    protected function registerFunctionSerializers(string $name, array $config)
+    {
+        $this->validateFunctionName($name);
+
+        $default = $this->parseSerializers($config);
+
+        $input = $config['input'] ?? [];
+        $output = $config['output'] ?? [];
+
+        $input = $this->parseSerializers($input);
+        $output = $this->parseSerializers($output);
+
+        $this->functionSerializers[$name] = [
+            'default' => $default,
+            'input' => $input,
+            'output' => $output,
+        ];
+    }
+
+    protected function registerEventInputDecoder(string $name, string $decoder)
+    {
+        $this->validateEventName($name);
+        static::validateDecoderClass($decoder);
+
+        $this->eventInputDecoders[$name] = $decoder;
+    }
+
+    protected function parseSerializers(array $serializer): array
+    {
+        $decoderClass = $serializer['decoder'] ?? false;
+        $encoderClass = $serializer['encoder'] ?? false;
+
+        $output = [];
+
+        if ($decoderClass) {
+            static::validateDecoderClass($decoderClass);
+            $output['decoder'] = $decoderClass;
+        }
+
+        if ($encoderClass) {
+            static::validateEncoderClass($encoderClass);
+            $output['encoder'] = $encoderClass;
+        }
+
+        return $output;
     }
 }

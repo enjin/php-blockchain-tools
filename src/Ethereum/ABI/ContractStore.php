@@ -19,14 +19,26 @@ class ContractStore
         }
     }
 
-    public function registerContract(string $name, string $address, string $jsonFile)
+    public function registerContract(string $name, string $address, string $jsonFile, array $config = [])
     {
-        $contractMeta = [
+        $default = [
+            'decode' => DataBlockDecoder::class,
+            'encode' => DataBlockEncoder::class,
+        ];
+
+        $serializers = [
+            'default' => array_merge($default, $config['default'] ?? []),
+
+            'functions' => $config['functions'] ?? [],
+            'events' => $config['events'] ?? [],
+        ];
+
+        $this->contractMeta[$name] = [
             'name' => $name,
             'address' => $this->normalizeAddress($address),
             'jsonFile' => $jsonFile,
+            'serializers' => $serializers,
         ];
-        $this->contractMeta[$name] = $contractMeta;
     }
 
     public function contract(string $name): Contract
@@ -67,6 +79,7 @@ class ContractStore
 
         $jsonFile = $meta['jsonFile'];
         $address = $meta['address'];
+        $serializers = $meta['serializers'];
 
         if (!file_exists($jsonFile)) {
             throw new ContractFileException('Contract file not found: ' . $jsonFile);
@@ -79,7 +92,7 @@ class ContractStore
             throw new ContractFileException('Contract file does not contain valid JSON: ' . $jsonFile);
         }
 
-        return new Contract($name, $address, $json);
+        return new Contract($name, $address, $json, $serializers);
     }
 
     protected function normalizeAddress(string $address): string

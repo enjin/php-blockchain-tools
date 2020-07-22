@@ -3,7 +3,6 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
-use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
@@ -303,7 +302,9 @@ class ContractTest extends TestCase
                 'foo',
                 'bar',
                 [],
-                'invalid-decoder'
+                [
+                    'decoder' => 'invalid-decoder',
+                ]
             );
         });
 
@@ -313,8 +314,9 @@ class ContractTest extends TestCase
                 'foo',
                 'bar',
                 [],
-                DataBlockDecoder::class,
-                'invalid-encoder'
+                [
+                    'encoder' => 'invalid-encoder',
+                ]
             );
         });
     }
