@@ -3,11 +3,13 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
-use Enjin\BlockchainTools\Ethereum\ABI\ContractEventSerializer;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractEventDecoder;
 use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Tests\TestCase;
 
-class ContractEventSerializerTest extends TestCase
+class ContractEventSerializationTest extends TestCase
 {
     public function testEventCase1()
     {
@@ -41,9 +43,9 @@ class ContractEventSerializerTest extends TestCase
         $topic = $contract->event('e')->signatureTopic();
 
         $expected = [
-            'myString' => 'Hello%!',
-            'myNumber' => '62224',
-            'mySmallNumber' => 16,
+            'myString' => HexConverter::stringToHex('Hello%!'),
+            'myNumber' => HexUInt256::fromUInt(62224)->toHex(),
+            'mySmallNumber' => HexUInt8::fromUInt(16)->toHexUInt256(),
         ];
 
         $topics = [
@@ -61,9 +63,9 @@ class ContractEventSerializerTest extends TestCase
         $event = $contract->findEventBySignatureTopic($topic);
 
         $data = '0x' . implode('', $serialized);
-        $result = (new ContractEventSerializer())->decode($event->inputs(), $topics, $data);
+        $result = (new ContractEventDecoder())->decode($event->inputs(), $topics, $data);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result->toArray());
     }
 
     public function testIndexedEventInput()
@@ -111,11 +113,17 @@ class ContractEventSerializerTest extends TestCase
         $event = $contract->event('testEvent');
 
         $expected = [
-            'name' => 'my name',
+            'name' => HexConverter::stringToHex('my name'),
             'indexedName' => 'cannot decode topics with type: string',
-            'id' => 88,
-            'indexedId' => '32',
-            'data' => HexConverter::hexToBytes('abcdef1234'),
+            'id' => HexUInt256::fromUInt(88)->toHex(),
+            'indexedId' => HexUInt256::fromUInt(32)->toHex(),
+            'data' => HexConverter::bytesToHex([
+                171,
+                205,
+                239,
+                18,
+                52,
+            ]),
             'indexedData' => 'cannot decode topics with type: bytes',
         ];
 
@@ -142,12 +150,12 @@ class ContractEventSerializerTest extends TestCase
         ];
 
         $serialized = '0x' . implode('', $serialized);
-        $eventSerializer = new ContractEventSerializer();
+        $eventSerializer = new ContractEventDecoder();
         $result = $eventSerializer->decode($event->inputs(), $topics, $serialized);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result->toArray());
 
-        $expectedRaw = [
+        $expected = [
             'name' => rtrim($nameHex, '0'),
             'indexedName' => 'cannot decode topics with type: string',
             'id' => $idHex,
@@ -156,8 +164,8 @@ class ContractEventSerializerTest extends TestCase
             'indexedData' => 'cannot decode topics with type: bytes',
         ];
 
-        $resultRaw = $eventSerializer->decodeRaw($event->inputs(), $topics, $serialized);
+        $decoded = $eventSerializer->decode($event->inputs(), $topics, $serialized);
 
-        $this->assertEquals($expectedRaw, $resultRaw);
+        $this->assertEquals($expected, $decoded->toArray());
     }
 }

@@ -40,7 +40,7 @@ class ContractFunctionTest extends TestCase
             ],
             'name' => $name,
             'type' => 'function',
-            'stateMutability' => 'view'
+            'stateMutability' => 'view',
         ];
 
         $function = new Contract\ContractFunction($json);
@@ -73,7 +73,6 @@ class ContractFunctionTest extends TestCase
         });
 
         $this->assertCount(2, $function->outputs());
-
 
         $output1 = $function->output('outputString');
         $output2 = $function->output('outputNumber');

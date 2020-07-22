@@ -6,6 +6,9 @@ use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractStore;
 use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\ContractFileException;
+use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Tests\TestCase;
 
 /**
@@ -108,9 +111,9 @@ class ContractStoreTest extends TestCase
         $topic = $contract->event('testEvent1')->signatureTopic();
 
         $expected = [
-            'myString' => 'Hello%!',
-            'myNumber' => '62224',
-            'mySmallNumber' => 16,
+            'myString' => HexConverter::stringToHex('Hello%!'),
+            'myNumber' => HexUInt256::fromUInt(62224)->toHex(),
+            'mySmallNumber' => HexUInt8::fromUInt(16)->toHexUInt256(),
         ];
 
         $topics = [
@@ -128,6 +131,6 @@ class ContractStoreTest extends TestCase
         $data = '0x' . implode('', $serialized);
 
         $result = $store->decodeEvent('test-address', $topics, $data);
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result->toArray());
     }
 }

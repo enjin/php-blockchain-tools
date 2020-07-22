@@ -29,11 +29,35 @@ class Contract
     protected $eventsMeta = [];
     protected $events = [];
 
-    public function __construct(string $name, string $address, array $json)
-    {
+    protected $functionInputSerializers = [];
+    protected $functionOutputSerializers = [];
+    protected $eventInputSerializers = [];
+
+    /**
+     * @var string
+     */
+    protected $defaultEncoderClass;
+
+    /**
+     * @var string
+     */
+    protected $defaultDecoderClass;
+
+    public function __construct(
+        string $name,
+        string $address,
+        array $json,
+        string $defaultDecoderClass = DataBlockDecoder::class,
+        string $defaultEncoderClass = DataBlockEncoder::class
+    ) {
+        static::validateDecoderClass($defaultDecoderClass);
+        static::validateEncoderClass($defaultEncoderClass);
+
         $this->name = $name;
         $this->address = $address;
         $this->json = $json;
+        $this->defaultDecoderClass = $defaultDecoderClass;
+        $this->defaultEncoderClass = $defaultEncoderClass;
 
         foreach ($json as $item) {
             $name = $item['name'];
@@ -67,18 +91,35 @@ class Contract
 
     public function function(string $name): ContractFunction
     {
-        $isValid = array_key_exists($name, $this->functionsMeta);
-        if (!$isValid) {
-            throw new InvalidArgumentException('method name not found: ' . $name . ' for Contract: ' . $this->name());
-        }
+        $this->validateFunctionName($name);
 
         $isInitialized = array_key_exists($name, $this->functions);
         if (!$isInitialized) {
             $meta = $this->functionsMeta[$name];
-            $this->functions[$name] = new ContractFunction($meta);
+
+            $input = $this->functionInputSerializers[$name] ?? $this->defaultSerializers();
+            $output = $this->functionOutputSerializers[$name] ?? $this->defaultSerializers();
+
+            $this->functions[$name] = new ContractFunction(
+                $meta,
+                $input['decoder'],
+                $input['encoder'],
+                $output['decoder'],
+                $output['encoder']
+            );
         }
 
         return $this->functions[$name];
+    }
+
+    public function registerFunctionInputSerializers(string $name, string $decoderClass, string $encoderClass)
+    {
+        $this->functionInputSerializers[$name] = $this->parseFunctionSerializers($name, $decoderClass, $encoderClass);
+    }
+
+    public function registerFunctionOutputSerializers(string $name, string $decoderClass, string $encoderClass)
+    {
+        $this->functionOutputSerializers[$name] = $this->parseFunctionSerializers($name, $decoderClass, $encoderClass);
     }
 
     public function events(): array
@@ -92,18 +133,31 @@ class Contract
 
     public function event(string $name): ContractEvent
     {
-        $isValid = array_key_exists($name, $this->eventsMeta);
-        if (!$isValid) {
-            throw new InvalidArgumentException('event name not found: ' . $name . ' for Contract: ' . $this->name());
-        }
+        $this->validateEventName($name);
 
         $isInitialized = array_key_exists($name, $this->events);
         if (!$isInitialized) {
             $meta = $this->eventsMeta[$name];
-            $this->events[$name] = new ContractEvent($meta);
+
+            $input = $this->eventInputSerializers[$name] ?? $this->defaultSerializers();
+
+            $this->events[$name] = new ContractEvent(
+                $meta,
+                $input['decoder']
+            );
         }
 
         return $this->events[$name];
+    }
+
+    public function registerEventInputSerializers(string $name, string $decoderClass)
+    {
+        $this->validateEventName($name);
+        static::validateDecoderClass($decoderClass);
+
+        $this->eventInputSerializers[$name] = [
+            'decoder' => $decoderClass,
+        ];
     }
 
     public function decodeEventInput(array $topics, string $data)
@@ -165,10 +219,62 @@ class Contract
         return $function->decodeOutput($data);
     }
 
+    public static function validateDecoderClass(string $decoder)
+    {
+        if (!is_a($decoder, DataBlockDecoder::class, true)) {
+            throw new InvalidArgumentException('Decoder class must be an instance of: ' . DataBlockDecoder::class . ', ' . $decoder . ' provided');
+        }
+    }
+
+    public static function validateEncoderClass(string $encoder)
+    {
+        if (!is_a($encoder, DataBlockEncoder::class, true)) {
+            throw new InvalidArgumentException('Encoder class must be an instance of: ' . DataBlockEncoder::class . ', ' . $encoder . ' provided');
+        }
+    }
+
+    protected function parseFunctionSerializers(string $name, string $decoderClass, string $encoderClass): array
+    {
+        $this->validateFunctionName($name);
+        static::validateDecoderClass($decoderClass);
+        static::validateEncoderClass($encoderClass);
+
+        return [
+            'decoder' => $decoderClass,
+            'encoder' => $encoderClass,
+        ];
+    }
+
     protected function getMethodIdFromData(string $data): string
     {
         $data = HexConverter::unPrefix($data);
 
         return substr($data, 0, 8);
+    }
+
+    protected function validateEventName(string $name)
+    {
+        $isValid = array_key_exists($name, $this->eventsMeta);
+        if (!$isValid) {
+            throw new InvalidArgumentException('event name not found: ' . $name . ' for Contract: ' . $this->name());
+        }
+    }
+
+    protected function validateFunctionName(string $name): void
+    {
+        $isValid = array_key_exists($name, $this->functionsMeta);
+        if (!$isValid) {
+            $message = 'method name not found: ' . $name . ' for Contract: ' . $this->name();
+
+            throw new InvalidArgumentException($message);
+        }
+    }
+
+    protected function defaultSerializers(): array
+    {
+        return [
+            'encoder' => $this->defaultEncoderClass,
+            'decoder' => $this->defaultDecoderClass,
+        ];
     }
 }

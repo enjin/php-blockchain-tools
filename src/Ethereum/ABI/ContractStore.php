@@ -49,7 +49,7 @@ class ContractStore
         return $this->contract($name);
     }
 
-    public function decodeEvent(string $address, array $topics, string $data): array
+    public function decodeEvent(string $address, array $topics, string $data): DataBlockDecoder
     {
         $contract = $this->contractByAddress($address);
 

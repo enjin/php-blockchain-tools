@@ -6,7 +6,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 
-class DataBlock
+class DataBlockEncoder
 {
     /**
      * @var int
@@ -57,56 +57,30 @@ class DataBlock
 
     public function add(ContractFunctionValueType $valueType, $value)
     {
-        $valueEncoded = $valueType->dataType()->encodeBaseType($value);
-
         $this->addRaw(
             $valueType->name(),
             $valueType->type(),
-            $valueEncoded,
+            $value,
             $value
         );
     }
 
-    public function addRaw(string $inputName, string $type, string $valueEncoded, $valueDecoded)
-    {
-        $this->data[$inputName] = [
-            'name' => $inputName,
-            'type' => $type,
-            'value' => $valueEncoded,
-            'value_decoded' => $valueDecoded,
-        ];
-    }
-
     public function addFixedLengthArray(ContractFunctionValueType $valueType, array $values)
     {
-        $valueEncoded = $valueType->dataType()->encodeArrayValues($values);
-
         $this->addFixedLengthArrayRaw(
             $valueType->name(),
             $valueType->type(),
-            $valueEncoded,
+            $values,
             $values
         );
     }
 
-    public function addFixedLengthArrayRaw(string $inputName, string $type, array $valuesEncoded, array $valuesDecoded)
-    {
-        $this->fixedLengthData[$inputName] = [
-            'name' => $inputName,
-            'type' => $type,
-            'values' => $valuesEncoded,
-            'values_decoded' => $valuesDecoded,
-        ];
-    }
-
     public function addDynamicLengthArray(ContractFunctionValueType $valueType, array $values)
     {
-        $valueEncoded = $valueType->dataType()->encodeArrayValues($values);
-
         $this->addDynamicLengthArrayRaw(
             $valueType->name(),
             $valueType->type(),
-            $valueEncoded,
+            $values,
             $values
         );
     }
@@ -114,8 +88,8 @@ class DataBlock
     public function addDynamicLengthArrayRaw(
         string $inputName,
         string $type,
-        array $valuesEncoded,
-        array $valuesDecoded
+        array $values,
+        array $valuesEncoded
     ) {
         $length = count($valuesEncoded);
 
@@ -125,81 +99,56 @@ class DataBlock
             'type' => $type,
             'position' => $this->dynamicPositionFor($length),
             'length' => $length,
-            'values' => $valuesEncoded,
-            'values_decoded' => $valuesDecoded,
+            'values_provided' => $values,
+            'values_encoded' => $valuesEncoded,
         ];
     }
 
-    public function addDynamicLengthBytes(ContractFunctionValueType $valueType, array $value)
+    public function addDynamicLengthBytes(ContractFunctionValueType $valueType, $value)
     {
-        $valueEncoded = $valueType->dataType()->encodeBaseType($value);
+        $bytes = HexConverter::hexToBytes($value);
+        $length = count($bytes);
 
-        $length = count($value);
+        $valueEncoded = str_split($value, 64);
+
+        $last = array_pop($valueEncoded);
+        $valueEncoded[] = HexUInt256::padRight($last);
 
         $this->addDynamicLengthBytesRaw(
             $valueType->name(),
             $valueType->type(),
-            $valueEncoded,
             $value,
+            $valueEncoded,
             $length
         );
     }
 
-    public function addDynamicLengthBytesRaw(
-        string $inputName,
-        string $type,
-        ?string $valueEncoded,
-        $valueDecoded,
-        int $length
-    ) {
-        $positionLength = ceil($length / 64);
-
-        $values = str_split($valueEncoded, 64);
-
-        $last = array_pop($values);
-        $values[] = HexUInt256::padRight($last);
-
-        $this->dynamicLengthData[$inputName] = [
-            'name' => $inputName,
-            'type' => $type,
-            'is_array' => false,
-            'position' => $this->dynamicPositionFor($positionLength),
-            'length' => $length,
-            'values' => $values,
-            'values_decoded' => $valueDecoded,
-        ];
+    public function addFixedLengthBytes(ContractFunctionValueType $valueType, $value)
+    {
+        $valueEncoded = $value;
+        $this->addFixedLengthBytesRaw(
+            $valueType->name(),
+            $valueType->type(),
+            $value,
+            $valueEncoded
+        );
     }
 
-    public function addString(ContractFunctionValueType $valueType, string $value)
+    public function addString(ContractFunctionValueType $valueType, $value)
     {
-        $length = strlen($value);
-        $valueEncoded = $valueType->dataType()->encodeBaseType($value);
+        $str = HexConverter::hexToString($value);
+        $length = strlen($str);
+
+        $valueEncoded = str_split($value, 64);
+        $last = array_pop($valueEncoded);
+        $valueEncoded[] = HexUInt256::padRight($last);
 
         $this->addStringRaw(
             $valueType->name(),
-            $valueEncoded,
             $value,
+            $valueEncoded,
             $length
         );
-    }
-
-    public function addStringRaw(string $inputName, string $value, string $valueDecoded, string $length)
-    {
-        $positionLength = ceil($length / 32);
-
-        $values = str_split($value, 64);
-
-        $last = array_pop($values);
-        $values[] = HexUInt256::padRight($last);
-
-        $this->dynamicLengthData[$inputName] = [
-            'name' => $inputName,
-            'type' => 'string',
-            'position' => $this->dynamicPositionFor($positionLength),
-            'length' => $length,
-            'values' => $values,
-            'values_decoded' => $valueDecoded,
-        ];
     }
 
     public function toString(): string
@@ -210,7 +159,7 @@ class DataBlock
     public function toArray(): array
     {
         return array_map(function ($item) {
-            return $item['value'];
+            return $item['value_encoded'];
         }, $this->toArrayWithMeta());
     }
 
@@ -221,10 +170,11 @@ class DataBlock
         foreach ($this->keys as $key) {
             if ($this->data[$key] ?? false) {
                 $output[] = $this->data[$key];
+
                 continue;
-            } else if ($this->fixedLengthData[$key] ?? false) {
+            } elseif ($this->fixedLengthData[$key] ?? false) {
                 $output = $this->addFixedLengthDataToOutput($output, $this->fixedLengthData[$key]);
-            } else if ($this->dynamicLengthData[$key] ?? false) {
+            } elseif ($this->dynamicLengthData[$key] ?? false) {
                 $output = $this->addDynamicLengthDataToOutput($output, $this->dynamicLengthData[$key]);
             }
         }
@@ -233,8 +183,8 @@ class DataBlock
             if ($this->dynamicLengthData[$key] ?? false) {
                 $item = $this->dynamicLengthData[$key];
                 $name = $item['name'];
-                $values = $item['values'];
-                $valuesDecoded = $item['values_decoded'];
+                $values = $item['values_provided'];
+                $valuesEncoded = $item['values_encoded'];
                 $length = $item['length'];
                 $type = $item['type'];
 
@@ -242,33 +192,32 @@ class DataBlock
                     $output[] = [
                         'name' => "{$name} length: {$length}",
                         'type' => $type,
-                        'value_decoded' => $length,
+                        'value' => $length,
+                        'value_encoded' => HexConverter::uintToHex($length, 64),
                         'length_hex_string' => $length * 2,
                         'length_chunk_size' => ($length * 2) / 64,
-                        'value' => HexConverter::uintToHex($length, 64),
                     ];
 
-                    foreach ($values as $i => $value) {
-
+                    foreach ($valuesEncoded as $i => $encoded) {
                         $output[] = [
                             'name' => $name . ' value chunk[' . $i . ']',
                             'type' => $type,
-                            'value' => $value,
+                            'value_encoded' => $encoded,
                         ];
                     }
                 } else {
                     $output[] = [
                         'name' => "{$name} length: {$length}",
                         'type' => $type,
-                        'value' => HexConverter::uintToHex($length, 64),
+                        'value_encoded' => HexConverter::uintToHex($length, 64),
                     ];
 
-                    foreach ($values as $i => $value) {
+                    foreach ($valuesEncoded as $i => $encoded) {
                         $output[] = [
                             'name' => $name . '[' . $i . '] value',
                             'type' => $type,
-                            'value_decoded' => $valuesDecoded[$i],
-                            'value' => $value,
+                            'value_provided' => $values[$i],
+                            'value_encoded' => $encoded,
                         ];
                     }
                 }
@@ -285,20 +234,88 @@ class DataBlock
         return $output;
     }
 
+    protected function addRaw(string $inputName, string $type, $value, string $valueEncoded)
+    {
+        $this->data[$inputName] = [
+            'name' => $inputName,
+            'type' => $type,
+            'value_provided' => $value,
+            'value_encoded' => $valueEncoded,
+        ];
+    }
+
+    protected function addFixedLengthArrayRaw(
+        string $inputName,
+        string $type,
+        array $values,
+        array $valuesEncoded
+    ) {
+        $this->fixedLengthData[$inputName] = [
+            'name' => $inputName,
+            'type' => $type,
+            'values_provided' => $values,
+            'values_encoded' => $valuesEncoded,
+        ];
+    }
+
+    protected function addDynamicLengthBytesRaw(
+        string $inputName,
+        string $type,
+        $value,
+        array $valueEncoded,
+        int $length
+    ) {
+        $positionLength = ceil($length / 64);
+
+        $this->dynamicLengthData[$inputName] = [
+            'name' => $inputName,
+            'type' => $type,
+            'is_array' => false,
+            'position' => $this->dynamicPositionFor($positionLength),
+            'length' => $length,
+            'values_provided' => $value,
+            'values_encoded' => $valueEncoded,
+        ];
+    }
+
+    protected function addFixedLengthBytesRaw(string $inputName, string $type, $value, string $valueEncoded)
+    {
+        $this->data[$inputName] = [
+            'name' => $inputName,
+            'type' => $type,
+            'value_provided' => $value,
+            'value_encoded' => $valueEncoded,
+        ];
+    }
+
+    protected function addStringRaw(string $inputName, $value, array $valueEncoded, string $length)
+    {
+        $positionLength = ceil($length / 32);
+
+        $this->dynamicLengthData[$inputName] = [
+            'name' => $inputName,
+            'type' => 'string',
+            'position' => $this->dynamicPositionFor($positionLength),
+            'length' => $length,
+            'values_provided' => $value,
+            'values_encoded' => $valueEncoded,
+        ];
+    }
+
     private function addFixedLengthDataToOutput(array $output, array $item): array
     {
         $name = $item['name'];
-        $values = $item['values'];
-        $valuesDecoded = $item['values_decoded'];
+        $values = $item['values_provided'];
+        $valuesEncoded = $item['values_encoded'];
         $type = $item['type'];
 
         foreach ($values as $i => $value) {
-            $decoded = $valuesDecoded[$i];
+            $encoded = $valuesEncoded[$i];
             $output[] = [
                 'name' => $name . '[' . $i . '] value',
                 'type' => $type,
-                'value_decoded' => $decoded,
-                'value' => $value,
+                'value_provided' => $value,
+                'value_encoded' => $encoded,
             ];
         }
 
@@ -309,15 +326,15 @@ class DataBlock
     {
         $name = $item['name'];
         $position = $item['position'];
-        $dataValuesDecoded = $item['values_decoded'];
+        $dataValuesEncoded = $item['values_encoded'];
 
         $output[] = [
             'name' => $name . ' data position',
-            'value_decoded' => $position,
+            'value' => $position,
+            'value_encoded' => HexConverter::uintToHex($position, 64),
             'position_string_index' => $position * 2,
             'position_chunk_index' => ($position * 2) / 64,
-            'data_value_decoded' => $dataValuesDecoded,
-            'value' => HexConverter::uintToHex($position, 64),
+            'data_value_encoded' => $dataValuesEncoded,
         ];
 
         return $output;

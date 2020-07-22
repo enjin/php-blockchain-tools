@@ -3,6 +3,11 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
+use Enjin\BlockchainTools\HexConverter;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Tests\Support\HasContractTestHelpers;
 use Tests\TestCase;
 
@@ -36,12 +41,11 @@ class ContractTest extends TestCase
         });
     }
 
-
     public function testFindEventBySignatureTopicNotFound()
     {
         $contract = new Contract('foo', 'bar', []);
 
-        $this->assertEquals(null, $contract->findEventBySignatureTopic('invalid'));
+        $this->assertNull($contract->findEventBySignatureTopic('invalid'));
     }
 
     public function testInvalidEvent()
@@ -149,8 +153,8 @@ class ContractTest extends TestCase
         $function = $contract->function('setMeltFee');
 
         $expected = [
-            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
-            '_fee' => '500',
+            '_id' => HexUInt256::fromUInt('36185027886661344501709775484676719393561338212044008423475592217920668696576')->toHex(),
+            '_fee' => HexUInt16::fromUInt('500')->toHexUInt256(),
         ];
 
         $serialized = [
@@ -161,10 +165,10 @@ class ContractTest extends TestCase
         $data = $function->methodId() . implode('', $serialized);
         $decoded = $contract->decodeFunctionInput($data);
 
-        $this->assertEquals($expected, $decoded);
+        $this->assertEquals($expected, $decoded->toArray());
 
         $decoded = $contract->decodeFunctionOutput($data);
-        $this->assertEquals($expected, $decoded);
+        $this->assertEquals($expected, $decoded->toArray());
     }
 
     public function testDecodeFunctionInputNotFound()
@@ -235,9 +239,9 @@ class ContractTest extends TestCase
         $topic = $event->signatureTopic();
 
         $expected = [
-            'myString' => 'Hello%!',
-            'myNumber' => '62224',
-            'mySmallNumber' => 16,
+            'myString' => HexConverter::stringToHex('Hello%!'),
+            'myNumber' => HexUInt256::fromUInt(62224)->toHex(),
+            'mySmallNumber' => HexUInt8::fromUInt(16)->toHexUInt256(),
         ];
 
         $topics = [
@@ -255,7 +259,7 @@ class ContractTest extends TestCase
         $data = implode('', $serialized);
         $decoded = $contract->decodeEventInput($topics, $data);
 
-        $this->assertEquals($expected, $decoded);
+        $this->assertEquals($expected, $decoded->toArray());
     }
 
     public function testDecodeEventInputNotFound()
@@ -288,6 +292,30 @@ class ContractTest extends TestCase
         $message = 'event with matching topic not found: invalid';
         $this->assertInvalidArgumentException($message, function () use ($contract) {
             $contract->decodeEventInput(['invalid'], '');
+        });
+    }
+
+    public function testValidSerializers()
+    {
+        $message = 'Decoder class must be an instance of: Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder, invalid-decoder provided';
+        $this->assertInvalidArgumentException($message, function () {
+            $contract = new Contract(
+                'foo',
+                'bar',
+                [],
+                'invalid-decoder'
+            );
+        });
+
+        $message = 'Encoder class must be an instance of: Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder, invalid-encoder provided';
+        $this->assertInvalidArgumentException($message, function () {
+            $contract = new Contract(
+                'foo',
+                'bar',
+                [],
+                DataBlockDecoder::class,
+                'invalid-encoder'
+            );
         });
     }
 }

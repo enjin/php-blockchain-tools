@@ -3,14 +3,20 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
-use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
+use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use RuntimeException;
+use Tests\Support\HasContractTestHelpers;
 use Tests\TestCase;
 
-class ContractFunctionSerializerTest extends TestCase
+class ContractFunctionSerializationTest extends TestCase
 {
+    use HasContractTestHelpers;
+
     public function testCase1()
     {
         $name = 'foo';
@@ -63,16 +69,18 @@ class ContractFunctionSerializerTest extends TestCase
         $this->assertFalse($function->constant());
 
         $expected = [
-            '_from' => '41f502f01195652d3dc55a06f71d8d802ada241b',
-            '_to' => '7d68cb169512d47ad39928b63bd97a40db65796d',
+            '_from' => HexUInt256::padLeft('41f502f01195652d3dc55a06f71d8d802ada241b'),
+            '_to' => HexUInt256::padLeft('7d68cb169512d47ad39928b63bd97a40db65796d'),
             '_ids' => [
-                HexUInt256::INT_MIN,
-                HexUInt256::INT_MAX,
-                // 1,
+                HexUInt256::HEX_MIN,
+                HexUInt256::HEX_MAX,
             ],
-            '_values' => [7, 8, 9],
-            '_data' => HexConverter::hexToBytes('251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df0bec6a5ce924dca23dfa'),
-
+            '_values' => [
+                HexUInt256::fromUInt(7)->toHex(),
+                HexUInt256::fromUInt(8)->toHex(),
+                HexUInt256::fromUInt(9)->toHex(),
+            ],
+            '_data' => '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df0bec6a5ce924dca23dfa',
         ];
 
         $serialized = [
@@ -162,52 +170,36 @@ class ContractFunctionSerializerTest extends TestCase
 
         $expected = [
             'tradeValues' => [
-                '2555112959999467300',
-                '53231519999999988452880',
-                '10000',
-                '1579686422033',
-                '1204943999999749000',
-                '565423',
-                '0',
-                '4655818029718533',
+                HexUInt256::fromUInt('2555112959999467300')->toHex(),
+                HexUInt256::fromUInt('53231519999999988452880')->toHex(),
+                HexUInt256::fromUInt('10000')->toHex(),
+                HexUInt256::fromUInt('1579686422033')->toHex(),
+                HexUInt256::fromUInt('1204943999999749000')->toHex(),
+                HexUInt256::fromUInt('565423')->toHex(),
+                HexUInt256::fromUInt('0')->toHex(),
+                HexUInt256::fromUInt('4655818029718533')->toHex(),
             ],
             'tradeAddresses' => [
-                '0000000000000000000000000000000000000000',
-                '037a54aab062628c9bbae1fdb1583c195585fe41',
-                'f3cb44e421e1774affb4abbbe691962cea19fa11',
-                '5ab9d116a53ef41063e3eae26a7ebe736720e9ba',
+                HexUInt256::padLeft('0000000000000000000000000000000000000000'),
+                HexUInt256::padLeft('037a54aab062628c9bbae1fdb1583c195585fe41'),
+                HexUInt256::padLeft('f3cb44e421e1774affb4abbbe691962cea19fa11'),
+                HexUInt256::padLeft('5ab9d116a53ef41063e3eae26a7ebe736720e9ba'),
             ],
             'v' => [
-                28,
-                27,
-            ],
-            'rs' => [
-                HexConverter::hexToBytes($serializedBytes[0]),
-                HexConverter::hexToBytes($serializedBytes[1]),
-                HexConverter::hexToBytes($serializedBytes[2]),
-                HexConverter::hexToBytes($serializedBytes[3]),
-            ],
-        ];
-
-        $serializedString = $function->methodId() . implode('', $serialized);
-        $decodedRaw = $function->decodeInputRaw($serializedString);
-
-        $expectedRaw = [
-            'tradeValues' => array_map(function ($value) {
-                return HexConverter::intToHex($value, 64);
-            }, $expected['tradeValues']),
-            'tradeAddresses' => array_map(function ($value) {
-                return HexConverter::padLeft($value, 64);
-            }, $expected['tradeAddresses']),
-            'v' => [
-                HexConverter::intToHex($expected['v'][0], 64),
-                HexConverter::intToHex($expected['v'][1], 64),
+                HexUInt256::fromUInt(28)->toHex(),
+                HexUInt256::fromUInt(27)->toHex(),
             ],
             'rs' => $serializedBytes,
         ];
 
-        $this->assertEquals($expectedRaw, $decodedRaw, 'correctly decodes raw');
-        $this->assertSerializerInput($function, $expected, $serialized);
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $function->decodeInput($serializedString);
+
+        $this->assertEquals($expected, $decoded->toArray(), 'correctly decodes');
+
+        $encoded = $function->encodeInput($expected);
+
+        $this->assertEquals($serialized, $encoded->toArray(), 'correctly encodes');
     }
 
     public function testCase3()
@@ -243,9 +235,9 @@ class ContractFunctionSerializerTest extends TestCase
         $function = $contract->function('testFunction');
 
         $expected = [
-            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
-            '_fee' => '500',
-            '_flagged' => true,
+            '_id' => HexUInt256::fromUInt('36185027886661344501709775484676719393561338212044008423475592217920668696576')->toHex(),
+            '_fee' => HexUInt16::fromUInt('500')->toHexUInt256(),
+            '_flagged' => HexUInt256::fromUInt('1')->toHex(),
         ];
 
         $serialized = [
@@ -290,12 +282,16 @@ class ContractFunctionSerializerTest extends TestCase
         $function = $contract->function('mintFungibles');
 
         $data = [
-            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
-            '_values' => [1, 2, 3],
+            '_id' => HexUInt256::fromUInt('36185027886661344501709775484676719393561338212044008423475592217920668696576')->toHex(),
+            '_values' => [
+                HexUInt256::fromUInt(1)->toHex(),
+                HexUInt256::fromUInt(2)->toHex(),
+                HexUInt256::fromUInt(3)->toHex(),
+            ],
             '_to' => [
-                '0xC814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
-                '0xC814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
-                '0xC814023915338E0FFA4a8f0Ba45C90Bf1d009a03',
+                HexUInt256::padLeft('C814023915338E0FFA4a8f0Ba45C90Bf1d009a03'),
+                HexUInt256::padLeft('C814023915338E0FFA4a8f0Ba45C90Bf1d009a03'),
+                HexUInt256::padLeft('C814023915338E0FFA4a8f0Ba45C90Bf1d009a03'),
             ],
         ];
 
@@ -318,14 +314,12 @@ class ContractFunctionSerializerTest extends TestCase
             return HexConverter::unPrefix($item);
         }, $expectedDecoded['_to']);
 
-        $serializer = new ContractFunctionSerializer();
-
-        $dataBlock = $serializer->encodeInput($function, $data);
+        $dataBlock = (new ContractFunctionEncoder())->encodeInput($function, $data);
         $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded input data');
 
         $serializedString = $function->methodId() . implode('', $serialized);
-        $decoded = $serializer->decodeInput($function, $serializedString);
-        $this->assertEquals($expectedDecoded, $decoded, 'correctly decoded input data');
+        $decoded = (new ContractFunctionDecoder())->decodeInput($function, $serializedString);
+        $this->assertEquals($expectedDecoded, $decoded->toArray(), 'correctly decoded input data');
     }
 
     public function testCase5()
@@ -357,8 +351,13 @@ class ContractFunctionSerializerTest extends TestCase
         $function = $contract->function('mintFungibles');
 
         $data = [
-            'name' => 'Test Name Test Name this is a test and such so that it is long enough to cause a problem',
-            'numbers' => [1, 2, 3, 4],
+            'name' => HexConverter::stringToHex('Test Name Test Name this is a test and such so that it is long enough to cause a problem'),
+            'numbers' => [
+                HexUInt256::fromUInt(1)->toHex(),
+                HexUInt256::fromUInt(2)->toHex(),
+                HexUInt256::fromUInt(3)->toHex(),
+                HexUInt256::fromUInt(4)->toHex(),
+            ],
         ];
 
         $serialized = [
@@ -375,17 +374,16 @@ class ContractFunctionSerializerTest extends TestCase
             '0000000000000000000000000000000000000000000000000000000000000004',
         ];
 
-        $serializer = new ContractFunctionSerializer();
-
-        $dataBlock = $serializer->encodeInput($function, $data);
+        $dataBlock = (new ContractFunctionEncoder())->encodeInput($function, $data);
         $this->assertEncodedEquals($serialized, $dataBlock->toArray(), 'correctly encoded input data');
 
         // uncomment for debug data
         // dump($dataBlock->toArrayWithMeta());
 
         $serializedString = $function->methodId() . implode('', $serialized);
-        $decoded = $serializer->decodeInput($function, $serializedString);
-        $this->assertEquals($data, $decoded, 'correctly decoded input data');
+        $decoded = (new ContractFunctionDecoder())->decodeInput($function, $serializedString);
+
+        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded input data');
 
         $this->assertEquals($function->methodId(), $dataBlock->methodId());
         $this->assertEquals($serializedString, $dataBlock->toString());
@@ -405,58 +403,9 @@ class ContractFunctionSerializerTest extends TestCase
                         'name' => 'myBytes',
                         'type' => 'bytes',
                     ],
-                ],
-                'name' => 'testFunction',
-                'outputs' => [
-                ],
-                'payable' => false,
-                'stateMutability' => 'nonpayable',
-                'type' => 'function',
-            ],
-        ];
-
-        $contract = new Contract('foo', 'bar', $json);
-
-        $function = $contract->function('testFunction');
-
-        $expected = [
-            'myString' => '',
-            'myBytes' => [],
-        ];
-
-        $serialized = [
-            '0000000000000000000000000000000000000000000000000000000000000040',
-            '0000000000000000000000000000000000000000000000000000000000000060',
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            '0000000000000000000000000000000000000000000000000000000000000000',
-        ];
-
-        $this->assertSerializerInput($function, $expected, $serialized);
-
-        $encoded = $function->encodeInput($expected)->toArray();
-
-        // uncomment to get debug data
-        // dump($function->encodeInput($expected)->toArrayWithMeta());
-
-        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded input data');
-
-        $serializedString = $function->methodId() . implode('', $serialized);
-        $decoded = $function->decodeInput($serializedString);
-
-        $this->assertEquals($expected, $decoded, 'correctly decoded input data');
-    }
-
-    public function testEncodeInvalid()
-    {
-        $json = [
-            [
-                'constant' => false,
-                'inputs' => [
                     [
-                        'name' => '_id',
-                        'type' => 'uint16',
+                        'name' => 'myBytes32',
+                        'type' => 'bytes32',
                     ],
                 ],
                 'name' => 'testFunction',
@@ -473,51 +422,32 @@ class ContractFunctionSerializerTest extends TestCase
         $function = $contract->function('testFunction');
 
         $data = [
-            '_id' => ((int) HexUInt16::INT_MAX) + 1,
+            'myString' => '',
+            'myBytes' => '',
+            'myBytes32' => '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
         ];
-
-        $expectedMessage = 'attempting to encode: _id, provided base 10 int(65536) is greater than max value for HexUInt16 (65535)';
-        $this->assertInvalidArgumentException($expectedMessage, function () use ($function, $data) {
-            $serializer = new ContractFunctionSerializer();
-            $serializer->encodeInput($function, $data);
-        });
-    }
-
-    public function testDecodeInvalid()
-    {
-        $json = [
-            [
-                'constant' => false,
-                'inputs' => [
-                    [
-                        'name' => '_id',
-                        'type' => 'uint16',
-                    ],
-                ],
-                'name' => 'testFunction',
-                'outputs' => [
-                ],
-                'payable' => false,
-                'stateMutability' => 'nonpayable',
-                'type' => 'function',
-            ],
-        ];
-
-        $contract = new Contract('foo', 'bar', $json);
-
-        $function = $contract->function('testFunction');
 
         $serialized = [
-            '9999999999999999999999999999999999999999999999999999999999991234',
+            '0000000000000000000000000000000000000000000000000000000000000060',
+            '0000000000000000000000000000000000000000000000000000000000000080',
+            '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000000',
         ];
 
-        $serializedString = $function->methodId() . implode('', $serialized);
+        $encoded = $function->encodeInput($data)->toArray();
 
-        $expectedMessage = 'attempting to decode: _id, Cannot safely convert down to bottom of 16 from 256, non-zero bits would be lost. (999999999999999999999999999999999999999999999999999999999999) from start of (9999999999999999999999999999999999999999999999999999999999991234)';
-        $this->assertInvalidArgumentException($expectedMessage, function () use ($function, $serializedString) {
-            $serializer = new ContractFunctionSerializer();
-            $serializer->decodeInput($function, $serializedString);
-        });
+        // uncomment to get debug data
+        // dump($function->encodeInput($data)->toArrayWithMeta());
+
+        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded input data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = $function->decodeInput($serializedString);
+
+        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded input data');
     }
 
     public function testOutputCase1()
@@ -558,8 +488,8 @@ class ContractFunctionSerializerTest extends TestCase
         $function = $contract->function('testOutputFunction');
 
         $data = [
-            '_id' => '36185027886661344501709775484676719393561338212044008423475592217920668696576',
-            '_fee' => '500',
+            '_id' => HexUInt256::fromUInt('36185027886661344501709775484676719393561338212044008423475592217920668696576')->toHex(),
+            '_fee' => HexUInt16::fromUInt('500')->toHexUInt256(),
         ];
 
         $serialized = [
@@ -569,87 +499,87 @@ class ContractFunctionSerializerTest extends TestCase
 
         $this->assertSerializerOutput($function, $data, $serialized);
 
-        $serializer = new ContractFunctionSerializer();
-
-        $encoded = $serializer->encodeOutput($function, $data)->toArray();
+        $encoded = (new ContractFunctionEncoder())->encodeOutput($function, $data)->toArray();
         $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded output data');
 
         $serializedString = $function->methodId() . implode('', $serialized);
-        $decoded = $serializer->decodeOutput($function, $serializedString);
-        $this->assertEquals($data, $decoded, 'correctly decoded output data');
+        $decoded = (new ContractFunctionDecoder())->decodeOutput($function, $serializedString);
+        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded output data');
 
         $encoded = $function->encodeOutput($data)->toArray();
         $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded output data');
 
         $decoded = $function->decodeOutput($serializedString);
-        $this->assertEquals($data, $decoded, 'correctly decoded output data');
+        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded output data');
     }
 
-    protected function assertSerializerInput(
-        Contract\ContractFunction $function,
-        array $data,
-        array $serialized
-    ) {
-        $this->assertSerializer($function, $data, $serialized, true);
-    }
-
-    protected function assertSerializerOutput(
-        Contract\ContractFunction $function,
-        array $data,
-        array $serialized
-    ) {
-        $this->assertSerializer($function, $data, $serialized, false);
-    }
-
-    protected function assertSerializer(
-        Contract\ContractFunction $function,
-        array $data,
-        array $serialized,
-        bool $input = true
-    ) {
-        $serializer = new ContractFunctionSerializer();
-
-        if ($input) {
-            $functionValueTypes = $function->inputs();
-        } else {
-            $functionValueTypes = $function->outputs();
-        }
-
-        $encoded = $serializer->encode($function->methodId(), $functionValueTypes, $data)->toArray();
-
-        // uncomment to get debug data
-        // dump($serializer->encode($function->methodId(), $functionValueTypes, $data)->toArrayWithMeta());
-
-        $dataType = $input ? 'input' : 'output';
-        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded ' . $dataType . ' data');
-
-        $serializedString = $function->methodId() . implode('', $serialized);
-        $decoded = $serializer->decode(
-            $function->methodId(),
-            $functionValueTypes,
-            $serializedString
-        );
-
-        $this->assertEquals($data, $decoded, 'correctly decoded ' . $dataType . ' data');
-    }
-
-    protected function assertEncodedEquals(array $expected, array $actual, $message = '')
+    public function testStringArrayNotSupported()
     {
-        // format the data in a more human readable way
-        $expectedEncoded = [
-            'raw' => $expected,
-            'trimmed' => array_map(function ($val) {
-                return ltrim($val, '0') ?: '0';
-            }, $expected),
-        ];
+        $name = 'foo';
+        $address = 'bar';
 
-        $actualEncoded = [
-            'raw' => $actual,
-            'trimmed' => array_map(function ($val) {
-                return ltrim($val, '0') ?: '0';
-            }, $actual),
+        $json = [
+            [
+                'name' => 'f',
+                'type' => 'function',
+                'stateMutability' => 'nonpayable',
+                'inputs' => [
+                    [
+                        'name' => '_names',
+                        'type' => 'string[]',
+                    ],
+                ],
+            ],
         ];
+        $contract = new Contract($name, $address, $json);
 
-        $this->assertEquals($expectedEncoded, $actualEncoded, $message);
+        $function = $contract->function('f');
+
+        $message = 'when attempting to encode: _names, caught ' . TypeNotSupportedException::class . ': string arrays (eg string[] or string[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->encodeInput([
+                '_names' => ['foo', 'bar'],
+            ]);
+        });
+
+        $message = 'when attempting to decode: _names, caught ' . TypeNotSupportedException::class . ': string arrays (eg string[] or string[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->decodeInput('foo');
+        });
+    }
+
+    public function testBytesArrayNotSupported()
+    {
+        $name = 'foo';
+        $address = 'bar';
+
+        $json = [
+            [
+                'name' => 'f',
+                'type' => 'function',
+                'stateMutability' => 'nonpayable',
+                'inputs' => [
+                    [
+                        'name' => '_data',
+                        'type' => 'bytes[]',
+                    ],
+                ],
+            ],
+        ];
+        $contract = new Contract($name, $address, $json);
+
+        $function = $contract->function('f');
+
+        $message = 'when attempting to encode: _data, caught ' . TypeNotSupportedException::class . ': bytes arrays (eg bytes[] or bytes[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->encodeInput([
+                '_data' => ['foo', 'bar'],
+            ]);
+        });
+
+        $message = 'when attempting to decode: _data, caught ' . TypeNotSupportedException::class . ': bytes arrays (eg bytes[] or bytes[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->decodeInput('foo');
+        });
     }
 }

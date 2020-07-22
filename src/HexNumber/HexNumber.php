@@ -136,6 +136,7 @@ abstract class HexNumber
 
     /**
      * @param int $characters number of characters to take from top (left) of hex
+     *
      * @return string
      */
     public function top(int $characters): string
@@ -152,6 +153,7 @@ abstract class HexNumber
 
     /**
      * @param int $characters number of characters to take from bottom (right) of hex
+     *
      * @return string
      */
     public function bottom(int $characters): string

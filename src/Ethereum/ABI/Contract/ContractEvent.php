@@ -2,13 +2,20 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
-use Enjin\BlockchainTools\Ethereum\ABI\ContractEventSerializer;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractEventDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
 use Enjin\BlockchainTools\HexConverter;
 use InvalidArgumentException;
 use kornrunner\Keccak;
 
 class ContractEvent
 {
+    /**
+     * @var string
+     */
+    protected $inputDecoderClass;
+
     /**
      * @var string
      */
@@ -26,10 +33,13 @@ class ContractEvent
 
     protected $topic;
 
-    public function __construct(array $event)
+    public function __construct(array $event, string $inputDecoderClass = DataBlockDecoder::class)
     {
+        Contract::validateDecoderClass($inputDecoderClass);
+
         $this->name = $event['name'];
         $this->anonymous = $event['anonymous'] ?? false;
+        $this->inputDecoderClass = $inputDecoderClass;
 
         $inputs = $event['inputs'] ?? [];
 
@@ -86,13 +96,10 @@ class ContractEvent
         return $this->topic;
     }
 
-    public function decodeInput(array $topics, string $data): array
+    public function decodeInput(array $topics, string $data): DataBlockDecoder
     {
-        return (new ContractEventSerializer())->decodeInput($this, $topics, $data);
-    }
+        $decoder = new ContractEventDecoder($this->inputDecoderClass);
 
-    public function decodeInputRaw(array $topics, string $data): array
-    {
-        return (new ContractEventSerializer())->decodeInputRaw($this, $topics, $data);
+        return $decoder->decodeInput($this, $topics, $data);
     }
 }

@@ -2,8 +2,11 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
-use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionSerializer;
-use Enjin\BlockchainTools\Ethereum\ABI\DataBlock;
+use Enjin\BlockchainTools\Ethereum\ABI\Contract;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder;
 use InvalidArgumentException;
 use kornrunner\Keccak;
 
@@ -59,10 +62,41 @@ class ContractFunction
     /**
      * @var string
      */
-    protected $topic;
+    protected $inputDecoderClass;
 
-    public function __construct(array $function)
-    {
+    /**
+     * @var string
+     */
+    protected $inputEncoderClass;
+
+    /**
+     * @var string
+     */
+    protected $outputDecoderClass;
+
+    /**
+     * @var string
+     */
+    protected $outputEncoderClass;
+
+    public function __construct(
+        array $function,
+        string $inputDecoderClass = DataBlockDecoder::class,
+        string $inputEncoderClass = DataBlockEncoder::class,
+        string $outputDecoderClass = DataBlockDecoder::class,
+        string $outputEncoderClass = DataBlockEncoder::class
+    ) {
+        Contract::validateDecoderClass($inputDecoderClass);
+        Contract::validateEncoderClass($inputEncoderClass);
+
+        Contract::validateDecoderClass($outputDecoderClass);
+        Contract::validateEncoderClass($outputEncoderClass);
+
+        $this->inputDecoderClass = $inputDecoderClass;
+        $this->inputEncoderClass = $inputEncoderClass;
+        $this->outputDecoderClass = $outputDecoderClass;
+        $this->outputEncoderClass = $outputEncoderClass;
+
         $stateMutability = $function['stateMutability'];
 
         $this->name = $function['name'];
@@ -160,33 +194,31 @@ class ContractFunction
         return $this->methodId;
     }
 
-    public function encodeInput(array $data): DataBlock
+    public function encodeInput(array $data): DataBlockEncoder
     {
-        return (new ContractFunctionSerializer())->encodeInput($this, $data);
+        $functionEncoder = new ContractFunctionEncoder($this->inputEncoderClass);
+
+        return $functionEncoder->encodeInput($this, $data);
     }
 
-    public function decodeInput(string $data): array
+    public function decodeInput(string $data): DataBlockDecoder
     {
-        return (new ContractFunctionSerializer())->decodeInput($this, $data);
+        $functionDecoder = new ContractFunctionDecoder($this->inputDecoderClass);
+
+        return $functionDecoder->decodeInput($this, $data);
     }
 
-    public function decodeInputRaw(string $data): array
+    public function encodeOutput(array $data): DataBlockEncoder
     {
-        return (new ContractFunctionSerializer())->decodeInputRaw($this, $data);
+        $functionEncoder = new ContractFunctionEncoder($this->outputEncoderClass);
+
+        return $functionEncoder->encodeOutput($this, $data);
     }
 
-    public function encodeOutput(array $data): DataBlock
+    public function decodeOutput(string $data): DataBlockDecoder
     {
-        return (new ContractFunctionSerializer())->encodeOutput($this, $data);
-    }
+        $functionDecoder = new ContractFunctionDecoder($this->outputDecoderClass);
 
-    public function decodeOutput(string $data): array
-    {
-        return (new ContractFunctionSerializer())->decodeOutput($this, $data);
-    }
-
-    public function decodeOutputRaw(string $data): array
-    {
-        return (new ContractFunctionSerializer())->decodeOutputRaw($this, $data);
+        return $functionDecoder->decodeOutput($this, $data);
     }
 }
