@@ -9,7 +9,7 @@ use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
 use Tests\TestCase;
 
-class ContractEventSerializerTest extends TestCase
+class ContractEventSerializationTest extends TestCase
 {
     public function testEventCase1()
     {
