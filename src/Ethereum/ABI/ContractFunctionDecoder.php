@@ -4,10 +4,12 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
+use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\Support\StringHelpers as Str;
-use InvalidArgumentException;
 use phpseclib\Math\BigInteger;
+use RuntimeException;
+use Throwable;
 
 class ContractFunctionDecoder
 {
@@ -76,6 +78,13 @@ class ContractFunctionDecoder
 
             try {
                 if ($isArray) {
+                    if ($baseType === 'string') {
+                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported ');
+                    }
+                    if ($baseType === 'bytes' && $dataType->bitSize() === 'dynamic') {
+                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported ');
+                    }
+
                     if ($dataType->isDynamicLengthArray()) {
                         $startIndex = $this->uIntFromIndex($data, $index) * 2;
 
@@ -105,10 +114,10 @@ class ContractFunctionDecoder
                 }
 
                 $dynamicLengthTypes = ['bytes', 'string'];
-
-                if (in_array($baseType, $dynamicLengthTypes)) {
+                if (in_array($baseType, $dynamicLengthTypes) && $dataType->bitSize() === 'dynamic') {
                     $startIndex = $this->uIntFromIndex($data, $index) * 2;
                     $valuesIndex = $startIndex + 64;
+
                     $length = $this->uIntFromIndex($data, $startIndex) * 2;
 
                     $hexValue = $this->hexFromIndex($data, $valuesIndex, $length);
@@ -129,8 +138,8 @@ class ContractFunctionDecoder
                 $results->add($item, $hex);
 
                 $index += 64;
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException('attempting to decode: ' . $itemName . ', ' . $e->getMessage(), 0, $e);
+            } catch (Throwable $e) {
+                throw new RuntimeException('attempting to decode: ' . $itemName . ', ' . $e->getMessage(), 0, $e);
             }
         }
 

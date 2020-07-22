@@ -29,6 +29,10 @@ class BasicEncoder extends DataBlockEncoder
 
     public function addDynamicLengthBytes(ContractFunctionValueType $valueType, $value)
     {
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException('array of bytes must be provided when encoding with this serializer, got ' . gettype($valueType));
+        }
+
         $length = count($value);
 
         if ($value) {

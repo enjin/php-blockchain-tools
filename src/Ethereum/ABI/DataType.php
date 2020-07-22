@@ -2,12 +2,8 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI;
 
-use Enjin\BlockchainTools\Ethereum\ABI\Concerns\SerializesDataTypeValues;
-
 class DataType
 {
-    use SerializesDataTypeValues;
-
     /**
      * @var string
      */

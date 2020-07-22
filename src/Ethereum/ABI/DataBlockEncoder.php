@@ -123,6 +123,17 @@ class DataBlockEncoder
         );
     }
 
+    public function addFixedLengthBytes(ContractFunctionValueType $valueType, $value)
+    {
+        $valueEncoded = $value;
+        $this->addFixedLengthBytesRaw(
+            $valueType->name(),
+            $valueType->type(),
+            $value,
+            $valueEncoded
+        );
+    }
+
     public function addString(ContractFunctionValueType $valueType, $value)
     {
         $str = HexConverter::hexToString($value);
@@ -264,6 +275,16 @@ class DataBlockEncoder
             'length' => $length,
             'values_provided' => $value,
             'values_encoded' => $valueEncoded,
+        ];
+    }
+
+    protected function addFixedLengthBytesRaw(string $inputName, string $type, $value, string $valueEncoded)
+    {
+        $this->data[$inputName] = [
+            'name' => $inputName,
+            'type' => $type,
+            'value_provided' => $value,
+            'value_encoded' => $valueEncoded,
         ];
     }
 

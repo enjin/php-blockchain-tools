@@ -47,8 +47,8 @@ class Contract
         string $name,
         string $address,
         array $json,
-        string $defaultEncoderClass = DataBlockEncoder::class,
-        string $defaultDecoderClass = DataBlockDecoder::class
+        string $defaultDecoderClass = DataBlockDecoder::class,
+        string $defaultEncoderClass = DataBlockEncoder::class
     ) {
         static::validateDecoderClass($defaultDecoderClass);
         static::validateEncoderClass($defaultEncoderClass);
@@ -56,8 +56,8 @@ class Contract
         $this->name = $name;
         $this->address = $address;
         $this->json = $json;
-        $this->defaultEncoderClass = $defaultEncoderClass;
         $this->defaultDecoderClass = $defaultDecoderClass;
+        $this->defaultEncoderClass = $defaultEncoderClass;
 
         foreach ($json as $item) {
             $name = $item['name'];
@@ -89,7 +89,7 @@ class Contract
         }, $names);
     }
 
-    public function function(string $name): ContractFunction
+    public function function (string $name): ContractFunction
     {
         $this->validateFunctionName($name);
 
@@ -143,23 +143,20 @@ class Contract
 
             $this->events[$name] = new ContractEvent(
                 $meta,
-                $input['decoder'],
-                $input['encoder']
+                $input['decoder']
             );
         }
 
         return $this->events[$name];
     }
 
-    public function registerEventInputSerializers(string $name, string $decoderClass, string $encoderClass)
+    public function registerEventInputSerializers(string $name, string $decoderClass)
     {
         $this->validateEventName($name);
         static::validateDecoderClass($decoderClass);
-        static::validateEncoderClass($encoderClass);
 
         $this->eventInputSerializers[$name] = [
             'decoder' => $decoderClass,
-            'encoder' => $encoderClass,
         ];
     }
 
@@ -225,14 +222,14 @@ class Contract
     public static function validateDecoderClass(string $decoder)
     {
         if (!is_a($decoder, DataBlockDecoder::class, true)) {
-            throw new InvalidArgumentException('Value must be name of a class that is an instance of: ' . DataBlockDecoder::class . ', ' . $decoder . ' provided');
+            throw new InvalidArgumentException('Decoder class must be an instance of: ' . DataBlockDecoder::class . ', ' . $decoder . ' provided');
         }
     }
 
     public static function validateEncoderClass(string $encoder)
     {
         if (!is_a($encoder, DataBlockEncoder::class, true)) {
-            throw new InvalidArgumentException('Value must be name of a class that is an instance of: ' . DataBlockEncoder::class);
+            throw new InvalidArgumentException('Encoder class must be an instance of: ' . DataBlockEncoder::class . ', ' . $encoder . ' provided');
         }
     }
 

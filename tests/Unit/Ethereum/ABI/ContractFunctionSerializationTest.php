@@ -401,6 +401,10 @@ class ContractFunctionSerializationTest extends TestCase
                         'name' => 'myBytes',
                         'type' => 'bytes',
                     ],
+                    [
+                        'name' => 'myBytes32',
+                        'type' => 'bytes32',
+                    ],
                 ],
                 'name' => 'testFunction',
                 'outputs' => [
@@ -418,11 +422,13 @@ class ContractFunctionSerializationTest extends TestCase
         $data = [
             'myString' => '',
             'myBytes' => '',
+            'myBytes32' => '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
         ];
 
         $serialized = [
-            '0000000000000000000000000000000000000000000000000000000000000040',
             '0000000000000000000000000000000000000000000000000000000000000060',
+            '0000000000000000000000000000000000000000000000000000000000000080',
+            '251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df',
             '0000000000000000000000000000000000000000000000000000000000000000',
             '0000000000000000000000000000000000000000000000000000000000000000',
             '0000000000000000000000000000000000000000000000000000000000000000',
@@ -432,19 +438,14 @@ class ContractFunctionSerializationTest extends TestCase
         $encoded = $function->encodeInput($data)->toArray();
 
         // uncomment to get debug data
-        // dump($function->encodeInput($expected)->toArrayWithMeta());
+        // dump($function->encodeInput($data)->toArrayWithMeta());
 
         $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded input data');
 
         $serializedString = $function->methodId() . implode('', $serialized);
         $decoded = $function->decodeInput($serializedString);
 
-        $expected = [
-            'myString' => '',
-            'myBytes' => '',
-        ];
-
-        $this->assertEquals($expected, $decoded->toArray(), 'correctly decoded input data');
+        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded input data');
     }
 
     public function testOutputCase1()

@@ -4,6 +4,7 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
+use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
 use InvalidArgumentException;
 
 class ContractFunctionEncoder
@@ -48,6 +49,13 @@ class ContractFunctionEncoder
 
             try {
                 if ($isArray) {
+                    if ($baseType === 'string') {
+                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported ');
+                    }
+                    if ($baseType === 'bytes' && $dataType->bitSize() === 'dynamic') {
+                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported ');
+                    }
+
                     if ($dataType->isDynamicLengthArray()) {
                         $dataBlock->addDynamicLengthArray($item, $value);
                     } else {
@@ -57,7 +65,11 @@ class ContractFunctionEncoder
                     if ($baseType === 'string') {
                         $dataBlock->addString($item, $value);
                     } elseif ($baseType === 'bytes') {
-                        $dataBlock->addDynamicLengthBytes($item, $value);
+                        if ($dataType->bitSize() === 'dynamic') {
+                            $dataBlock->addDynamicLengthBytes($item, $value);
+                        } else {
+                            $dataBlock->addFixedLengthBytes($item, $value);
+                        }
                     } else {
                         $dataBlock->add($item, $value);
                     }

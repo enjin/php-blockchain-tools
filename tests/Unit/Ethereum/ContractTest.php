@@ -3,6 +3,7 @@
 namespace Tests\Unit\Ethereum\ABI;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
@@ -292,6 +293,30 @@ class ContractTest extends TestCase
         $message = 'event with matching topic not found: invalid';
         $this->assertInvalidArgumentException($message, function () use ($contract) {
             $contract->decodeEventInput(['invalid'], '');
+        });
+    }
+
+    public function testValidSerializers()
+    {
+        $message = 'Decoder class must be an instance of: Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder, invalid-decoder provided';
+        $this->assertInvalidArgumentException($message, function () {
+            $contract = new Contract(
+                'foo',
+                'bar',
+                [],
+                'invalid-decoder'
+            );
+        });
+
+        $message = 'Encoder class must be an instance of: Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder, invalid-encoder provided';
+        $this->assertInvalidArgumentException($message, function () {
+            $contract = new Contract(
+                'foo',
+                'bar',
+                [],
+                DataBlockDecoder::class,
+                'invalid-encoder'
+            );
         });
     }
 }
