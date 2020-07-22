@@ -11,6 +11,80 @@ use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
 
 trait HasContractTestHelpers
 {
+    protected function assertSerializerInput(
+        ContractFunction $function,
+        array $data,
+        array $serialized
+    ) {
+        $this->assertSerializer($function, $data, $serialized, true);
+    }
+
+    protected function assertSerializerOutput(
+        ContractFunction $function,
+        array $data,
+        array $serialized
+    ) {
+        $this->assertSerializer($function, $data, $serialized, false);
+    }
+
+    protected function assertSerializer(
+        ContractFunction $function,
+        array $data,
+        array $serialized,
+        bool $input = true
+    ) {
+        if ($input) {
+            $functionValueTypes = $function->inputs();
+        } else {
+            $functionValueTypes = $function->outputs();
+        }
+
+        $encoded = (new ContractFunctionEncoder())->encode($function->methodId(), $functionValueTypes, $data)->toArray();
+
+        // uncomment to get debug data
+        // dump($serializer->encode($function->methodId(), $functionValueTypes, $data)->toArrayWithMeta());
+
+        $dataType = $input ? 'input' : 'output';
+        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded ' . $dataType . ' data');
+
+        $serializedString = $function->methodId() . implode('', $serialized);
+        $decoded = (new ContractFunctionDecoder())->decode(
+            $function->methodId(),
+            $functionValueTypes,
+            $serializedString
+        );
+
+        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded ' . $dataType . ' data');
+    }
+
+    protected function assertEncodedEquals(array $expected, array $actual, $message = '')
+    {
+        // format the data in a more human readable way
+        $expectedEncoded = [
+            'raw' => $expected,
+            'trimmed' => array_map(function ($val) {
+                if (is_string($val)) {
+                    return ltrim($val, '0') ?: '0';
+                }
+
+                return $val;
+            }, $expected),
+        ];
+
+        $actualEncoded = [
+            'raw' => $actual,
+            'trimmed' => array_map(function ($val) {
+                if (is_string($val)) {
+                    return ltrim($val, '0') ?: '0';
+                }
+
+                return $val;
+            }, $actual),
+        ];
+
+        $this->assertEquals($expectedEncoded, $actualEncoded, $message);
+    }
+
     private function makeContractFunctionJson(array $inputs = [], array $outputs = [])
     {
         return [
@@ -155,78 +229,5 @@ trait HasContractTestHelpers
         }
 
         return $type;
-    }
-
-
-    protected function assertSerializerInput(
-        ContractFunction $function,
-        array $data,
-        array $serialized
-    ) {
-        $this->assertSerializer($function, $data, $serialized, true);
-    }
-
-    protected function assertSerializerOutput(
-        ContractFunction $function,
-        array $data,
-        array $serialized
-    ) {
-        $this->assertSerializer($function, $data, $serialized, false);
-    }
-
-    protected function assertSerializer(
-        ContractFunction $function,
-        array $data,
-        array $serialized,
-        bool $input = true
-    ) {
-        if ($input) {
-            $functionValueTypes = $function->inputs();
-        } else {
-            $functionValueTypes = $function->outputs();
-        }
-
-        $encoded = (new ContractFunctionEncoder())->encode($function->methodId(), $functionValueTypes, $data)->toArray();
-
-        // uncomment to get debug data
-        // dump($serializer->encode($function->methodId(), $functionValueTypes, $data)->toArrayWithMeta());
-
-        $dataType = $input ? 'input' : 'output';
-        $this->assertEncodedEquals($serialized, $encoded, 'correctly encoded ' . $dataType . ' data');
-
-        $serializedString = $function->methodId() . implode('', $serialized);
-        $decoded = (new ContractFunctionDecoder())->decode(
-            $function->methodId(),
-            $functionValueTypes,
-            $serializedString
-        );
-
-        $this->assertEquals($data, $decoded->toArray(), 'correctly decoded ' . $dataType . ' data');
-    }
-
-    protected function assertEncodedEquals(array $expected, array $actual, $message = '')
-    {
-        // format the data in a more human readable way
-        $expectedEncoded = [
-            'raw' => $expected,
-            'trimmed' => array_map(function ($val) {
-                if (is_string($val)) {
-                    return ltrim($val, '0') ?: '0';
-                }
-                return $val;
-            }, $expected),
-        ];
-
-        $actualEncoded = [
-            'raw' => $actual,
-            'trimmed' => array_map(function ($val) {
-                if (is_string($val)) {
-                    return ltrim($val, '0') ?: '0';
-                }
-                return $val;
-            }, $actual),
-        ];
-
-        $this->assertEquals($expectedEncoded, $actualEncoded, $message);
     }
 }

@@ -6,5 +6,4 @@ use Exception;
 
 class TypeNotSupportedException extends Exception
 {
-
 }

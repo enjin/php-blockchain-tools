@@ -41,12 +41,11 @@ class ContractTest extends TestCase
         });
     }
 
-
     public function testFindEventBySignatureTopicNotFound()
     {
         $contract = new Contract('foo', 'bar', []);
 
-        $this->assertEquals(null, $contract->findEventBySignatureTopic('invalid'));
+        $this->assertNull($contract->findEventBySignatureTopic('invalid'));
     }
 
     public function testInvalidEvent()

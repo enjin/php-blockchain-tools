@@ -79,10 +79,10 @@ class ContractFunctionDecoder
             try {
                 if ($isArray) {
                     if ($baseType === 'string') {
-                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported ');
+                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported');
                     }
                     if ($baseType === 'bytes' && $dataType->bitSize() === 'dynamic') {
-                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported ');
+                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported');
                     }
 
                     if ($dataType->isDynamicLengthArray()) {
@@ -139,7 +139,9 @@ class ContractFunctionDecoder
 
                 $index += 64;
             } catch (Throwable $e) {
-                throw new RuntimeException('attempting to decode: ' . $itemName . ', ' . $e->getMessage(), 0, $e);
+                $message = 'when attempting to decode: ' . $itemName . ', caught ' . get_class($e) . ': ' . $e->getMessage();
+
+                throw new RuntimeException($message, 0, $e);
             }
         }
 

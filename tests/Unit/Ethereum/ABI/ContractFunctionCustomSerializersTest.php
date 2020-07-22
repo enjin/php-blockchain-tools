@@ -7,6 +7,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder\BasicDecoder;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder\BasicEncoder;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use RuntimeException;
 use Tests\Support\HasContractTestHelpers;
 use Tests\TestCase;
 
@@ -136,8 +137,8 @@ class ContractFunctionCustomSerializersTest extends TestCase
             '_data' => 'zxc',
         ];
 
-        $expectedMessage = 'attempting to encode: _data, array of bytes must be provided when encoding with this serializer, got object';
-        $this->assertInvalidArgumentException($expectedMessage, function () use ($function, $data) {
+        $expectedMessage = 'when attempting to encode: _data, caught InvalidArgumentException: array of bytes must be provided when encoding with this serializer, got object';
+        $this->assertExceptionThrown(RuntimeException::class, $expectedMessage, function () use ($function, $data) {
             $function->encodeInput($data);
         });
     }
@@ -233,6 +234,7 @@ class ContractFunctionCustomSerializersTest extends TestCase
             ],
             '_data' => HexConverter::hexToBytes('251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df251b0de3886fb5597f493c6740717fbd64f7939eb5e3c0bec6a5ce924dca23df0bec6a5ce924dca23dfa'),
         ];
+
         return $expected;
     }
 

@@ -89,7 +89,7 @@ class Contract
         }, $names);
     }
 
-    public function function (string $name): ContractFunction
+    public function function(string $name): ContractFunction
     {
         $this->validateFunctionName($name);
 

@@ -30,7 +30,7 @@ class ContractEventTest extends TestCase
                 [
                     'name' => 'someBytes',
                     'type' => 'bytes',
-                ]
+                ],
             ],
 
             'name' => $name,
@@ -73,7 +73,8 @@ class ContractEventTest extends TestCase
         });
     }
 
-    public function testIndexedTypes(){
+    public function testIndexedTypes()
+    {
         $name = 'testEvent';
         $json = [
             'inputs' => [
@@ -118,6 +119,5 @@ class ContractEventTest extends TestCase
         $this->assertEquals('0x4581a5a0f5cfbb7d11c56a6cf6378ade3399f42dc3a846d5a0b438153d0f368a', $event->signatureTopic());
         // confirm cache coverage
         $this->assertEquals('0x4581a5a0f5cfbb7d11c56a6cf6378ade3399f42dc3a846d5a0b438153d0f368a', $event->signatureTopic());
-
     }
 }

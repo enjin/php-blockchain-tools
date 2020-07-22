@@ -5,9 +5,11 @@ namespace Tests\Unit\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionDecoder;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
+use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt16;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
+use RuntimeException;
 use Tests\Support\HasContractTestHelpers;
 use Tests\TestCase;
 
@@ -509,5 +511,75 @@ class ContractFunctionSerializationTest extends TestCase
 
         $decoded = $function->decodeOutput($serializedString);
         $this->assertEquals($data, $decoded->toArray(), 'correctly decoded output data');
+    }
+
+    public function testStringArrayNotSupported()
+    {
+        $name = 'foo';
+        $address = 'bar';
+
+        $json = [
+            [
+                'name' => 'f',
+                'type' => 'function',
+                'stateMutability' => 'nonpayable',
+                'inputs' => [
+                    [
+                        'name' => '_names',
+                        'type' => 'string[]',
+                    ],
+                ],
+            ],
+        ];
+        $contract = new Contract($name, $address, $json);
+
+        $function = $contract->function('f');
+
+        $message = 'when attempting to encode: _names, caught ' . TypeNotSupportedException::class . ': string arrays (eg string[] or string[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->encodeInput([
+                '_names' => ['foo', 'bar'],
+            ]);
+        });
+
+        $message = 'when attempting to decode: _names, caught ' . TypeNotSupportedException::class . ': string arrays (eg string[] or string[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->decodeInput('foo');
+        });
+    }
+
+    public function testBytesArrayNotSupported()
+    {
+        $name = 'foo';
+        $address = 'bar';
+
+        $json = [
+            [
+                'name' => 'f',
+                'type' => 'function',
+                'stateMutability' => 'nonpayable',
+                'inputs' => [
+                    [
+                        'name' => '_data',
+                        'type' => 'bytes[]',
+                    ],
+                ],
+            ],
+        ];
+        $contract = new Contract($name, $address, $json);
+
+        $function = $contract->function('f');
+
+        $message = 'when attempting to encode: _data, caught ' . TypeNotSupportedException::class . ': bytes arrays (eg bytes[] or bytes[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->encodeInput([
+                '_data' => ['foo', 'bar'],
+            ]);
+        });
+
+        $message = 'when attempting to decode: _data, caught ' . TypeNotSupportedException::class . ': bytes arrays (eg bytes[] or bytes[99]) are not supported';
+        $this->assertExceptionThrown(RuntimeException::class, $message, function () use ($function) {
+            $function->decodeInput('foo');
+        });
     }
 }

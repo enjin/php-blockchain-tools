@@ -32,7 +32,7 @@ class ContractEventCustomSerializersTest extends TestCase
         $json = $this->functionJSON();
         $contract = new Contract($name, $address, $json);
 
-        $contract->registerEventInputSerializers('e', BasicDecoder::class, BasicEncoder::class);
+        $contract->registerEventInputSerializers('e', BasicDecoder::class);
 
         $this->assertContractEventInputSerialization($contract);
     }

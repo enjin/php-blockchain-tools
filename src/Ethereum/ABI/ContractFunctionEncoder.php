@@ -5,7 +5,8 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
-use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 class ContractFunctionEncoder
 {
@@ -50,10 +51,10 @@ class ContractFunctionEncoder
             try {
                 if ($isArray) {
                     if ($baseType === 'string') {
-                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported ');
+                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported');
                     }
                     if ($baseType === 'bytes' && $dataType->bitSize() === 'dynamic') {
-                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported ');
+                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported');
                     }
 
                     if ($dataType->isDynamicLengthArray()) {
@@ -74,8 +75,10 @@ class ContractFunctionEncoder
                         $dataBlock->add($item, $value);
                     }
                 }
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException('attempting to encode: ' . $itemName . ', ' . $e->getMessage(), 0, $e);
+            } catch (Throwable $e) {
+                $message = 'when attempting to encode: ' . $itemName . ', caught ' . get_class($e) . ': ' . $e->getMessage();
+
+                throw new RuntimeException($message, 0, $e);
             }
         }
 
