@@ -293,31 +293,4 @@ class ContractTest extends TestCase
             $contract->decodeEventInput(['invalid'], '');
         });
     }
-
-    public function testValidSerializers()
-    {
-        $message = 'Decoder class must be an instance of: Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder, invalid-decoder provided';
-        $this->assertInvalidArgumentException($message, function () {
-            $contract = new Contract(
-                'foo',
-                'bar',
-                [],
-                [
-                    'decoder' => 'invalid-decoder',
-                ]
-            );
-        });
-
-        $message = 'Encoder class must be an instance of: Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder, invalid-encoder provided';
-        $this->assertInvalidArgumentException($message, function () {
-            $contract = new Contract(
-                'foo',
-                'bar',
-                [],
-                [
-                    'encoder' => 'invalid-encoder',
-                ]
-            );
-        });
-    }
 }

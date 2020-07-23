@@ -11,9 +11,14 @@ class ContractEventDecoder
      */
     protected $dataBlockDecoderClass;
 
-    public function __construct(string $dataBlockDecoderClass = DataBlockDecoder::class)
+    /**
+     * @var Serializer
+     */
+    protected $serializer;
+
+    public function __construct(Serializer $serializer = null)
     {
-        $this->dataBlockDecoderClass = $dataBlockDecoderClass;
+        $this->serializer = $serializer ?: Serializer::makeDefault();
     }
 
     public function decodeInput(ContractEvent $function, array $topics, string $data): DataBlockDecoder
@@ -37,7 +42,7 @@ class ContractEventDecoder
     protected function decodeData(array $eventInputs, array $topics, string $data): DataBlockDecoder
     {
         /** @var DataBlockDecoder $results */
-        $results = new $this->dataBlockDecoderClass($eventInputs);
+        $results = $this->serializer->decoder($eventInputs);
 
         $separated = $this->separateInputs($eventInputs);
 
@@ -65,7 +70,7 @@ class ContractEventDecoder
             $results->addEventTopic($item, $indexedValue);
         }
 
-        $functionSerializer = new ContractFunctionDecoder($this->dataBlockDecoderClass);
+        $functionSerializer = new ContractFunctionDecoder($this->serializer);
         $nonIndexedResults = $functionSerializer->decodeWithoutMethodId($nonIndexedInputs, $data);
 
         $results->merge($nonIndexedResults);

@@ -37,5 +37,30 @@
         "stateMutability": "view",
         "name": "testFunction1",
         "type": "function"
+    },
+    {
+        "stateMutability": "view",
+        "name": "testFunction2",
+        "type": "function"
+    },
+    {
+        "stateMutability": "view",
+        "name": "testFunction3",
+        "type": "function"
+    },
+    {
+        "stateMutability": "view",
+        "name": "testFunction4",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "myString",
+                "type": "string"
+            }
+        ],
+        "name": "testEvent2",
+        "type": "event"
     }
 ]

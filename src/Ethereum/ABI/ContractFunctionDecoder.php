@@ -14,14 +14,13 @@ use Throwable;
 class ContractFunctionDecoder
 {
     /**
-     * @var string
+     * @var Serializer
      */
-    protected $decoderClass;
+    protected $serializer;
 
-    public function __construct(string $decoderClass = DataBlockDecoder::class)
+    public function __construct(Serializer $serializer = null)
     {
-        Contract::validateDecoderClass($decoderClass);
-        $this->decoderClass = $decoderClass;
+        $this->serializer = $serializer ?: Serializer::makeDefault();
     }
 
     public function decodeInput(ContractFunction $function, string $data): DataBlockDecoder
@@ -65,7 +64,7 @@ class ContractFunctionDecoder
         $index = 0;
 
         /** @var DataBlockDecoder $results */
-        $results = new $this->decoderClass($valueTypes);
+        $results = $this->serializer->decoder($valueTypes);
 
         foreach ($valueTypes as $i => $item) {
             /** @var ContractFunctionValueType $item */

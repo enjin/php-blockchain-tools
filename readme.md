@@ -141,16 +141,94 @@ use Enjin\BlockchainTools\Ethereum\ABI\ContractStore;
 
 $store = new ContractStore();
 
-$store->registerContract([
-    'name' => 'my-contract',
-    'address' => '0xabc...',
-    'jsonFile' => '/path/to/abi/json/file'
+$store->registerContracts([
+    [
+        'name' => 'my-contract',
+        'address' => '0xabc...',
+        'jsonFile' => '/path/to/abi/json/file'
+    ]
 ]);
+
+// OR
+$store->registerContract('my-contract', '0xabc...', '/path/to/abi/json/file');
 
 $contract = $store->contract('my-contract');
 
 $contract = $store->contractByAddress('0xabc...');
 
+```
+
+#### Custom Contract Serializers
+
+Custom serializers may be registered for contracts or specific functions/events.
+
+See: [`Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder`](src/Ethereum/ABI/DataBlockDecoder.php)
+See: [`Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder`](src/Ethereum/ABI/DataBlockDecoder.php)
+
+See: [`Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder\BasicDecoder`](src/Ethereum/ABI/DataBlockDecoder/BasicDecoder.php)
+See: [`Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder\BasicEncoder`](src/Ethereum/ABI/DataBlockDecoder/BasicEncoder.php)
+
+```php
+use Enjin\BlockchainTools\Ethereum\ABI\ContractStore;
+use Enjin\BlockchainTools\Ethereum\ABI\Serializer;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder\BasicDecoder;
+use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder\BasicEncoder;
+
+$default = Serializer::makeDefault();
+
+// make a serializer instance with a custom decoder/encoder classes
+// basic decoder/encoder converts:
+//  - string to/from hex
+//  - bytes to/from array of bytes to hex
+//  - php bool to/from hex
+//  - address to/from hex (converted to correct length with prefix removed)
+
+$basic = new Serializer(
+    BasicDecoder::class,
+    BasicEncoder::class
+);
+
+$store = new ContractStore();
+$serializers =  [
+    // default for all functions and events
+    'default' => $default,
+   
+    'functions' => [
+        'myFunction1' => [
+            // replaces contract default
+            // default for input and output of myFunction
+            'default' => $basic,
+
+            // replaces function default for input
+            'input' => $default, 
+            
+            // replaces function default for output
+            'output' => $basic, 
+        ],
+        'myFunction2' => [
+           'default' => $basic,
+        ],
+        // ...
+    ],
+    'events' => [
+        // events only have input and only decode 
+        // so are assigned serializers directly
+        'myEvent1' => $basic,
+        'myEvent2' => $basic,
+        // ...
+    ]   
+];
+
+$store->registerContracts([
+    [
+        'name' => 'my-contract',
+        'address' => '0xabc...',
+        'jsonFile' => '/path/to/abi/json/file',
+        'serializers' => $serializers,
+    ]
+]);
+
+$store->registerContract('my-contract', '0xabc...', '/path/to/abi/json/file', $serializers);
 ```
 
 

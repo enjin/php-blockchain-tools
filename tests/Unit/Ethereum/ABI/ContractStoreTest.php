@@ -6,6 +6,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractStore;
 use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\ContractFileException;
+use Enjin\BlockchainTools\Ethereum\ABI\Serializer;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt8;
@@ -132,5 +133,74 @@ class ContractStoreTest extends TestCase
 
         $result = $store->decodeEvent('test-address', $topics, $data);
         $this->assertEquals($expected, $result->toArray());
+    }
+
+    /**
+     * @covers \Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction
+     * @covers \Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractEvent
+     */
+    public function testCustomSerializers()
+    {
+        $store = new ContractStore();
+
+        $a = new class() extends Serializer {
+        };
+
+        $b = new class() extends Serializer {
+        };
+
+        $c = new class() extends Serializer {
+        };
+
+        $d = new class() extends Serializer {
+        };
+
+        $contractMeta = [
+            'name' => 'test-contract',
+            'address' => 'test-address',
+            'jsonFile' => __DIR__ . '/../../../Support/test-contract.json',
+            'serializers' => [
+                'default' => $a,
+                'functions' => [
+                    'testFunction1' => [
+
+                    ],
+                    'testFunction2' => [
+                        'default' => $b,
+                    ],
+                    'testFunction3' => [
+                        'default' => $b,
+                        'input' => $c,
+                    ],
+                    'testFunction4' => [
+                        'default' => $b,
+                        'input' => $c,
+                        'output' => $d,
+                    ],
+                ],
+                'events' => [
+                    'testEvent2' => $d,
+                ],
+            ],
+        ];
+
+        $store->registerContracts([$contractMeta]);
+
+        $contract = $store->contract('test-contract');
+
+        $this->assertEquals($a, $contract->function('testFunction1')->inputSerializer());
+        $this->assertEquals($a, $contract->function('testFunction1')->outputSerializer());
+
+        $this->assertEquals($b, $contract->function('testFunction2')->inputSerializer());
+        $this->assertEquals($b, $contract->function('testFunction2')->outputSerializer());
+
+        $this->assertEquals($c, $contract->function('testFunction3')->inputSerializer());
+        $this->assertEquals($b, $contract->function('testFunction3')->outputSerializer());
+
+        $this->assertEquals($c, $contract->function('testFunction4')->inputSerializer());
+        $this->assertEquals($d, $contract->function('testFunction4')->outputSerializer());
+
+        $this->assertEquals($a, $contract->event('testEvent1')->serializer());
+        $this->assertEquals($d, $contract->event('testEvent2')->serializer());
     }
 }

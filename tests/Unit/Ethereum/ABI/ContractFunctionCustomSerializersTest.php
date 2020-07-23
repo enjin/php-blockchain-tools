@@ -5,6 +5,7 @@ namespace Tests\Unit\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder\BasicDecoder;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder\BasicEncoder;
+use Enjin\BlockchainTools\Ethereum\ABI\Serializer;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexUInt\HexUInt256;
 use RuntimeException;
@@ -24,8 +25,10 @@ class ContractFunctionCustomSerializersTest extends TestCase
         $serializers = [
             'functions' => [
                 'f' => [
-                    'decoder' => BasicDecoder::class,
-                    'encoder' => BasicEncoder::class,
+                    'default' => new Serializer(
+                        BasicDecoder::class,
+                        BasicEncoder::class
+                    ),
                 ],
             ],
         ];
@@ -47,8 +50,10 @@ class ContractFunctionCustomSerializersTest extends TestCase
         $serializers = [
             'functions' => [
                 'f' => [
-                    'decoder' => BasicDecoder::class,
-                    'encoder' => BasicEncoder::class,
+                    'default' => new Serializer(
+                        BasicDecoder::class,
+                        BasicEncoder::class
+                    ),
                 ],
             ],
         ];
@@ -67,10 +72,10 @@ class ContractFunctionCustomSerializersTest extends TestCase
         $serializers = [
             'functions' => [
                 'f' => [
-                    'input' => [
-                        'decoder' => BasicDecoder::class,
-                        'encoder' => BasicEncoder::class,
-                    ],
+                    'input' => new Serializer(
+                        BasicDecoder::class,
+                        BasicEncoder::class
+                    ),
                 ],
             ],
         ];
@@ -92,10 +97,10 @@ class ContractFunctionCustomSerializersTest extends TestCase
         $serializers = [
             'functions' => [
                 'f' => [
-                    'output' => [
-                        'decoder' => BasicDecoder::class,
-                        'encoder' => BasicEncoder::class,
-                    ],
+                    'output' => new Serializer(
+                        BasicDecoder::class,
+                        BasicEncoder::class
+                    ),
                 ],
             ],
         ];
@@ -126,8 +131,10 @@ class ContractFunctionCustomSerializersTest extends TestCase
         ];
 
         $serializers = [
-            'decoder' => BasicDecoder::class,
-            'encoder' => BasicEncoder::class,
+            'default' => new Serializer(
+                BasicDecoder::class,
+                BasicEncoder::class
+            ),
         ];
 
         $contract = new Contract('foo', 'bar', $json, $serializers);
@@ -175,8 +182,10 @@ class ContractFunctionCustomSerializersTest extends TestCase
         ];
 
         $serializers = [
-            'decoder' => BasicDecoder::class,
-            'encoder' => BasicEncoder::class,
+            'default' => new Serializer(
+                BasicDecoder::class,
+                BasicEncoder::class
+            ),
         ];
 
         $contract = new Contract('foo', 'bar', $json, $serializers);

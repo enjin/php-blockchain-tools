@@ -15,20 +15,14 @@ class ContractStore
     public function registerContracts(array $contractMeta = [])
     {
         foreach ($contractMeta as $meta) {
-            $this->registerContract($meta['name'], $meta['address'], $meta['jsonFile']);
+            $this->registerContract($meta['name'], $meta['address'], $meta['jsonFile'], $meta['serializers'] ?? []);
         }
     }
 
     public function registerContract(string $name, string $address, string $jsonFile, array $config = [])
     {
-        $default = [
-            'decode' => DataBlockDecoder::class,
-            'encode' => DataBlockEncoder::class,
-        ];
-
         $serializers = [
-            'default' => array_merge($default, $config['default'] ?? []),
-
+            'default' => $config['default'] ?? Serializer::makeDefault(),
             'functions' => $config['functions'] ?? [],
             'events' => $config['events'] ?? [],
         ];

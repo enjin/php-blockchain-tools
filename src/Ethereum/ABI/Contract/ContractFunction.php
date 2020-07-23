@@ -2,11 +2,11 @@
 
 namespace Enjin\BlockchainTools\Ethereum\ABI\Contract;
 
-use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionDecoder;
 use Enjin\BlockchainTools\Ethereum\ABI\ContractFunctionEncoder;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockDecoder;
 use Enjin\BlockchainTools\Ethereum\ABI\DataBlockEncoder;
+use Enjin\BlockchainTools\Ethereum\ABI\Serializer;
 use InvalidArgumentException;
 use kornrunner\Keccak;
 
@@ -60,42 +60,29 @@ class ContractFunction
     protected $methodId;
 
     /**
-     * @var string
+     * @var Serializer
      */
-    protected $inputDecoderClass;
+    protected $defaultSerializer;
 
     /**
-     * @var string
+     * @var Serializer
      */
-    protected $inputEncoderClass;
+    protected $inputSerializer;
 
     /**
-     * @var string
+     * @var Serializer
      */
-    protected $outputDecoderClass;
-
-    /**
-     * @var string
-     */
-    protected $outputEncoderClass;
+    protected $outputSerializer;
 
     public function __construct(
         array $function,
-        string $inputDecoderClass = DataBlockDecoder::class,
-        string $inputEncoderClass = DataBlockEncoder::class,
-        string $outputDecoderClass = DataBlockDecoder::class,
-        string $outputEncoderClass = DataBlockEncoder::class
+        Serializer $defaultSerializer = null,
+        Serializer $inputSerializer = null,
+        Serializer $outputSerializer = null
     ) {
-        Contract::validateDecoderClass($inputDecoderClass);
-        Contract::validateEncoderClass($inputEncoderClass);
-
-        Contract::validateDecoderClass($outputDecoderClass);
-        Contract::validateEncoderClass($outputEncoderClass);
-
-        $this->inputDecoderClass = $inputDecoderClass;
-        $this->inputEncoderClass = $inputEncoderClass;
-        $this->outputDecoderClass = $outputDecoderClass;
-        $this->outputEncoderClass = $outputEncoderClass;
+        $this->defaultSerializer = $defaultSerializer ?? Serializer::makeDefault();
+        $this->inputSerializer = $inputSerializer;
+        $this->outputSerializer = $outputSerializer;
 
         $stateMutability = $function['stateMutability'];
 
@@ -196,29 +183,39 @@ class ContractFunction
 
     public function encodeInput(array $data): DataBlockEncoder
     {
-        $functionEncoder = new ContractFunctionEncoder($this->inputEncoderClass);
+        $serializer = $this->inputSerializer();
 
-        return $functionEncoder->encodeInput($this, $data);
+        return (new ContractFunctionEncoder($serializer))->encodeInput($this, $data);
     }
 
     public function decodeInput(string $data): DataBlockDecoder
     {
-        $functionDecoder = new ContractFunctionDecoder($this->inputDecoderClass);
+        $serializer = $this->inputSerializer();
 
-        return $functionDecoder->decodeInput($this, $data);
+        return (new ContractFunctionDecoder($serializer))->decodeInput($this, $data);
     }
 
     public function encodeOutput(array $data): DataBlockEncoder
     {
-        $functionEncoder = new ContractFunctionEncoder($this->outputEncoderClass);
+        $serializer = $this->outputSerializer();
 
-        return $functionEncoder->encodeOutput($this, $data);
+        return (new ContractFunctionEncoder($serializer))->encodeOutput($this, $data);
     }
 
     public function decodeOutput(string $data): DataBlockDecoder
     {
-        $functionDecoder = new ContractFunctionDecoder($this->outputDecoderClass);
+        $serializer = $this->outputSerializer();
 
-        return $functionDecoder->decodeOutput($this, $data);
+        return (new ContractFunctionDecoder($serializer))->decodeOutput($this, $data);
+    }
+
+    public function inputSerializer(): Serializer
+    {
+        return $this->inputSerializer ?: $this->defaultSerializer;
+    }
+
+    public function outputSerializer(): Serializer
+    {
+        return $this->outputSerializer ?: $this->defaultSerializer;
     }
 }
