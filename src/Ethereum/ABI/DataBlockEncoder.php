@@ -153,6 +153,11 @@ class DataBlockEncoder
 
     public function toString(): string
     {
+        return '0x' . $this->toStringUnPrefixed();
+    }
+
+    public function toStringUnPrefixed(): string
+    {
         return $this->methodId() . implode('', $this->toArray());
     }
 

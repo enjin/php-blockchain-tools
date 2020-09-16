@@ -14,7 +14,7 @@ class ContractTest extends TestCase
 {
     use HasContractTestHelpers;
 
-    public function testCreate()
+    public function testCreateWithAddressPrefixed()
     {
         $name = $this->faker()->name;
         $address = $this->faker()->ethAddress;
@@ -23,7 +23,24 @@ class ContractTest extends TestCase
         $contract = new Contract($name, $address, $json);
 
         $this->assertEquals($name, $contract->name());
-        $this->assertEquals($address, $contract->address());
+        $this->assertEquals(strtolower($address), $contract->address());
+
+        $unPrefixed = substr($address, 2);
+        $this->assertEquals(strtolower($unPrefixed), $contract->addressUnPrefixed());
+    }
+
+    public function testCreateWithAddressUnPrefixed()
+    {
+        $name = $this->faker()->name;
+        $address = $this->faker()->ethAddress;
+        $addressUnPrefixed = substr($address, 2);
+        $json = [];
+
+        $contract = new Contract($name, $addressUnPrefixed, $json);
+
+        $this->assertEquals($name, $contract->name());
+        $this->assertEquals(strtolower($address), $contract->address());
+        $this->assertEquals(strtolower($addressUnPrefixed), $contract->addressUnPrefixed());
     }
 
     public function testInvalidFunction()

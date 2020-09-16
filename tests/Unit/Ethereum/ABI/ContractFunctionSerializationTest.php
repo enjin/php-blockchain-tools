@@ -386,7 +386,9 @@ class ContractFunctionSerializationTest extends TestCase
         $this->assertEquals($data, $decoded->toArray(), 'correctly decoded input data');
 
         $this->assertEquals($function->methodId(), $dataBlock->methodId());
-        $this->assertEquals($serializedString, $dataBlock->toString());
+        $this->assertEquals('0x'. $serializedString, $dataBlock->toString());
+        $this->assertEquals($serializedString, $dataBlock->toStringUnPrefixed());
+
     }
 
     public function testEmptyStringAndBytes()

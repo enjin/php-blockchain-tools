@@ -47,7 +47,7 @@ class Contract
 
         $this->setDefaultSerializer($serializer);
         $this->name = $name;
-        $this->address = $address;
+        $this->address = HexConverter::prefix(strtolower($address));
         $this->json = $json;
 
         foreach ($json as $item) {
@@ -82,6 +82,11 @@ class Contract
     public function address(): string
     {
         return $this->address;
+    }
+
+    public function addressUnPrefixed(): string
+    {
+        return HexConverter::unPrefix($this->address);
     }
 
     public function functions(): array
