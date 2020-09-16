@@ -87,5 +87,11 @@ class ContractFunctionTest extends TestCase
         $this->assertInvalidArgumentException($message, function () use ($function) {
             $function->output('invalid-output-name');
         });
+
+        $expectedJson = array_merge($json, [
+            'payable' => false,
+            'constant' => true,
+        ]);
+        $this->assertEquals($expectedJson, $function->toArray());
     }
 }

@@ -218,4 +218,29 @@ class ContractFunction
     {
         return $this->outputSerializer ?: $this->defaultSerializer;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'type' => 'function',
+            'payable' => $this->payable,
+            'constant' => $this->constant,
+            'stateMutability' => $this->stateMutability,
+            'inputs' => $this->contractValuesToArray($this->inputs()),
+            'outputs' => $this->contractValuesToArray($this->outputs()),
+        ];
+    }
+
+    protected function contractValuesToArray(array $values): array
+    {
+        $mapped = array_map(function (ContractFunctionValueType $item) {
+            return [
+                'name' => $item->name(),
+                'type' => $item->type(),
+            ];
+        }, $values);
+
+        return array_values($mapped);
+    }
 }

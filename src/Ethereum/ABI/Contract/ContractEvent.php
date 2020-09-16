@@ -105,4 +105,26 @@ class ContractEvent
     {
         return $this->serializer;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'type' => 'event',
+            'anonymous' => $this->anonymous,
+            'inputs' => $this->contractValuesToArray($this->inputs()),
+        ];
+    }
+
+    protected function contractValuesToArray(array $values): array
+    {
+        $mapped = array_map(function (ContractFunctionValueType $item) {
+            return [
+                'name' => $item->name(),
+                'type' => $item->type(),
+            ];
+        }, $values);
+
+        return array_values($mapped);
+    }
 }
