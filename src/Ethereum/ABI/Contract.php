@@ -51,8 +51,11 @@ class Contract
         $this->json = $json;
 
         foreach ($json as $item) {
-            $name = $item['name'];
             $type = $item['type'] ?? 'function';
+            if ($type == 'constructor') {
+                continue;
+            }
+            $name = $item['name'];
             if ($type === 'function') {
                 $this->functionsMeta[$name] = $item;
             } elseif ($type === 'event') {
@@ -98,7 +101,7 @@ class Contract
         }, $names);
     }
 
-    public function function(string $name): ContractFunction
+    public function function (string $name): ContractFunction
     {
         $this->validateFunctionName($name);
 
