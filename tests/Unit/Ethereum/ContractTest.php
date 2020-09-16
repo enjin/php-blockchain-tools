@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Ethereum\ABI;
+namespace Tests\Unit\Ethereum;
 
 use Enjin\BlockchainTools\Ethereum\ABI\Contract;
 use Enjin\BlockchainTools\HexConverter;
