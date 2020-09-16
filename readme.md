@@ -90,26 +90,26 @@ Classes to represent and convert all valid Int values are in the `HexNumber\HexI
 // all will throw an exception if an invalid value is provided
 // the value must be within the min/max range 
 // if it is a hex it must have the correct number of characters
-$HexInt16 = new HexInt16('0xfefc');
-$HexInt16 = HexInt16::fromHex('0xfefc');
-$HexInt16 = HexInt::fromHexInt16('0xfefc');
-$HexInt16 = HexInt::fromHexIntBitSize(16, '0xfefc');
+$hexInt16 = new HexInt16('0xfefc');
+$hexInt16 = HexInt16::fromHex('0xfefc');
+$hexInt16 = HexInt::fromHexInt16('0xfefc');
+$hexInt16 = HexInt::fromHexIntBitSize(16, '0xfefc');
 
 // creating from a base 10 decimal value
-$HexInt16 = HexInt16::fromInt('-260');
-$HexInt16 = HexInt::fromIntBitSize(16, '-260');
+$hexInt16 = HexInt16::fromInt('-260');
+$hexInt16 = HexInt::fromIntBitSize(16, '-260');
 
-$HexInt16->toPrefixed(); // '0xfefc'
-$HexInt16->toUnPrefixed(); // 'fefc'
-$HexInt16->toDecimal(); // '-260'
-$HexInt16->toHexInt64(); // '0x000000000000fefc'
+$hexInt16->toPrefixed(); // '0xfefc'
+$hexInt16->toUnPrefixed(); // 'fefc'
+$hexInt16->toDecimal(); // '-260'
+$hexInt16->toHexInt64(); // '0x000000000000fefc'
 
 // can only convert to top/bottom of lower bit sizes
 HexInt16::fromHex('0xfe00')->toHexInt8Top(); // '0xfe'
 HexInt16::fromHex('0x00fc')->toHexInt8Bottom(); // '0xfc'
 
 // returned exactly as provided (with our without prefix)
-$HexInt16->toHex(); // '0xfefc'
+$hexInt16->toHex(); // '0xfefc'
 
 // note that prefix remains intact when provided
 HexInt::fromHexInt24('123456')->toHexInt64(); // '0000000000123456'
