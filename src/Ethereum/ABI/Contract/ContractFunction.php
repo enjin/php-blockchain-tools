@@ -84,7 +84,12 @@ class ContractFunction
         $this->inputSerializer = $inputSerializer;
         $this->outputSerializer = $outputSerializer;
 
-        $stateMutability = $function['stateMutability'];
+        // backward compatibility with older abi spec
+        if (!isset($function['stateMutability']) && isset($function['payable'])) {
+            $stateMutability = $function['payable'] ? 'payable' : 'nonpayable';
+        } else {
+            $stateMutability = $function['stateMutability'];
+        }
 
         $this->name = $function['name'];
         $this->payable = $stateMutability === 'payable';
