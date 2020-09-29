@@ -52,7 +52,7 @@ class Contract
 
         foreach ($json as $item) {
             $type = $item['type'] ?? 'function';
-            if ($type == 'constructor') {
+            if (!in_array($type, ['function', 'event'])) {
                 continue;
             }
             $name = $item['name'];
