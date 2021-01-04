@@ -5,6 +5,7 @@ namespace Enjin\BlockchainTools\Ethereum\ABI;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunction;
 use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
+use Enjin\BlockchainTools\HexConverter;
 use RuntimeException;
 use Throwable;
 
@@ -56,12 +57,18 @@ class ContractFunctionEncoder
                         throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported');
                     }
 
+                    foreach ($value as &$v) {
+                        $v = HexConverter::unPrefix($v);
+                    }
+
                     if ($dataType->isDynamicLengthArray()) {
                         $dataBlock->addDynamicLengthArray($item, $value);
                     } else {
                         $dataBlock->addFixedLengthArray($item, $value);
                     }
                 } else {
+                    $value = HexConverter::unPrefix($value);
+
                     if ($baseType === 'string') {
                         $dataBlock->addString($item, $value);
                     } elseif ($baseType === 'bytes') {

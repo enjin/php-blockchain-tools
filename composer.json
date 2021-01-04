@@ -1,5 +1,6 @@
 {
     "name": "enjin/php-blockchain-tools",
+    "description": "Tools for handling hex numbers and decoding contract data.",
     "type": "library",
     "require": {
         "php": ">=7.2",
