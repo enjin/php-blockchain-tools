@@ -3,7 +3,7 @@
 namespace Enjin\BlockchainTools;
 
 use Closure;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 class HexConverter
 {

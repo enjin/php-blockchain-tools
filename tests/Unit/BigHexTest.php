@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Enjin\BlockchainTools\BigHex;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 use stdClass;
 use Tests\TestCase;
 

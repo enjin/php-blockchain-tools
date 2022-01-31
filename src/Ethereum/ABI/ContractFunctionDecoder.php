@@ -7,7 +7,7 @@ use Enjin\BlockchainTools\Ethereum\ABI\Contract\ContractFunctionValueType;
 use Enjin\BlockchainTools\Ethereum\ABI\Exceptions\TypeNotSupportedException;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\Support\StringHelpers as Str;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 use RuntimeException;
 use Throwable;
 

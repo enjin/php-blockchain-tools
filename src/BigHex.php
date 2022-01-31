@@ -3,7 +3,7 @@
 namespace Enjin\BlockchainTools;
 
 use InvalidArgumentException;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 class BigHex
 {
