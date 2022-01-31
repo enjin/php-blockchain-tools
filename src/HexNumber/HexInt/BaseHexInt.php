@@ -4,7 +4,7 @@ namespace Enjin\BlockchainTools\HexNumber\HexInt;
 
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\HexNumber;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 abstract class BaseHexInt extends HexNumber
 {

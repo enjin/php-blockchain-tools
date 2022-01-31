@@ -5,7 +5,7 @@ namespace Enjin\BlockchainTools\HexNumber;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\BlockchainTools\HexNumber\Concerns\ConvertsByBitSize;
 use InvalidArgumentException;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 abstract class HexNumber
 {
