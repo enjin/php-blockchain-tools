@@ -99,7 +99,7 @@ class DataTypeParser
             return $this->parseInt($type, 'uint');
         }
 
-        throw new InvalidArgumentException('Invalid type: ' . $type);
+        return null;
     }
 
     public function parseInt(string $type, string $baseType)
