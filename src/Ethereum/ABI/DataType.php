@@ -33,6 +33,11 @@ class DataType
      * @var string|null
      */
     protected $aliasedFrom;
+    
+    /**
+     * @var array|null
+     */
+    protected $components;
 
     public function __construct(array $data)
     {
@@ -43,7 +48,9 @@ class DataType
             'arrayLength' => null,
             'decimalPrecision' => null,
             'aliasedFrom' => null,
+            'components' => null,
         ];
+        
         $data = array_merge($defaults, $data);
 
         $this->setData(
@@ -52,7 +59,8 @@ class DataType
             $data['bitSize'],
             $data['arrayLength'],
             $data['decimalPrecision'],
-            $data['aliasedFrom']
+            $data['aliasedFrom'],
+            $data['components'],
         );
     }
 
@@ -69,6 +77,11 @@ class DataType
     public function bitSize()
     {
         return $this->bitSize;
+    }
+    
+    public function components(): ?array
+    {
+        return $this->components;
     }
 
     public function arrayLength()
@@ -107,7 +120,8 @@ class DataType
         $bitSize = null,
         $arrayLength = null,
         int $decimalPrecision = null,
-        string $aliasedFrom = null
+        string $aliasedFrom = null,
+        array $components = null
     ) {
         $this->rawType = $rawType;
         $this->baseType = $baseType;
@@ -115,5 +129,6 @@ class DataType
         $this->arrayLength = $arrayLength;
         $this->decimalPrecision = $decimalPrecision;
         $this->aliasedFrom = $aliasedFrom;
+        $this->components = $components;
     }
 }

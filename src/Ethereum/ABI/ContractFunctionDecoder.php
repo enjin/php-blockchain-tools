@@ -17,6 +17,10 @@ class ContractFunctionDecoder
      * @var Serializer
      */
     protected $serializer;
+    
+    protected int $index = 0;
+    
+    protected ?DataBlockDecoder $results = null;
 
     public function __construct(Serializer $serializer = null)
     {
@@ -45,12 +49,12 @@ class ContractFunctionDecoder
     {
         $data = $this->removeSignatureFromData($methodId, $data);
 
-        return $this->decodeData($valueTypes, $data);
+        return $this->decodeDataBlock($valueTypes, $data);
     }
 
     public function decodeWithoutMethodId(array $valueTypes, string $data)
     {
-        return $this->decodeData($valueTypes, $data);
+        return $this->decodeDataBlock($valueTypes, $data);
     }
 
     public function removeSignatureFromData(string $methodId, string $data): string
@@ -58,85 +62,17 @@ class ContractFunctionDecoder
         return Str::removeFromBeginning($data, $methodId);
     }
 
-    protected function decodeData(array $valueTypes, string $data): DataBlockDecoder
+    protected function decodeDataBlock(array $valueTypes, string $data): DataBlockDecoder
     {
         $data = HexConverter::unPrefix($data);
-        $index = 0;
 
-        /** @var DataBlockDecoder $results */
-        $results = $this->serializer->decoder($valueTypes);
+        $this->results = $this->serializer->decoder($valueTypes);
 
         foreach ($valueTypes as $i => $item) {
-            /** @var ContractFunctionValueType $item */
             $itemName = $item->name() ?: $i;
 
-            $dataType = $item->dataType();
-            $rawType = $item->type();
-            $baseType = $dataType->baseType();
-            $isArray = $dataType->isArray();
-
             try {
-                if ($isArray) {
-                    if ($baseType === 'string') {
-                        throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported');
-                    }
-                    if ($baseType === 'bytes' && $dataType->bitSize() === 'dynamic') {
-                        throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported');
-                    }
-
-                    if ($dataType->isDynamicLengthArray()) {
-                        $startIndex = $this->uIntFromIndex($data, $index) * 2;
-
-                        $valuesIndex = $startIndex + 64;
-                        $arrayLength = $this->uIntFromIndex($data, $startIndex);
-
-                        $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
-
-                        $results->addDynamicLengthArray($item, $hexValues);
-
-                        $index += 64;
-
-                        continue;
-                    }
-
-                    // fixed length array
-                    $valuesIndex = $index;
-                    $arrayLength = $dataType->arrayLength();
-
-                    $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
-
-                    $results->addFixedLengthArray($item, $hexValues);
-
-                    $index += $arrayLength * 64;
-
-                    continue;
-                }
-
-                $dynamicLengthTypes = ['bytes', 'string'];
-                if (in_array($baseType, $dynamicLengthTypes) && $dataType->bitSize() === 'dynamic') {
-                    $startIndex = $this->uIntFromIndex($data, $index) * 2;
-                    $valuesIndex = $startIndex + 64;
-
-                    $length = $this->uIntFromIndex($data, $startIndex) * 2;
-
-                    $hexValue = $this->hexFromIndex($data, $valuesIndex, $length);
-
-                    if ($baseType === 'bytes') {
-                        $results->addDynamicLengthBytes($item, $hexValue);
-                    } elseif ($baseType === 'string') {
-                        $results->addString($item, $hexValue);
-                    }
-
-                    $index += 64;
-
-                    continue;
-                }
-
-                $hex = $this->hexFromIndex($data, $index, 64);
-
-                $results->add($item, $hex);
-
-                $index += 64;
+                $this->decodeData($item, $data);
             } catch (Throwable $e) {
                 $message = 'when attempting to decode: ' . $itemName . ', caught ' . get_class($e) . ': ' . $e->getMessage();
 
@@ -144,7 +80,76 @@ class ContractFunctionDecoder
             }
         }
 
-        return $results;
+        return $this->results;
+    }
+    
+    protected function decodeData($item, string $data)
+    {
+        $dataType = $item->dataType();
+        $baseType = $dataType->baseType();
+        $isArray = $dataType->isArray();
+        
+        if ($isArray) {
+            if ($baseType === 'string') {
+                throw new TypeNotSupportedException('string arrays (eg string[] or string[99]) are not supported');
+            }
+            if ($baseType === 'bytes' && $dataType->bitSize() === 'dynamic') {
+                throw new TypeNotSupportedException('bytes arrays (eg bytes[] or bytes[99]) are not supported');
+            }
+            
+            if ($dataType->isDynamicLengthArray()) {
+                $startIndex = $this->uIntFromIndex($data, $this->index) * 2;
+                
+                $valuesIndex = $startIndex + 64;
+                $arrayLength = $this->uIntFromIndex($data, $startIndex);
+                
+                $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
+    
+                $this->results->addDynamicLengthArray($item, $hexValues);
+    
+                $this->index += 64;
+            }
+            
+            // fixed length array
+            $valuesIndex = $this->index;
+            $arrayLength = $dataType->arrayLength();
+            
+            if ($baseType === 'tuple' && !empty($dataType->components())) {
+                foreach($dataType->components() as $component) {
+                    $this->decodeData($component, $data);
+                }
+            }
+            
+            $hexValues = $this->hexArrayFromIndex($data, $valuesIndex, $arrayLength);
+    
+            $this->results->addFixedLengthArray($item, $hexValues);
+            
+            $this->index += $arrayLength * 64;
+        }
+        
+        $dynamicLengthTypes = ['bytes', 'string'];
+        if (in_array($baseType, $dynamicLengthTypes) && $dataType->bitSize() === 'dynamic') {
+            $startIndex = $this->uIntFromIndex($data, $this->index) * 2;
+            $valuesIndex = $startIndex + 64;
+            
+            $length = $this->uIntFromIndex($data, $startIndex) * 2;
+            
+            $hexValue = $this->hexFromIndex($data, $valuesIndex, $length);
+            
+            if ($baseType === 'bytes') {
+                $this->results->addDynamicLengthBytes($item, $hexValue);
+            } elseif ($baseType === 'string') {
+                $this->results->addString($item, $hexValue);
+            }
+    
+            $this->index += 64;
+        }
+        
+        $hex = $this->hexFromIndex($data, $this->index, 64);
+    
+        $this->results->add($item, $hex);
+    
+        $this->index += 64;
     }
 
     protected function uIntFromIndex(string $data, int $index): int

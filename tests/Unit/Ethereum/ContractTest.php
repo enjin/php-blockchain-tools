@@ -247,12 +247,12 @@ class ContractTest extends TestCase
                         'type' => 'tuple',
                         'components' => [
                             [
-                                'name' => 'myTupleNumber',
-                                'type' => 'uint256',
+                                'name' => 'assetClass',
+                                'type' => 'bytes4',
                             ],
                             [
-                                'name' => 'myTupleBool',
-                                'type' => 'bool',
+                                'name' => 'data',
+                                'type' => 'bytes',
                             ],
                         ],
                     ]
@@ -272,9 +272,9 @@ class ContractTest extends TestCase
             'myNumber' => HexUInt256::fromUInt(62224)->toHex(),
             'mySmallNumber' => HexUInt8::fromUInt(16)->toHexUInt256(),
             'myString' => HexConverter::stringToHex('Hello%!'),
-            'tuple' => [
-                'myTupleNumber' => HexUInt256::fromUInt(45121)->toHex(),
-                'myTupleBool' => true,
+            'myTuple' => [
+                'assetClass' => '73ad2146',
+                'data' => '000000000000000000000000f5de760f2e916647fd766b4ad9e85ff943ce3a2b0000000000000000000000000000000000000000000000000000000000043298',
             ],
         ];
 
@@ -285,9 +285,15 @@ class ContractTest extends TestCase
         ];
 
         $serialized = [
-            '0000000000000000000000000000000000000000000000000000000000000020',
+            '0000000000000000000000000000000000000000000000000000000000000040',
+            '0000000000000000000000000000000000000000000000000000000000000080',
             '0000000000000000000000000000000000000000000000000000000000000007',
             '48656c6c6f252100000000000000000000000000000000000000000000000000',
+            '73ad214600000000000000000000000000000000000000000000000000000000',
+            '0000000000000000000000000000000000000000000000000000000000000040',
+            '0000000000000000000000000000000000000000000000000000000000000040',
+            '000000000000000000000000f5de760f2e916647fd766b4ad9e85ff943ce3a2b',
+            '0000000000000000000000000000000000000000000000000000000000043298',
         ];
 
         $data = implode('', $serialized);

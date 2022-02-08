@@ -32,7 +32,7 @@ class ContractFunctionValueType
         $this->name = $input['name'];
         $this->type = $input['type'];
         $this->components = $input['components'] ?? null;
-        $this->dataType = (new DataTypeParser())->parse($this->type);
+        $this->dataType = (new DataTypeParser())->parse($this->type, $this->components);
     }
 
     public function name(): string

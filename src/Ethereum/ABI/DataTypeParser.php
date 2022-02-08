@@ -8,16 +8,16 @@ use InvalidArgumentException;
 
 class DataTypeParser
 {
-    public function parse(string $type): DataType
+    public function parse(string $type, ?array $components = null): DataType
     {
         if (substr($type, -1) === ']') {
-            $this->parseArray($type);
+            return $this->parseArray($type);
         }
 
-        return $this->parseType($type);
+        return $this->parseType($type, $components);
     }
 
-    public function parseType(string $type)
+    public function parseType(string $type, ?array $components = null)
     {
         if ($type === 'string') {
             return new DataType([
@@ -54,10 +54,16 @@ class DataTypeParser
         }
     
         if ($type === 'tuple') {
+            $children = [];
+            foreach($components as $component) {
+                $children[] = $this->parseType($component['type'], $component['components'] ?? null);
+            };
+            
             return new DataType([
                 'rawType' => 'tuple',
                 'baseType' => 'tuple',
-                'bitSize' => 'dynamic',
+                'components' => $children,
+                'arrayLength' => count($children),
             ]);
         }
 
