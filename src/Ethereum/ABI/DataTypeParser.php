@@ -10,40 +10,8 @@ class DataTypeParser
 {
     public function parse(string $type): DataType
     {
-        $last1 = substr($type, -1);
-        $isArray = $last1 === ']';
-
-        if ($isArray) {
-            $arrayMeta = $this->parseArrayLength($type);
-            $arrayLength = $arrayMeta['length'];
-            $arrayType = $arrayMeta['type'];
-
-            $parsed = $this->parseType($arrayType);
-
-            $baseType = $parsed->baseType();
-            $bitSize = $parsed->bitSize();
-            $aliasedFrom = $parsed->aliasedFrom();
-            $decimalPrecision = $parsed->decimalPrecision();
-
-            if ($aliasedFrom) {
-                if ($arrayLength === 'dynamic') {
-                    $arraySuffix = '[]';
-                } else {
-                    $arraySuffix = '[' . $arrayLength . ']';
-                }
-
-                $type = $baseType . $bitSize . $arraySuffix;
-                $aliasedFrom = $aliasedFrom . $arraySuffix;
-            }
-
-            return new DataType([
-                'rawType' => $type,
-                'baseType' => $baseType,
-                'bitSize' => $bitSize,
-                'arrayLength' => $arrayLength,
-                'decimalPrecision' => $decimalPrecision,
-                'aliasedFrom' => $aliasedFrom,
-            ]);
+        if (substr($type, -1) === ']') {
+            $this->parseArray($type);
         }
 
         return $this->parseType($type);
@@ -82,6 +50,14 @@ class DataTypeParser
                 'rawType' => 'address',
                 'baseType' => 'address',
                 'bitSize' => 160,
+            ]);
+        }
+    
+        if ($type === 'tuple') {
+            return new DataType([
+                'rawType' => 'tuple',
+                'baseType' => 'tuple',
+                'bitSize' => 'dynamic',
             ]);
         }
 
@@ -125,7 +101,7 @@ class DataTypeParser
         } else {
             $suffix = Str::removeFromBeginning($type, $baseType);
 
-            list($bitSize, $decimalPrecision) = explode('x', $suffix, 2);
+            [$bitSize, $decimalPrecision] = explode('x', $suffix, 2);
 
             if (!is_numeric($bitSize)) {
                 throw new InvalidArgumentException('invalid bit size: ' . $bitSize . ', in: ' . $type);
@@ -181,6 +157,39 @@ class DataTypeParser
         }
 
         return $length;
+    }
+    
+    public function parseArray(string $type) {
+        $arrayMeta = $this->parseArrayLength($type);
+        $arrayLength = $arrayMeta['length'];
+        $arrayType = $arrayMeta['type'];
+    
+        $parsed = $this->parseType($arrayType);
+    
+        $baseType = $parsed->baseType();
+        $bitSize = $parsed->bitSize();
+        $aliasedFrom = $parsed->aliasedFrom();
+        $decimalPrecision = $parsed->decimalPrecision();
+    
+        if ($aliasedFrom) {
+            if ($arrayLength === 'dynamic') {
+                $arraySuffix = '[]';
+            } else {
+                $arraySuffix = '[' . $arrayLength . ']';
+            }
+        
+            $type = $baseType . $bitSize . $arraySuffix;
+            $aliasedFrom = $aliasedFrom . $arraySuffix;
+        }
+    
+        return new DataType([
+            'rawType' => $type,
+            'baseType' => $baseType,
+            'bitSize' => $bitSize,
+            'arrayLength' => $arrayLength,
+            'decimalPrecision' => $decimalPrecision,
+            'aliasedFrom' => $aliasedFrom,
+        ]);
     }
 
     public function parseArrayLength(string $type)

@@ -229,10 +229,6 @@ class ContractTest extends TestCase
             [
                 'inputs' => [
                     [
-                        'name' => 'myString',
-                        'type' => 'string',
-                    ],
-                    [
                         'name' => 'myNumber',
                         'type' => 'uint256',
                         'indexed' => true,
@@ -242,6 +238,24 @@ class ContractTest extends TestCase
                         'type' => 'uint8',
                         'indexed' => true,
                     ],
+                    [
+                        'name' => 'myString',
+                        'type' => 'string',
+                    ],
+                    [
+                        'name' => 'myTuple',
+                        'type' => 'tuple',
+                        'components' => [
+                            [
+                                'name' => 'myTupleNumber',
+                                'type' => 'uint256',
+                            ],
+                            [
+                                'name' => 'myTupleBool',
+                                'type' => 'bool',
+                            ],
+                        ],
+                    ]
                 ],
                 'name' => 'testEvent',
                 'type' => 'event',
@@ -255,9 +269,13 @@ class ContractTest extends TestCase
         $topic = $event->signatureTopic();
 
         $expected = [
-            'myString' => HexConverter::stringToHex('Hello%!'),
             'myNumber' => HexUInt256::fromUInt(62224)->toHex(),
             'mySmallNumber' => HexUInt8::fromUInt(16)->toHexUInt256(),
+            'myString' => HexConverter::stringToHex('Hello%!'),
+            'tuple' => [
+                'myTupleNumber' => HexUInt256::fromUInt(45121)->toHex(),
+                'myTupleBool' => true,
+            ],
         ];
 
         $topics = [

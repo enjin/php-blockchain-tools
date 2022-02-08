@@ -33,8 +33,7 @@ class ContractStoreTest extends TestCase
 
         $contract = $store->contractByAddress($address);
 
-        $expectedAddress = substr($address, 2);
-        $expectedAddress = strtolower($expectedAddress);
+        $expectedAddress = strtolower($address);
 
         $this->assertEquals($expectedAddress, $contract->address());
         $this->assertEquals($name, $contract->name());

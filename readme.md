@@ -125,7 +125,6 @@ $paddedHex = HexInt16::padLeft('0x12'); // '0x0012'
  - string[]
  - bytes[]
  - multi-dimensional arrays (uint16[][])
- - tuple
  - fixed
  - ufixed
 

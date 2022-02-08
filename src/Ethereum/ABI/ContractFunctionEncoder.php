@@ -67,7 +67,9 @@ class ContractFunctionEncoder
                         $dataBlock->addFixedLengthArray($item, $value);
                     }
                 } else {
-                    $value = HexConverter::unPrefix($value);
+                    if ($baseType !== 'bytes') {
+                        $value = HexConverter::unPrefix($value);
+                    }
 
                     if ($baseType === 'string') {
                         $dataBlock->addString($item, $value);
