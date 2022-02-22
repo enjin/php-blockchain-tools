@@ -1,25 +1,7 @@
-/node_modules
-/public/api-docs
-/public/css
-/public/hot
-/public/js
-/public/mix-manifest.json
-/public/storage
-/schema.json
-/storage/*.key
-/storage/debugbar
 /vendor
 /.idea
-/.vscode
-/.vagrant
-Homestead.json
-Homestead.yaml
-npm-debug.log
-*.env
-*.env.*
-.DS_Store
-.orig
-.phpunit.result.cache
-.php_cs.cache
-/.phpstorm.meta.php
-/_ide_helper.php
+composer.lock
+.*.cache
+.php_cs export-ignore
+.php-cs-fixer export-ignore
+phpunit.xml export-ignore
