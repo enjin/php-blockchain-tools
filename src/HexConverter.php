@@ -251,6 +251,16 @@ class HexConverter
 
     public static function hexToAddressPrefixed(string $hex): string
     {
-        return self::prefix(substr($hex, -40));
+        return self::prefix(substr(strtolower($hex), -40));
+    }
+
+    public static function addressToEventTopic(string $address): string
+    {
+        return str_pad(strtolower(self::unprefix($address)), 64, '0', STR_PAD_LEFT);
+    }
+
+    public static function addressToEventTopicPrefixed(string $address): string
+    {
+        return self::prefix(self::addressToEventTopic($address));
     }
 }
