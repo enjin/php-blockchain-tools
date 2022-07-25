@@ -249,9 +249,14 @@ class HexConverter
         return $value;
     }
 
+    public static function hexToAddress(string $hex): string
+    {
+        return substr(strtolower($hex), -40);
+    }
+
     public static function hexToAddressPrefixed(string $hex): string
     {
-        return self::prefix(substr(strtolower($hex), -40));
+        return self::prefix(self::hexToAddress($hex));
     }
 
     public static function addressToEventTopic(string $address): string
