@@ -248,4 +248,9 @@ class HexConverter
 
         return $value;
     }
+
+    public static function hexToAddressPrefixed(string $hex): string
+    {
+        return self::prefix(substr($hex, -40));
+    }
 }
