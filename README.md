@@ -10,24 +10,24 @@ Contains static utility functions for handling decimal and hex data.
 
 #### Conversion Method Reference
 
-| Method  | From                        | To                                   |
-| ----- |-----------------------------|--------------------------------------|
-| `hexToInt` | signed int (base 16)        | signed int (base 10)                 |
-| `intToHex` | signed int (base 10)        | signed int (base 16)                 |
-| `intToHexPrefixed` |                             | `0x` prefixed                        |
-| `hexToUInt` | unsigned int (base 16)      | unsigned int (base 10)               |
-| `uIntToHex` | unsigned int (base 10)      | unsigned int (base 16)               |
-| `uIntToHexPrefixed` |                             | `0x` prefixed                        |
-| `hexToString` | hex encoded string (base 16) | decoded string                       
-| `stringToHex` | decoded string              | hex encoded string (base 16)         |
-| `stringToHexPrefixed` |                             | `0x` prefixed                        |
-| `hexToBytes` | hex encoded bytes (base 16) | array of bytes                       
-| `bytesToHex` | array of bytes              | hex encoded bytes (base 16)          |
-| `bytesToHexPrefixed` |                             | `0x` prefixed                        |
-| `hexToAddress` | hex string                  | address                              |
-| `hexToAddressPrefixed` |                             | `0x` prefixed                        |
-| `addressToEventTopic` | address                     | address padded to event topic length |
-| `addressToEventTopicPrefixed` | | `0x` prefixed                        |
+| Method                        | From                         | To                            |
+|-------------------------------|------------------------------|-------------------------------|
+| `hexToInt`                    | signed int (base 16)         | signed int (base 10)          |
+| `intToHex`                    | signed int (base 10)         | signed int (base 16)          |
+| `intToHexPrefixed`            |                              | `0x` prefixed                 |
+| `hexToUInt`                   | unsigned int (base 16)       | unsigned int (base 10)        |
+| `uIntToHex`                   | unsigned int (base 10)       | unsigned int (base 16)        |
+| `uIntToHexPrefixed`           |                              | `0x` prefixed                 |
+| `hexToString`                 | hex encoded string (base 16) | decoded string                |
+| `stringToHex`                 | decoded string               | hex encoded string (base 16)  |
+| `stringToHexPrefixed`         |                              | `0x` prefixed                 |
+| `hexToBytes`                  | hex encoded bytes (base 16)  | array of bytes                |
+| `bytesToHex`                  | array of bytes               | hex encoded bytes (base 16)   |
+| `bytesToHexPrefixed`          |                              | `0x` prefixed                 |
+| `hexToAddress`                | hex string                   | address                       |
+| `hexToAddressPrefixed`        |                              | `0x` prefixed                 |
+| `addressToEventTopic`         | address                      | address padded to event topic |
+| `addressToEventTopicPrefixed` |                              | `0x` prefixed                 |
 
 ### BigHex
 
