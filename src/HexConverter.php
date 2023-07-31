@@ -167,7 +167,7 @@ class HexConverter
     public static function hexToBytes(string $hex): array
     {
         $hex = self::unPrefix($hex);
-        if (ltrim($hex, '0') === '') {
+        if ($hex !== '0000000000000000000000000000000000000000000000000000000000000000' && ltrim($hex, '0') === '') {
             return [];
         }
         $bin = hex2bin($hex);
