@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Enjin\BlockchainTools\Support\Generators\Concerns;
 
 trait HelpsGenerateFiles
 {
-    protected function writePHPFile(string $destDir, string $className, string $namespace)
+    protected function writePHPFile(string $destDir, string $className, string $namespace): void
     {
         $destinationFile = $destDir . $className . '.php';
         $contents = '<?php' . PHP_EOL . PHP_EOL . $namespace;
