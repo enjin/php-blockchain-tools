@@ -14,10 +14,10 @@ class UIntGenerator
 {
     use HelpsGenerateFiles;
 
-    protected const NAMESPACE = 'Enjin\BlockchainTools\HexNumber';
-    protected const DIR = __DIR__ . '/../../../src/HexNumber';
+    protected const string NAMESPACE = 'Enjin\BlockchainTools\HexNumber';
+    protected const string DIR = __DIR__ . '/../../../src/HexNumber';
 
-    public function generate()
+    public function generate(): void
     {
         $sizes = $this->getIntLengths();
 
@@ -40,7 +40,7 @@ class UIntGenerator
         $this->writePHPFile($destDir, $className, $contents);
     }
 
-    public function makeHexUIntSizeClass(int $size, array $sizes)
+    public function makeHexUIntSizeClass(int $size, array $sizes): array
     {
         $namespaceString = static::NAMESPACE . '\HexUInt';
         $namespace = new PhpNamespace($namespaceString);
@@ -68,19 +68,19 @@ class UIntGenerator
         foreach ($sizes as $targetSize) {
             if ($targetSize === $size) {
                 $class->addMethod('toHexUInt' . $targetSize)
-                    ->setReturnType(Type::STRING)
+                    ->setReturnType(Type::String)
                     ->addBody('return $this->value;');
             } elseif ($targetSize < $size) {
                 $class->addMethod('toHexUInt' . $targetSize . 'Top')
-                    ->setReturnType(Type::STRING)
+                    ->setReturnType(Type::String)
                     ->addBody('return $this->convertDownToTop(' . $targetSize . ');');
 
                 $class->addMethod('toHexUInt' . $targetSize . 'Bottom')
-                    ->setReturnType(Type::STRING)
+                    ->setReturnType(Type::String)
                     ->addBody('return $this->convertDownToBottom(' . $targetSize . ');');
             } elseif ($size < $targetSize) {
                 $class->addMethod('toHexUInt' . $targetSize)
-                    ->setReturnType(Type::STRING)
+                    ->setReturnType(Type::String)
                     ->addBody('return $this->convertUpTo(' . $targetSize . ');');
             }
         }
@@ -92,7 +92,7 @@ class UIntGenerator
         ];
     }
 
-    public function makeHexUIntConverterClass(array $sizes)
+    public function makeHexUIntConverterClass(array $sizes): array
     {
         $namespace = new PhpNamespace(static::NAMESPACE);
 
@@ -133,7 +133,7 @@ class UIntGenerator
                 ->setReturnType($targetClass);
 
             $method->addParameter($paramName)
-                ->setType(Type::STRING);
+                ->setType(Type::String);
         }
 
         $printer = new PsrPrinter;
@@ -144,16 +144,16 @@ class UIntGenerator
         ];
     }
 
-    protected function addFromHexBitSizeMethod(ClassType $class)
+    protected function addFromHexBitSizeMethod(ClassType $class): void
     {
         $method = $class->addMethod('fromHexUIntBitSize')
             ->setStatic();
 
         $method->addParameter('bitSize')
-            ->setType(Type::INT);
+            ->setType(Type::Int);
 
         $method->addParameter('hex')
-            ->setType(Type::STRING);
+            ->setType(Type::String);
 
         $method->setBody('
 if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
@@ -166,16 +166,16 @@ return new $class($hex);
                 ');
     }
 
-    protected function addFromNumberBitSizeMethod(ClassType $class)
+    protected function addFromNumberBitSizeMethod(ClassType $class): void
     {
         $method = $class->addMethod('fromUIntBitSize')
             ->setStatic();
 
         $method->addParameter('bitSize')
-            ->setType(Type::INT);
+            ->setType(Type::Int);
 
         $method->addParameter('int')
-            ->setType(Type::STRING);
+            ->setType(Type::String);
 
         $method->setBody('
 if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {

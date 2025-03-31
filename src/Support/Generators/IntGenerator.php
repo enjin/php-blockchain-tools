@@ -14,10 +14,10 @@ class IntGenerator
 {
     use HelpsGenerateFiles;
 
-    protected const NAMESPACE = 'Enjin\BlockchainTools\HexNumber';
-    protected const DIR = __DIR__ . '/../../../src/HexNumber';
+    protected const string NAMESPACE = 'Enjin\BlockchainTools\HexNumber';
+    protected const string DIR = __DIR__ . '/../../../src/HexNumber';
 
-    public function generate()
+    public function generate(): void
     {
         $sizes = $this->getIntLengths();
 
@@ -40,7 +40,7 @@ class IntGenerator
         $this->writePHPFile($destDir, $className, $contents);
     }
 
-    public function makeHexIntSizeClass(int $size, array $sizes)
+    public function makeHexIntSizeClass(int $size, array $sizes): array
     {
         $namespaceString = static::NAMESPACE . '\HexInt';
         $namespace = new PhpNamespace($namespaceString);
@@ -75,11 +75,11 @@ class IntGenerator
         foreach ($sizes as $targetSize) {
             if ($targetSize === $size) {
                 $class->addMethod('toHexInt' . $targetSize)
-                    ->setReturnType(Type::STRING)
+                    ->setReturnType(Type::String)
                     ->addBody('return $this->value;');
             } elseif ($size < $targetSize) {
                 $class->addMethod('toHexInt' . $targetSize)
-                    ->setReturnType(Type::STRING)
+                    ->setReturnType(Type::String)
                     ->addBody('return $this->convertUpTo(' . $targetSize . ');');
             }
         }
@@ -91,7 +91,7 @@ class IntGenerator
         ];
     }
 
-    public function makeHexIntConverterClass(array $sizes)
+    public function makeHexIntConverterClass(array $sizes): array
     {
         $namespace = new PhpNamespace(static::NAMESPACE);
 
@@ -132,7 +132,7 @@ class IntGenerator
                 ->setReturnType($targetClass);
 
             $method->addParameter($paramName)
-                ->setType(Type::STRING);
+                ->setType(Type::String);
         }
 
         $printer = new PsrPrinter;
@@ -143,16 +143,16 @@ class IntGenerator
         ];
     }
 
-    protected function addFromHexBitSizeMethod(ClassType $class)
+    protected function addFromHexBitSizeMethod(ClassType $class): void
     {
         $method = $class->addMethod('fromHexIntBitSize')
             ->setStatic();
 
         $method->addParameter('bitSize')
-            ->setType(Type::INT);
+            ->setType(Type::Int);
 
         $method->addParameter('hex')
-            ->setType(Type::STRING);
+            ->setType(Type::String);
 
         $method->setBody('
 if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {
@@ -165,16 +165,16 @@ return new $class($hex);
                 ');
     }
 
-    protected function addFromNumberBitSizeMethod(ClassType $class)
+    protected function addFromNumberBitSizeMethod(ClassType $class): void
     {
         $method = $class->addMethod('fromIntBitSize')
             ->setStatic();
 
         $method->addParameter('bitSize')
-            ->setType(Type::INT);
+            ->setType(Type::Int);
 
         $method->addParameter('int')
-            ->setType(Type::STRING);
+            ->setType(Type::String);
 
         $method->setBody('
 if (!array_key_exists($bitSize, static::BIT_SIZE_TO_CLASS)) {

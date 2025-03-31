@@ -3,16 +3,21 @@
     "description": "Tools for handling hex numbers and decoding contract data.",
     "type": "library",
     "require": {
-        "php": "^8.0|^8.1",
+        "php": "^8.3|^8.4",
+        "ext-sodium": "*",
         "kornrunner/keccak": "^1.0",
-        "phpseclib/phpseclib": "^3.0"
+        "phpseclib/phpseclib": "^3.0",
+        "tuupola/base58": "^2.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
-        "fakerphp/faker": "^1.18",
-        "symfony/var-dumper": "^6.0",
-        "mockery/mockery": "^1.5",
-        "nette/php-generator": "^v3.6"
+        "fakerphp/faker": "^1.24",
+        "symfony/var-dumper": "^7.0",
+        "mockery/mockery": "^1.6",
+        "nette/php-generator": "^v4.0"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
     },
     "autoload": {
         "psr-4": {
