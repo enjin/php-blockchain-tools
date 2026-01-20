@@ -161,7 +161,7 @@ class HexConverter
     {
         $hex = self::unPrefix($hex);
 
-        return (string) (new BigInteger($hex, 16))->toString();
+        return (new BigInteger($hex, 16))->toString();
     }
 
     public static function hexToBytes(string $hex): array
@@ -170,7 +170,19 @@ class HexConverter
         if ($hex !== '0000000000000000000000000000000000000000000000000000000000000000' && ltrim($hex, '0') === '') {
             return [];
         }
-        $bin = hex2bin($hex);
+
+        // Ensure even length for hex2bin (pad with leading zero if odd length)
+        if (strlen($hex) % 2 !== 0) {
+            $hex = '0' . $hex;
+        }
+
+        // Add @ to mute warning because hex2bin returns false on invalid hex string
+        $bin = @hex2bin($hex);
+
+        if ($bin === false) {
+            return [];
+        }
+
         $array = unpack('C*', $bin);
 
         return array_values($array);
