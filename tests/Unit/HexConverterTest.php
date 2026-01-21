@@ -268,4 +268,18 @@ class HexConverterTest extends TestCase
 
         $this->assertEquals($hex, HexConverter::bytesToHex($bytes));
     }
+
+    /**
+     * @covers \Enjin\BlockchainTools\HexConverter::hexToBytes
+     */
+    public function testHexToBytesOddLength()
+    {
+        // Odd length hex should be padded with leading zero
+        $this->assertEquals([1], HexConverter::hexToBytes('1'));
+        $this->assertEquals([1], HexConverter::hexToBytes('0x1'));
+        $this->assertEquals([1, 35], HexConverter::hexToBytes('123'));
+        $this->assertEquals([1, 35], HexConverter::hexToBytes('0x123'));
+        $this->assertEquals([13, 119, 82], HexConverter::hexToBytes('d7752'));
+        $this->assertEquals([13, 119, 82], HexConverter::hexToBytes('0xd7752'));
+    }
 }
